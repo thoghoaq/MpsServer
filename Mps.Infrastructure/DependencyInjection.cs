@@ -1,5 +1,6 @@
 ﻿using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mps.Application.Abstractions.Authentication;
@@ -17,6 +18,19 @@ namespace Mps.Infrastructure
             });
 
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
+
+            services.AddHttpClient<IJwtProvider, JwtProvider>(client =>
+            {
+                client.BaseAddress = new Uri(configuration.GetSection("Authentication:TokenUri").Value!);
+            });
+
+            services.AddAuthentication()
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.Authority = configuration.GetSection("Authentication:ValidIssuer").Value;
+                    options.Audience = configuration.GetSection("Authentication:Audience").Value;
+                    options.TokenValidationParameters.ValidIssuer = configuration.GetSection("Authentication:ValidIssuer").Value;
+                });
         }
     }
 }

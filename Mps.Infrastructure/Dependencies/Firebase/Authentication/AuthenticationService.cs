@@ -18,6 +18,13 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Authentication
         public async Task DeleteAccountAsync(string email, CancellationToken cancellationToken)
         {
             await FirebaseAuth.DefaultInstance.DeleteUserAsync(email, cancellationToken);
+
+            FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(email);
+        }
+
+        public Task<string> LoginAsync(string email, string password, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

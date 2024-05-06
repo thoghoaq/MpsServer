@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mps.Application.Features.Account;
 
@@ -10,12 +11,13 @@ namespace Mps.Api.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
+        [Authorize]
         [HttpGet]
         [Route("all")]
         public async Task<IActionResult> GetAllUsers()
         {
             var result = await _mediator.Send(new GetAllUsers.Query());
-            return result.IsSuccess ? Ok(result.Payload) : BadRequest(result.FailureReason);
+            return result.IsSuccess ? Ok(result.Payload?.Users) : BadRequest(result.FailureReason);
         }
         /// <summary>
         /// Register user with role Admin, User and Supplier
@@ -41,7 +43,35 @@ namespace Mps.Api.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _mediator.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(new
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        /// <summary>
+        /// Login with email and password
+        /// </summary>
+        /// <remarks>
+        /// Example request:
+        /// 
+        ///     {
+        ///         "email": "thonght150201@gmail.com",
+        ///         "password": "User@123"
+        ///     }
+        /// </remarks>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login([FromBody] Login.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
             {
                 reason = result.FailureReason
             });
