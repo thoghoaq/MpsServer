@@ -8,11 +8,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Mps.Domain.Migrations
+namespace Mps.Api.Migrations
 {
     [DbContext(typeof(MpsDbContext))]
-    [Migration("20240506110532_initial")]
-    partial class initial
+    [Migration("20240506153137_UpdateEmail")]
+    partial class UpdateEmail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,11 +40,21 @@ namespace Mps.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("IdentityId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("UserId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IdentityId")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

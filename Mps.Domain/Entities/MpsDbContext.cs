@@ -8,6 +8,9 @@ namespace Mps.Domain.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasKey(u => u.UserId);
+            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder.Entity<User>().Property(u => u.Role).IsRequired();
+            modelBuilder.Entity<User>().HasIndex(u => u.IdentityId).IsUnique();
         }
     }
 }

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Mps.Domain.Migrations
+namespace Mps.Api.Migrations
 {
     [DbContext(typeof(MpsDbContext))]
     partial class MpsDbContextModelSnapshot : ModelSnapshot
@@ -37,11 +37,21 @@ namespace Mps.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("IdentityId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("UserId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IdentityId")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
