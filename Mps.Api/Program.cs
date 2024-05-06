@@ -1,5 +1,8 @@
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Mps.Application.Features.Account;
 using Mps.Domain.Entities;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,8 @@ builder.Services.AddDbContext<MpsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(GetAllUsers).Assembly));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,3 +33,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

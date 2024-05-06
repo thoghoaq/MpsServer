@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
     <Folder Include="Dependencies\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
   <ItemGroup>
