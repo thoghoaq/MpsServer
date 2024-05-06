@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Mps.Application.Features.Account;
 using Mps.Domain.Entities;
 using Mps.Infrastructure;
+using Mps.Infrastructure.Middleware;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);

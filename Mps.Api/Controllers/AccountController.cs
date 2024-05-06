@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mps.Application.Features.Account;
+using Mps.Infrastructure.Middleware;
 
 namespace Mps.Api.Controllers
 {
@@ -11,7 +11,7 @@ namespace Mps.Api.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [Authorize]
+        [Auth(Roles = "Admin")]
         [HttpGet]
         [Route("all")]
         public async Task<IActionResult> GetAllUsers()
