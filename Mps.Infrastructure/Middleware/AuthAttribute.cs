@@ -10,11 +10,17 @@ namespace Mps.Infrastructure.Middleware
     public class AuthAttribute : Attribute, IAuthorizationFilter
     {
         public string? Roles { get; set; }
+        public bool AllowAnonymous { get; set; } = false;
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
+            if (AllowAnonymous == true)
+            {
+                return;
+            }
             if (Roles.IsNullOrEmpty())
             {
+                context.Result = new UnauthorizedResult();
                 return;
             }
             var dbContext = context.HttpContext

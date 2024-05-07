@@ -34,6 +34,7 @@ namespace Mps.Api.Controllers
         /// </remarks>
         /// <param name="command"></param>
         /// <returns></returns>
+        [Auth(AllowAnonymous = true)]
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] CreateUser.Command command)

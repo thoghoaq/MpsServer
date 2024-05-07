@@ -28,24 +28,39 @@ namespace Mps.Application.Features.Account
             public string? Message { get; set; }
         }
 
-        public class Handler(IAuthenticationService authenticationService, MpsDbContext context, ILogger<CreateUser> logger) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(IAuthenticationService authenticationService, MpsDbContext context, ILoggedUser loggedUser, ILogger<CreateUser> logger) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly IAuthenticationService _authenticationService = authenticationService;
             private readonly MpsDbContext _context = context;
             private readonly ILogger<CreateUser> _logger = logger;
+            private readonly ILoggedUser _loggedUser = loggedUser;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
-                if (request.Role != Role.Admin.GetDescription() && request.Role != Role.Customer.GetDescription() && request.Role != Role.Supplier.GetDescription())
+                try
                 {
-                    return CommandResult<Result>.Fail("Role is not valid");
-                }
-                var existUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
-                if (existUser != null)
+                    if (request.Role == Role.Admin.GetDescription() || request.Role == Role.Supplier.GetDescription())
+                    {
+                        if (!_loggedUser.Roles.Contains(Role.Admin.GetDescription()))
+                        {
+                            return CommandResult<Result>.Fail("You don't have permission to create this role");
+                        }
+                    }
+                    if (request.Role != Role.Admin.GetDescription() && request.Role != Role.Customer.GetDescription() && request.Role != Role.Supplier.GetDescription())
+                    {
+                        return CommandResult<Result>.Fail("Role is not valid");
+                    }
+                    var existUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
+                    if (existUser != null)
+                    {
+                        return await AppendNewRole(existUser, request, cancellationToken);
+                    }
+                    return await CreateNewUser(request, cancellationToken);
+                } catch (Exception ex)
                 {
-                    return await AppendNewRole(existUser, request, cancellationToken);
+                    _logger.LogError(ex, "CreateUserFailure");
+                    return CommandResult<Result>.Fail(ex.Message);
                 }
-                return await CreateNewUser(request, cancellationToken);
             }
 
             private async Task<CommandResult<Result>> AppendNewRole(User user, Command request, CancellationToken cancellationToken)

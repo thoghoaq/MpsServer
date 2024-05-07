@@ -1,10 +1,12 @@
 ﻿using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Infrastructure.Dependencies.Firebase.Authentication;
+using Mps.Infrastructure.Dependencies.LoggedUser;
 
 namespace Mps.Infrastructure
 {
@@ -18,6 +20,10 @@ namespace Mps.Infrastructure
             });
 
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
+
+            services.AddTransient<ILoggedUser, LoggedUser>();
+
+            services.AddHttpContextAccessor();
 
             services.AddHttpClient<IJwtProvider, JwtProvider>(client =>
             {
