@@ -77,5 +77,21 @@ namespace Mps.Api.Controllers
                 reason = result.FailureReason
             });
         }
+
+        [Auth(Roles = "Admin")]
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<IActionResult> DeleteUser([FromBody] DeleteUser.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
     }
 }

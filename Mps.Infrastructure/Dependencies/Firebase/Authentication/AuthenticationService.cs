@@ -15,9 +15,9 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Authentication
             return userRecord.Uid;
         }
 
-        public async Task DeleteAccountAsync(string email, CancellationToken cancellationToken)
+        public async Task DeleteAccountAsync(string uid, CancellationToken cancellationToken)
         {
-            await FirebaseAuth.DefaultInstance.DeleteUserAsync(email, cancellationToken);
+            await FirebaseAuth.DefaultInstance.DeleteUserAsync(uid, cancellationToken);
         }
 
         public Task<string> LoginAsync(string email, string password, CancellationToken cancellationToken)
