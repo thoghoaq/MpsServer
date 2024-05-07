@@ -33,7 +33,6 @@ jobs:
         with:
           files: '${{env.DOTNET_ROOT}}\myapp\appsettings.json'
         env:
-          ConnectionStrings.DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
           FirebaseAdminSdk: ${{ secrets.FIREBASE_ADMIN_SDK }}
           Authentication.TokenUri: ${{ secrets.AUTHENTICATION_TOKEN_URI }}
           Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
