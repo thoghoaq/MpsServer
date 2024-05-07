@@ -22,22 +22,23 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
           
-      - name: App Settings Variable Substitution
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: '${{env.DOTNET_ROOT}}\myapp\appsettings.json'
-        env:
-          ConnectionStrings.DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
-          FirebaseAdminSdk: ${{ secrets.FIREBASE_ADMIN_SDK }}
-          Authentication.TokenUri: ${{ secrets.AUTHENTICATION_TOKEN_URI }}
-          Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
-          Authentication.ValidIssuer: ${{ secrets.AUTHENTICATION_VALID_ISSUER }}
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{env.DOTNET_ROOT}}/myapp/appsettings.json'
+        env:
+          ConnectionStrings.DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
+          FirebaseAdminSdk: ${{ secrets.FIREBASE_ADMIN_SDK }}
+          Authentication.TokenUri: ${{ secrets.AUTHENTICATION_TOKEN_URI }}
+          Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
+          Authentication.ValidIssuer: ${{ secrets.AUTHENTICATION_VALID_ISSUER }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
