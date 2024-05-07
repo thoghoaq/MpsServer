@@ -3,12 +3,22 @@ using Microsoft.OpenApi.Models;
 using Mps.Application.Features.Account;
 using Mps.Domain.Entities;
 using Mps.Infrastructure;
-using Mps.Infrastructure.Middleware;
 using System.Reflection;
 
+var MpsAllowSpecificOrigins = "_mpsAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MpsAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins:MpsWebApp").Value!)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -63,6 +73,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors(MpsAllowSpecificOrigins);
 
 app.UseAuthentication();
 

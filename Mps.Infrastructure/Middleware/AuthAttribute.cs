@@ -18,11 +18,6 @@ namespace Mps.Infrastructure.Middleware
             {
                 return;
             }
-            if (Roles.IsNullOrEmpty())
-            {
-                context.Result = new UnauthorizedResult();
-                return;
-            }
             var dbContext = context.HttpContext
             .RequestServices
             .GetService(typeof(MpsDbContext)) as MpsDbContext;
@@ -41,6 +36,10 @@ namespace Mps.Infrastructure.Middleware
             if (user == null)
             {
                 context.Result = new UnauthorizedResult();
+                return;
+            }
+            if (Roles.IsNullOrEmpty())
+            {
                 return;
             }
             if (!user.Role.Contains(Roles!))

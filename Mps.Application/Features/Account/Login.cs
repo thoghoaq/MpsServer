@@ -16,12 +16,14 @@ namespace Mps.Application.Features.Account
 
         public class Result
         {
-            public required string Token { get; set; }
+            public required string AccessToken { get; set; }
+            public GetUser.User? User { get; set; }
         }
 
-        public class Handler(IJwtProvider jwtProvider) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(IJwtProvider jwtProvider, IMediator mediator) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly IJwtProvider _jwtProvider = jwtProvider;
+            private readonly IMediator _mediator = mediator;
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var response = await _jwtProvider.GenerateTokenAsync(request.Email, request.Password, cancellationToken);
@@ -29,7 +31,11 @@ namespace Mps.Application.Features.Account
                 {
                     return CommandResult<Result>.Fail("Invalid email or password");
                 }
-                return CommandResult<Result>.Success(new Result { Token = response });
+                var commandResult = _mediator.Send(new GetUser.Query { Email = request.Email }, cancellationToken);
+                return CommandResult<Result>.Success(new Result { 
+                    AccessToken = response,
+                    User = commandResult.Result.Payload?.User
+                });
             }
         }
     }

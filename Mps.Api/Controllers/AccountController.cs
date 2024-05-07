@@ -19,6 +19,16 @@ namespace Mps.Api.Controllers
             var result = await _mediator.Send(new GetAllUsers.Query { Filter = query, PageNumber = pageNumber, PageSize = pageSize, Role = role });
             return result.IsSuccess ? Ok(result.Payload?.Users) : BadRequest(result.FailureReason);
         }
+
+        [Auth]
+        [HttpGet]
+        [Route("logged-user")]
+        public async Task<IActionResult> GetLoggedUser()
+        {
+            var result = await _mediator.Send(new GetUser.Query());
+            return result.IsSuccess ? Ok(result.Payload?.User) : BadRequest(result.FailureReason);
+        }
+
         /// <summary>
         /// Register user with role Admin, User and Supplier
         /// </summary>
