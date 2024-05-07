@@ -14,9 +14,9 @@ namespace Mps.Api.Controllers
         [Auth(Roles = "Admin")]
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers(string? role, int? pageNumber, int? pageSize, string? query)
         {
-            var result = await _mediator.Send(new GetAllUsers.Query());
+            var result = await _mediator.Send(new GetAllUsers.Query { Filter = query, PageNumber = pageNumber, PageSize = pageSize, Role = role });
             return result.IsSuccess ? Ok(result.Payload?.Users) : BadRequest(result.FailureReason);
         }
         /// <summary>

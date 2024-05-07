@@ -9,9 +9,13 @@ namespace Mps.Application.Features.Account
     {
         public class Query : IRequest<CommandResult<Result>>
         {
+            public string? Role { get; set; }
+            public int? PageNumber { get; set; }
+            public int? PageSize { get; set; }
+            public string? Filter { get; set; }
         }
 
-        public class  Result
+        public class Result
         {
             public required List<User> Users { get; set; }
         }
@@ -22,7 +26,15 @@ namespace Mps.Application.Features.Account
 
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var users = await _context.Users.ToListAsync(cancellationToken: cancellationToken);
+                var query = _context.Users
+                    .Where(u => request.Role == null || u.Role.Contains(request.Role))
+                    .Where(u => request.Filter == null || u.FullName.Contains(request.Filter) || u.Email.Contains(request.Filter))
+                    .AsQueryable();
+                if (request.PageNumber.HasValue && request.PageSize.HasValue)
+                {
+                    query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
+                };
+                var users = await query.ToListAsync(cancellationToken: cancellationToken);
                 return CommandResult<Result>.Success(new Result { Users = users });
             }
         }
