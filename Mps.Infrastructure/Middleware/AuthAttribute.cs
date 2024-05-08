@@ -31,6 +31,11 @@ namespace Mps.Infrastructure.Middleware
             }
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+            if (jwtToken?.ValidTo < DateTime.UtcNow)
+            {
+                context.Result = new UnauthorizedResult();
+                return;
+            }
             var userId = jwtToken?.Payload?.Sub;
             var user = dbContext?.Users.FirstOrDefault(x => x.IdentityId == userId);
             if (user == null)
