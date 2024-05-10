@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Mps.Application.Features.Account;
 using Mps.Domain.Entities;
 using Mps.Infrastructure;
+using Mps.Infrastructure.Middleware;
 using System.Reflection;
 
 var MpsAllowSpecificOrigins = "_mpsAllowSpecificOrigins";
@@ -81,16 +82,12 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseHangfireDashboard("/hangfire");
-
-app.Use(async (context, next) =>
+app.UseHangfireDashboard($"/hangfire-{builder.Configuration.GetSection("HangfireKey").Value}", new DashboardOptions
 {
-    if (context.Request.Path == "/")
-    {
-        context.Response.Redirect("/swagger/index.html", permanent: false);
-        return;
-    }
-    await next();
+    Authorization = new[] { new HangfireAuthorizationFilter() },
+    AppPath = "/swagger/index.html",
+    DisplayStorageConnectionString = false,
+    DashboardTitle = "Mps Hangfire Dashboard",
 });
 
 app.MapControllers();

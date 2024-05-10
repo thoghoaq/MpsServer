@@ -38,6 +38,7 @@ jobs:
           Authentication.TokenUri: ${{ secrets.AUTHENTICATION_TOKEN_URI }}
           Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
           Authentication.ValidIssuer: ${{ secrets.AUTHENTICATION_VALID_ISSUER }}
+          HangfireKey: ${{ secrets.HANGFIRE_KEY }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
