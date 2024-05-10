@@ -1,7 +1,8 @@
 ﻿using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mps.Application.Abstractions.Authentication;
@@ -12,6 +13,7 @@ namespace Mps.Infrastructure
 {
     public static class DependencyInjection
     {
+        [Obsolete]
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             FirebaseApp.Create(new AppOptions
@@ -37,6 +39,12 @@ namespace Mps.Infrastructure
                     options.Audience = configuration.GetSection("Authentication:Audience").Value;
                     options.TokenValidationParameters.ValidIssuer = configuration.GetSection("Authentication:ValidIssuer").Value;
                 });
+
+            services.AddHangfireServer();
+            services.AddHangfire(config =>
+            {
+                config.UsePostgreSqlStorage(configuration.GetConnectionString("DefaultConnection"));
+            });
         }
     }
 }
