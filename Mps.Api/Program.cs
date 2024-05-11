@@ -90,6 +90,8 @@ app.UseHangfireDashboard($"/hangfire-{builder.Configuration.GetSection("Hangfire
     DashboardTitle = "Mps Hangfire Dashboard",
 });
 
+app.UseRequestLocalization();
+
 app.MapControllers();
 
 app.Run();

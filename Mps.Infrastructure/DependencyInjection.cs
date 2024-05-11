@@ -3,17 +3,23 @@ using Google.Apis.Auth.OAuth2;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mps.Application.Abstractions.Authentication;
+using Mps.Application.Abstractions.Localization;
 using Mps.Infrastructure.Dependencies.Firebase.Authentication;
+using Mps.Infrastructure.Dependencies.Localization;
 using Mps.Infrastructure.Dependencies.LoggedUser;
 
 namespace Mps.Infrastructure
 {
     public static class DependencyInjection
     {
-        [Obsolete]
+        private static readonly string[] ConfigureOptions = ["en-US", "vi-VN"];
+
+        [Obsolete("Some services will be obsolete")]
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             FirebaseApp.Create(new AppOptions
@@ -44,6 +50,19 @@ namespace Mps.Infrastructure
             services.AddHangfire(config =>
             {
                 config.UsePostgreSqlStorage(configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            services.AddLocalization(options => options.ResourcesPath = "");
+
+            services.AddTransient<IAppLocalizer, AppLocalizer>();
+
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = ConfigureOptions;
+                options.SetDefaultCulture(supportedCultures[0]);
+                options.AddSupportedCultures(supportedCultures);
+                options.AddSupportedUICultures(supportedCultures);
+                options.ApplyCurrentCultureToResponseHeaders = true;
             });
         }
     }
