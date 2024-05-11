@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
+using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
+using Mps.Application.Helpers;
 using Mps.Domain.Constants;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
@@ -28,27 +30,29 @@ namespace Mps.Application.Features.Account
             public string? Message { get; set; }
         }
 
-        public class Handler(IAuthenticationService authenticationService, MpsDbContext context, ILoggedUser loggedUser, ILogger<CreateUser> logger) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(IAuthenticationService authenticationService, MpsDbContext context, ILoggedUser loggedUser, ILogger<CreateUser> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly IAuthenticationService _authenticationService = authenticationService;
             private readonly MpsDbContext _context = context;
             private readonly ILogger<CreateUser> _logger = logger;
             private readonly ILoggedUser _loggedUser = loggedUser;
+            private readonly IAppLocalizer _localizer = localizer;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    if (request.Role == Role.Admin.GetDescription() || request.Role == Role.Supplier.GetDescription())
+                    if (request.Role == Role.Admin.GetDescription())
                     {
-                        if (!_loggedUser.Roles.Contains(Role.Admin.GetDescription()))
-                        {
-                            return CommandResult<Result>.Fail("You don't have permission to create this role");
-                        }
+                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
                     }
-                    if (request.Role != Role.Admin.GetDescription() && request.Role != Role.Customer.GetDescription() && request.Role != Role.Supplier.GetDescription())
+                    if (request.Role == Role.Staff.GetDescription() && !_loggedUser.Roles.Contains(Role.Admin.GetDescription()))
                     {
-                        return CommandResult<Result>.Fail("Role is not valid");
+                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
+                    }
+                    if (!request.Role.InRoles())
+                    {
+                        return CommandResult<Result>.Fail(_localizer["Role is not valid"]);
                     }
                     var existUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
                     if (existUser != null)
@@ -69,11 +73,12 @@ namespace Mps.Application.Features.Account
                 {
                     if (user.Role.Contains(request.Role))
                     {
-                        return CommandResult<Result>.Fail("User already has this role");
+                        return CommandResult<Result>.Fail(_localizer["User already has this role"]);
                     }
                     user.Role = user.Role + request.Role + ",";
+                    user.UpdatedAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync(cancellationToken);
-                    return CommandResult<Result>.Success(new Result { Message = "Successfully created new role"});
+                    return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new role"] });
                 } catch (Exception ex)
                 {
                     _logger.LogError(ex, "AppendNewRoleFailure");
@@ -88,18 +93,20 @@ namespace Mps.Application.Features.Account
                     var identityId = await _authenticationService.RegisterAsync(request.Email, request.Password, cancellationToken);
                     if (string.IsNullOrEmpty(identityId))
                     {
-                        return CommandResult<Result>.Fail("Firebase register return null");
+                        return CommandResult<Result>.Fail(_localizer["Firebase register return null"]);
                     }
                     var user = new User
                     {
                         Email = request.Email,
                         IdentityId = identityId,
                         Role = request.Role + ",",
-                        FullName = request.FullName
+                        FullName = request.FullName,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     };
                     _context.Add(user);
                     await _context.SaveChangesAsync(cancellationToken);
-                    return CommandResult<Result>.Success(new Result { Message = "Successfully created new user"});
+                    return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new user"]});
                 }
                 catch (Exception ex)
                 {

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Mps.Application.Abstractions.Authentication;
+using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 
@@ -50,16 +51,17 @@ namespace Mps.Application.Features.Account
 
         }
 
-        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser) : IRequestHandler<Query, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IAppLocalizer localizer) : IRequestHandler<Query, CommandResult<Result>>
         {
             private readonly MpsDbContext _dbContext = dbContext;
             private readonly ILoggedUser _loggedUser = loggedUser;
+            private readonly IAppLocalizer _localizer = localizer;
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _dbContext.Users.FirstOrDefaultAsync(u => request.Email != null ? u.Email == request.Email : u.UserId == _loggedUser.UserId, cancellationToken);
                 if (user == null)
                 {
-                    return CommandResult<Result>.Fail("User not found");
+                    return CommandResult<Result>.Fail(_localizer["User not found"]);
                 }
                 var result = new Result
                 {

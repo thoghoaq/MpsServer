@@ -30,16 +30,16 @@ namespace Mps.Api.Controllers
         }
 
         /// <summary>
-        /// Register user with role Admin, User and Supplier
+        /// Register user with role Admin, Staff, Customer and ShopOwner
         /// </summary>
         /// <remarks>
         /// Example request:
         /// 
         ///     {
-        ///         "email": "thonght150201@gmail.com",
+        ///         "email": "mpsAdmin@gmail.com",
         ///         "password": "User@123",
-        ///         "fullName": "Thong Hoang",
-        ///         "role": "Customer"
+        ///         "fullName": "Nguyen Van A",
+        ///         "role": "Admin"
         ///     }
         /// </remarks>
         /// <param name="command"></param>
@@ -67,7 +67,7 @@ namespace Mps.Api.Controllers
         /// Example request:
         /// 
         ///     {
-        ///         "email": "thonght150201@gmail.com",
+        ///         "email": "mpsAdmin@gmail.com",
         ///         "password": "User@123"
         ///     }
         /// </remarks>
