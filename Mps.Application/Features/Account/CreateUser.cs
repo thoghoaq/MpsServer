@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Commons;
+using Mps.Application.Helpers;
 using Mps.Domain.Constants;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
@@ -39,14 +40,15 @@ namespace Mps.Application.Features.Account
             {
                 try
                 {
-                    if (request.Role == Role.Admin.GetDescription() || request.Role == Role.Supplier.GetDescription())
+                    if (request.Role == Role.Admin.GetDescription())
                     {
-                        if (!_loggedUser.Roles.Contains(Role.Admin.GetDescription()))
-                        {
-                            return CommandResult<Result>.Fail("You don't have permission to create this role");
-                        }
+                        return CommandResult<Result>.Fail("You don't have permission to create this role");
                     }
-                    if (request.Role != Role.Admin.GetDescription() && request.Role != Role.Customer.GetDescription() && request.Role != Role.Supplier.GetDescription())
+                    if (request.Role == Role.Staff.GetDescription() && !_loggedUser.Roles.Contains(Role.Admin.GetDescription()))
+                    {
+                        return CommandResult<Result>.Fail("You don't have permission to create this role");
+                    }
+                    if (!request.Role.InRoles())
                     {
                         return CommandResult<Result>.Fail("Role is not valid");
                     }
@@ -72,6 +74,7 @@ namespace Mps.Application.Features.Account
                         return CommandResult<Result>.Fail("User already has this role");
                     }
                     user.Role = user.Role + request.Role + ",";
+                    user.UpdatedAt = DateTime.UtcNow;
                     await _context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = "Successfully created new role"});
                 } catch (Exception ex)
@@ -95,7 +98,9 @@ namespace Mps.Application.Features.Account
                         Email = request.Email,
                         IdentityId = identityId,
                         Role = request.Role + ",",
-                        FullName = request.FullName
+                        FullName = request.FullName,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     };
                     _context.Add(user);
                     await _context.SaveChangesAsync(cancellationToken);

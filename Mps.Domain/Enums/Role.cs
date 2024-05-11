@@ -6,9 +6,11 @@ namespace Mps.Domain.Constants
     {
         [Description("Admin")]
         Admin,
+        [Description("Staff")]
+        Staff,
         [Description("Customer")]
         Customer,
-        [Description("Supplier")]
-        Supplier
+        [Description("ShopOwner")]
+        ShopOwner
     }
 }
