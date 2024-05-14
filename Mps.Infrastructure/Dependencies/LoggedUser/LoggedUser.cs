@@ -44,6 +44,8 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
 
         public string IpAddress => _httpContext.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
 
+        public bool IsAuthenticated => GetUser() != null;
+
         public bool IsManagerGroup => GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.Staff.GetDescription());
 
         public bool IsAdminGroup => GetUser()!.Role.Contains(Role.Admin.GetDescription());

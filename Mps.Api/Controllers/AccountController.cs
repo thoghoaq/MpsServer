@@ -124,5 +124,17 @@ namespace Mps.Api.Controllers
                 reason = result.FailureReason
             });
         }
+
+        [Auth]
+        [HttpGet]
+        [Route("details/{userId}")]
+        public async Task<IActionResult> GetUserDetails(int userId)
+        {
+            var result = await _mediator.Send(new GetUserDetails.Query { UserId = userId });
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
     }
 }

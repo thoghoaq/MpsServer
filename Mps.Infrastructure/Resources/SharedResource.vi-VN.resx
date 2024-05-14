@@ -144,6 +144,9 @@
   <data name="User not found" xml:space="preserve">
     <value>Không tìm thấy người dùng</value>
   </data>
+  <data name="You are not authorized to view this user" xml:space="preserve">
+    <value>Bạn không có quyền để xem hồ sơ người này</value>
+  </data>
   <data name="You don't have permission to activate or deactivate this user" xml:space="preserve">
     <value>Bạn không có quyền để vô hiệu hóa tài khoản này</value>
   </data>

@@ -8,6 +8,7 @@
         public IEnumerable<string> Roles { get; }
         public string IdentityId { get; }
         public string IpAddress { get; }
+        public bool IsAuthenticated { get; }
         public bool IsManagerGroup { get; }
         public bool IsAdminGroup { get; }
     }

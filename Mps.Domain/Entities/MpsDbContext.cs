@@ -5,7 +5,7 @@ namespace Mps.Domain.Entities
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<ShopOwner> Suppliers { get; set; }
+        public DbSet<ShopOwner> ShopOwners { get; set; }
         public DbSet<Shop> Shops { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
