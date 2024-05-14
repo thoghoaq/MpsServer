@@ -90,7 +90,7 @@ namespace Mps.Application.Features.Payment
                     });
                 } catch (Exception ex)
                 {
-                    _logger.LogError(ex, ex.Message);
+                    _logger.LogError(ex, "CreatePaymentFailure");
                     return CommandResult<Result>.Fail(ex.Message);
                 }
             }

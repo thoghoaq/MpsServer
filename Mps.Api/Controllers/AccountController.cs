@@ -14,9 +14,9 @@ namespace Mps.Api.Controllers
         [Auth(Roles = ["Admin"])]
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> GetAllUsers(string? role, int? pageNumber, int? pageSize, string? query)
+        public async Task<IActionResult> GetAllUsers(string? role, int? pageNumber, int? pageSize, string? query, bool? isActive)
         {
-            var result = await _mediator.Send(new GetAllUsers.Query { Filter = query, PageNumber = pageNumber, PageSize = pageSize, Role = role });
+            var result = await _mediator.Send(new GetAllUsers.Query { Filter = query, PageNumber = pageNumber, PageSize = pageSize, Role = role, IsActive = isActive });
             return result.IsSuccess ? Ok(result.Payload?.Users) : BadRequest(result.FailureReason);
         }
 
@@ -92,6 +92,27 @@ namespace Mps.Api.Controllers
         [HttpDelete]
         [Route("delete")]
         public async Task<IActionResult> DeleteUser([FromBody] DeleteUser.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        /// <summary>
+        /// Activate/Deactivate user
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [Auth(Roles = ["Admin"])]
+        [HttpPut]
+        [Route("status")]
+        public async Task<IActionResult> ActiveUser([FromBody] ActiveUser.Command command)
         {
             if (!ModelState.IsValid)
             {

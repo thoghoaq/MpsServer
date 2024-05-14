@@ -102,7 +102,8 @@ namespace Mps.Application.Features.Account
                         Role = request.Role + ",",
                         FullName = request.FullName,
                         CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        UpdatedAt = DateTime.UtcNow,
+                        IsActive = true
                     };
                     _context.Add(user);
                     await _context.SaveChangesAsync(cancellationToken);
