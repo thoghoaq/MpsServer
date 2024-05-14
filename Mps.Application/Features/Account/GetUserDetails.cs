@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
-using Mps.Domain.Constants;
+using Mps.Domain.Enums;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
 

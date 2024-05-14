@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Mps.Application.Abstractions.Authentication;
-using Mps.Domain.Constants;
+using Mps.Domain.Enums;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
 using System.IdentityModel.Tokens.Jwt;
