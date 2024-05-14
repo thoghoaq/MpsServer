@@ -52,6 +52,10 @@ namespace Mps.Infrastructure.Middleware
                 context.Result = new UnauthorizedResult();
                 return;
             }
+            if (user.IsActive == false)
+            {
+                context.Result = new UnauthorizedResult();
+            }
             return;
         }
     }

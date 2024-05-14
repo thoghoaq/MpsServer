@@ -5,7 +5,7 @@ namespace Mps.Domain.Entities
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<ShopOwner> Suppliers { get; set; }
         public DbSet<Shop> Shops { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
@@ -29,12 +29,12 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<Customer>().HasKey(c => c.UserId);
             modelBuilder.Entity<Customer>().HasOne(c => c.User).WithOne().HasForeignKey<Customer>(c => c.UserId);
 
-            modelBuilder.Entity<Supplier>().HasKey(s => s.UserId);
-            modelBuilder.Entity<Supplier>().HasOne(s => s.User).WithOne().HasForeignKey<Supplier>(s => s.UserId);
-            modelBuilder.Entity<Supplier>().HasMany(s => s.Shops).WithOne(s => s.Supplier).HasForeignKey(s => s.SupplierId);
+            modelBuilder.Entity<ShopOwner>().HasKey(s => s.UserId);
+            modelBuilder.Entity<ShopOwner>().HasOne(s => s.User).WithOne().HasForeignKey<ShopOwner>(s => s.UserId);
+            modelBuilder.Entity<ShopOwner>().HasMany(s => s.Shops).WithOne(s => s.ShopOwner).HasForeignKey(s => s.ShopOwnerId);
 
             modelBuilder.Entity<Shop>().HasKey(s => s.ShopId);
-            modelBuilder.Entity<Shop>().HasOne(s => s.Supplier).WithMany().HasForeignKey(s => s.SupplierId);
+            modelBuilder.Entity<Shop>().HasOne(s => s.ShopOwner).WithMany().HasForeignKey(s => s.ShopOwnerId);
             modelBuilder.Entity<Shop>().Property(s => s.ShopName).IsRequired();
 
             modelBuilder.Entity<Product>().HasKey(s => s.ProductId);

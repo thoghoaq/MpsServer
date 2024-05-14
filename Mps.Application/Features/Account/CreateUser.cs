@@ -42,17 +42,17 @@ namespace Mps.Application.Features.Account
             {
                 try
                 {
-                    if (request.Role == Role.Admin.GetDescription())
-                    {
-                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
-                    }
-                    if (request.Role == Role.Staff.GetDescription() && !_loggedUser.Roles.Contains(Role.Admin.GetDescription()))
-                    {
-                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
-                    }
                     if (!request.Role.InRoles())
                     {
                         return CommandResult<Result>.Fail(_localizer["Role is not valid"]);
+                    }
+                    if (request.Role == Role.Admin.GetDescription() && !_loggedUser.IsAdminGroup)
+                    {
+                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
+                    }
+                    if (request.Role == Role.Staff.GetDescription() && !_loggedUser.IsAdminGroup)
+                    {
+                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
                     }
                     var existUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
                     if (existUser != null)

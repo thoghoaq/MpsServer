@@ -11,7 +11,7 @@ namespace Mps.Api.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [Auth(Roles = ["Admin"])]
+        [Auth(Roles = ["Admin","Staff"])]
         [HttpGet]
         [Route("all")]
         public async Task<IActionResult> GetAllUsers(string? role, int? pageNumber, int? pageSize, string? query, bool? isActive)
@@ -109,7 +109,7 @@ namespace Mps.Api.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Auth(Roles = ["Admin"])]
+        [Auth(Roles = ["Admin","Staff"])]
         [HttpPut]
         [Route("status")]
         public async Task<IActionResult> ActiveUser([FromBody] ActiveUser.Command command)
