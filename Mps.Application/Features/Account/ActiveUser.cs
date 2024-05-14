@@ -40,7 +40,11 @@ namespace Mps.Application.Features.Account
                     {
                         return CommandResult<Result>.Fail(_localizer["User not found"]);
                     }
-                    if (user.Role.Contains(Role.Admin.GetDescription()))
+                    if (user.Role.Contains(Role.SuperAdmin.GetDescription())) 
+                    {
+                        return CommandResult<Result>.Fail(_localizer["You don't have permission to activate or deactivate this user"]);
+                    }
+                    if (user.Role.Contains(Role.Admin.GetDescription()) && !_loggedUser.Roles.Contains(Role.SuperAdmin.GetDescription()))
                     {
                         return CommandResult<Result>.Fail(_localizer["You don't have permission to activate or deactivate this user"]);
                     }

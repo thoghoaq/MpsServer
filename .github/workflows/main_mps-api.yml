@@ -39,7 +39,6 @@ jobs:
           Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
           Authentication.ValidIssuer: ${{ secrets.AUTHENTICATION_VALID_ISSUER }}
           HangfireKey: ${{ secrets.HANGFIRE_KEY }}
-          VnPay.ReturnUrl: ${{ secrets.VNPAY_RETURN_URL }}
           VnPay.HashSecret: ${{ secrets.VNPAY_SECRET_KEY }}
           VnPay.TmnCode: ${{ secrets.VNPAY_TMN_CODE }}
 

@@ -46,8 +46,8 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
 
         public bool IsAuthenticated => GetUser() != null;
 
-        public bool IsManagerGroup => GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.Staff.GetDescription());
+        public bool IsManagerGroup => GetUser()!.Role.Contains(Role.SuperAdmin.GetDescription()) || GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.Staff.GetDescription());
 
-        public bool IsAdminGroup => GetUser()!.Role.Contains(Role.Admin.GetDescription());
+        public bool IsAdminGroup => GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.SuperAdmin.GetDescription());
     }
 }

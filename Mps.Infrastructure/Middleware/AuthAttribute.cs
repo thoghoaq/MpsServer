@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
+using Mps.Domain.Extensions;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Mps.Infrastructure.Middleware
@@ -49,6 +51,10 @@ namespace Mps.Infrastructure.Middleware
                 return;
             }
             if (Roles.IsNullOrEmpty())
+            {
+                return;
+            }
+            if (Roles!.Contains(Role.Admin.GetDescription()) && user.Role.Contains(Role.SuperAdmin.GetDescription()))
             {
                 return;
             }

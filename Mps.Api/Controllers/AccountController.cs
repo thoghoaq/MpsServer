@@ -88,7 +88,7 @@ namespace Mps.Api.Controllers
             });
         }
 
-        [Auth(Roles = ["Admin"])]
+        [Auth(Roles = ["SuperAdmin"])]
         [HttpDelete]
         [Route("delete")]
         public async Task<IActionResult> DeleteUser([FromBody] DeleteUser.Command command)

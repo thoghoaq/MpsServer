@@ -4,6 +4,8 @@ namespace Mps.Domain.Enums
 {
     public enum Role
     {
+        [Description("SuperAdmin")]
+        SuperAdmin,
         [Description("Admin")]
         Admin,
         [Description("Staff")]

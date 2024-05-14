@@ -46,7 +46,7 @@ namespace Mps.Application.Features.Account
                     {
                         return CommandResult<Result>.Fail(_localizer["Role is not valid"]);
                     }
-                    if (request.Role == Role.Admin.GetDescription() && !_loggedUser.IsAdminGroup)
+                    if (request.Role == Role.Admin.GetDescription() && !_loggedUser.Roles.Contains(Role.SuperAdmin.GetDescription()))
                     {
                         return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
                     }
