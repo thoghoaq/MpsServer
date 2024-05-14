@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel;
 
-namespace Mps.Domain.Constants
+namespace Mps.Domain.Enums
 {
     public enum Role
     {
+        [Description("SuperAdmin")]
+        SuperAdmin,
         [Description("Admin")]
         Admin,
         [Description("Staff")]

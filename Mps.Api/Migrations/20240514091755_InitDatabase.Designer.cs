@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Mps.Api.Migrations
 {
     [DbContext(typeof(MpsDbContext))]
-    [Migration("20240508104709_AddStatusData")]
-    partial class AddStatusData
+    [Migration("20240514091755_InitDatabase")]
+    partial class InitDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Order", b =>
@@ -88,7 +88,7 @@ namespace Mps.Api.Migrations
 
                     b.HasIndex("ShopId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.OrderDetail", b =>
@@ -128,7 +128,7 @@ namespace Mps.Api.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetail");
+                    b.ToTable("OrderDetails");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.OrderProgress", b =>
@@ -173,7 +173,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("OrderStatusId");
 
-                    b.ToTable("OrderStatus");
+                    b.ToTable("OrderStatuses");
 
                     b.HasData(
                         new
@@ -213,6 +213,52 @@ namespace Mps.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Mps.Domain.Entities.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentId"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ExpireDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("MerchantId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PaymentContent")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentCurrency")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentDestinationId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentLanguage")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PaymentRefId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("RequiredAmount")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("PaymentId");
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("Mps.Domain.Entities.PaymentMethod", b =>
                 {
                     b.Property<int>("PaymentMethodId")
@@ -227,7 +273,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("PaymentMethodId");
 
-                    b.ToTable("PaymentMethod");
+                    b.ToTable("PaymentMethods");
 
                     b.HasData(
                         new
@@ -257,6 +303,42 @@ namespace Mps.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Mps.Domain.Entities.PaymentSignature", b =>
+                {
+                    b.Property<int>("PaymentSignatureId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentSignatureId"));
+
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PaymentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PaymentId1")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SignDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("SignOwn")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SignValue")
+                        .HasColumnType("text");
+
+                    b.HasKey("PaymentSignatureId");
+
+                    b.HasIndex("PaymentId")
+                        .IsUnique();
+
+                    b.HasIndex("PaymentId1");
+
+                    b.ToTable("PaymentSignatures");
+                });
+
             modelBuilder.Entity("Mps.Domain.Entities.PaymentStatus", b =>
                 {
                     b.Property<int>("PaymentStatusId")
@@ -271,7 +353,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("PaymentStatusId");
 
-                    b.ToTable("PaymentStatus");
+                    b.ToTable("PaymentStatuses");
 
                     b.HasData(
                         new
@@ -339,7 +421,7 @@ namespace Mps.Api.Migrations
 
                     b.HasIndex("ShopId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.ProductBrand", b =>
@@ -356,7 +438,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("BrandId");
 
-                    b.ToTable("ProductBrand");
+                    b.ToTable("ProductBrands");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.ProductCategory", b =>
@@ -373,7 +455,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("ProductCategory");
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.ProductImage", b =>
@@ -400,7 +482,7 @@ namespace Mps.Api.Migrations
 
                     b.HasIndex("ProductId1");
 
-                    b.ToTable("ProductImage");
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Shop", b =>
@@ -433,7 +515,7 @@ namespace Mps.Api.Migrations
 
                     b.HasIndex("SupplierUserId");
 
-                    b.ToTable("Shop");
+                    b.ToTable("Shops");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Supplier", b =>
@@ -449,7 +531,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Supplier");
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.User", b =>
@@ -579,6 +661,21 @@ namespace Mps.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Mps.Domain.Entities.PaymentSignature", b =>
+                {
+                    b.HasOne("Mps.Domain.Entities.Payment", null)
+                        .WithOne("PaymentSignature")
+                        .HasForeignKey("Mps.Domain.Entities.PaymentSignature", "PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Mps.Domain.Entities.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId1");
+
+                    b.Navigation("Payment");
+                });
+
             modelBuilder.Entity("Mps.Domain.Entities.Product", b =>
                 {
                     b.HasOne("Mps.Domain.Entities.ProductBrand", "Brand")
@@ -652,6 +749,11 @@ namespace Mps.Api.Migrations
                     b.Navigation("OrderDetails");
 
                     b.Navigation("Progresses");
+                });
+
+            modelBuilder.Entity("Mps.Domain.Entities.Payment", b =>
+                {
+                    b.Navigation("PaymentSignature");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Product", b =>

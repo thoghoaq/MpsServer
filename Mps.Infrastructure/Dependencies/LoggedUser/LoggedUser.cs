@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Mps.Application.Abstractions.Authentication;
+using Mps.Domain.Enums;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Mps.Infrastructure.Dependencies.LoggedUser
@@ -41,5 +43,11 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
         public string IdentityId => GetUser()!.IdentityId;
 
         public string IpAddress => _httpContext.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+
+        public bool IsAuthenticated => GetUser() != null;
+
+        public bool IsManagerGroup => GetUser()!.Role.Contains(Role.SuperAdmin.GetDescription()) || GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.Staff.GetDescription());
+
+        public bool IsAdminGroup => GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.SuperAdmin.GetDescription());
     }
 }

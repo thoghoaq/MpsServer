@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mps.Domain.Entities;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Mps.Api.Migrations
 {
     [DbContext(typeof(MpsDbContext))]
-    partial class MpsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240514092605_IsActiveUser")]
+    partial class IsActiveUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,15 +251,10 @@ namespace Mps.Api.Migrations
                     b.Property<int?>("PaymentRefId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("PaymentStatusId")
-                        .HasColumnType("integer");
-
                     b.Property<decimal>("RequiredAmount")
                         .HasColumnType("numeric");
 
                     b.HasKey("PaymentId");
-
-                    b.HasIndex("PaymentStatusId");
 
                     b.ToTable("Payments");
                 });
@@ -366,17 +364,22 @@ namespace Mps.Api.Migrations
                         new
                         {
                             PaymentStatusId = 2,
-                            PaymentStatusName = "Success"
+                            PaymentStatusName = "Processing"
                         },
                         new
                         {
                             PaymentStatusId = 3,
-                            PaymentStatusName = "Failed"
+                            PaymentStatusName = "Paid"
                         },
                         new
                         {
                             PaymentStatusId = 4,
-                            PaymentStatusName = "Expired"
+                            PaymentStatusName = "Cancelled"
+                        },
+                        new
+                        {
+                            PaymentStatusId = 5,
+                            PaymentStatusName = "Refunded"
                         });
                 });
 
@@ -497,10 +500,10 @@ namespace Mps.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ShopOwnerId")
+                    b.Property<int>("SupplierId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ShopOwnerUserId")
+                    b.Property<int?>("SupplierUserId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -508,14 +511,14 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("ShopId");
 
-                    b.HasIndex("ShopOwnerId");
+                    b.HasIndex("SupplierId");
 
-                    b.HasIndex("ShopOwnerUserId");
+                    b.HasIndex("SupplierUserId");
 
                     b.ToTable("Shops");
                 });
 
-            modelBuilder.Entity("Mps.Domain.Entities.ShopOwner", b =>
+            modelBuilder.Entity("Mps.Domain.Entities.Supplier", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -528,7 +531,7 @@ namespace Mps.Api.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("ShopOwners");
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.User", b =>
@@ -538,9 +541,6 @@ namespace Mps.Api.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
-
-                    b.Property<string>("AvatarPath")
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -559,9 +559,6 @@ namespace Mps.Api.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -667,17 +664,6 @@ namespace Mps.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Mps.Domain.Entities.Payment", b =>
-                {
-                    b.HasOne("Mps.Domain.Entities.PaymentStatus", "PaymentStatus")
-                        .WithMany()
-                        .HasForeignKey("PaymentStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PaymentStatus");
-                });
-
             modelBuilder.Entity("Mps.Domain.Entities.PaymentSignature", b =>
                 {
                     b.HasOne("Mps.Domain.Entities.Payment", null)
@@ -737,24 +723,24 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.Shop", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.ShopOwner", "ShopOwner")
+                    b.HasOne("Mps.Domain.Entities.Supplier", "Supplier")
                         .WithMany()
-                        .HasForeignKey("ShopOwnerId")
+                        .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Mps.Domain.Entities.ShopOwner", null)
+                    b.HasOne("Mps.Domain.Entities.Supplier", null)
                         .WithMany("Shops")
-                        .HasForeignKey("ShopOwnerUserId");
+                        .HasForeignKey("SupplierUserId");
 
-                    b.Navigation("ShopOwner");
+                    b.Navigation("Supplier");
                 });
 
-            modelBuilder.Entity("Mps.Domain.Entities.ShopOwner", b =>
+            modelBuilder.Entity("Mps.Domain.Entities.Supplier", b =>
                 {
                     b.HasOne("Mps.Domain.Entities.User", "User")
                         .WithOne()
-                        .HasForeignKey("Mps.Domain.Entities.ShopOwner", "UserId")
+                        .HasForeignKey("Mps.Domain.Entities.Supplier", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -778,7 +764,7 @@ namespace Mps.Api.Migrations
                     b.Navigation("Images");
                 });
 
-            modelBuilder.Entity("Mps.Domain.Entities.ShopOwner", b =>
+            modelBuilder.Entity("Mps.Domain.Entities.Supplier", b =>
                 {
                     b.Navigation("Shops");
                 });

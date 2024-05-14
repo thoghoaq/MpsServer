@@ -4,48 +4,18 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Mps.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitEntities : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<DateTime>(
-                name: "CreatedAt",
-                table: "Users",
-                type: "timestamp with time zone",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "UpdatedAt",
-                table: "Users",
-                type: "timestamp with time zone",
-                nullable: true);
-
             migrationBuilder.CreateTable(
-                name: "Customer",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Customer", x => x.UserId);
-                    table.ForeignKey(
-                        name: "FK_Customer_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderStatus",
+                name: "OrderStatuses",
                 columns: table => new
                 {
                     OrderStatusId = table.Column<int>(type: "integer", nullable: false)
@@ -54,11 +24,11 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderStatus", x => x.OrderStatusId);
+                    table.PrimaryKey("PK_OrderStatuses", x => x.OrderStatusId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PaymentMethod",
+                name: "PaymentMethods",
                 columns: table => new
                 {
                     PaymentMethodId = table.Column<int>(type: "integer", nullable: false)
@@ -67,11 +37,34 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PaymentMethod", x => x.PaymentMethodId);
+                    table.PrimaryKey("PK_PaymentMethods", x => x.PaymentMethodId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PaymentStatus",
+                name: "Payments",
+                columns: table => new
+                {
+                    PaymentId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PaymentContent = table.Column<string>(type: "text", nullable: true),
+                    PaymentCurrency = table.Column<string>(type: "text", nullable: true),
+                    PaymentRefId = table.Column<int>(type: "integer", nullable: true),
+                    RequiredAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    PaymentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ExpireDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    PaymentLanguage = table.Column<string>(type: "text", nullable: true),
+                    MerchantId = table.Column<int>(type: "integer", nullable: true),
+                    PaymentDestinationId = table.Column<string>(type: "text", nullable: true),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentStatuses",
                 columns: table => new
                 {
                     PaymentStatusId = table.Column<int>(type: "integer", nullable: false)
@@ -80,11 +73,11 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PaymentStatus", x => x.PaymentStatusId);
+                    table.PrimaryKey("PK_PaymentStatuses", x => x.PaymentStatusId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductBrand",
+                name: "ProductBrands",
                 columns: table => new
                 {
                     BrandId = table.Column<int>(type: "integer", nullable: false)
@@ -93,11 +86,11 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductBrand", x => x.BrandId);
+                    table.PrimaryKey("PK_ProductBrands", x => x.BrandId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductCategory",
+                name: "ProductCategories",
                 columns: table => new
                 {
                     CategoryId = table.Column<int>(type: "integer", nullable: false)
@@ -106,11 +99,58 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductCategory", x => x.CategoryId);
+                    table.PrimaryKey("PK_ProductCategories", x => x.CategoryId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Supplier",
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FullName = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<string>(type: "text", nullable: false),
+                    IdentityId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentSignatures",
+                columns: table => new
+                {
+                    PaymentSignatureId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SignValue = table.Column<string>(type: "text", nullable: true),
+                    SignDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SignOwn = table.Column<int>(type: "integer", nullable: true),
+                    PaymentId = table.Column<int>(type: "integer", nullable: false),
+                    IsValid = table.Column<bool>(type: "boolean", nullable: false),
+                    PaymentId1 = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentSignatures", x => x.PaymentSignatureId);
+                    table.ForeignKey(
+                        name: "FK_PaymentSignatures_Payments_PaymentId",
+                        column: x => x.PaymentId,
+                        principalTable: "Payments",
+                        principalColumn: "PaymentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PaymentSignatures_Payments_PaymentId1",
+                        column: x => x.PaymentId1,
+                        principalTable: "Payments",
+                        principalColumn: "PaymentId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customers",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false),
@@ -119,9 +159,9 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Supplier", x => x.UserId);
+                    table.PrimaryKey("PK_Customers", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_Supplier_Users_UserId",
+                        name: "FK_Customers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
@@ -129,7 +169,26 @@ namespace Mps.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Shop",
+                name: "Suppliers",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Suppliers", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_Suppliers_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Shops",
                 columns: table => new
                 {
                     ShopId = table.Column<int>(type: "integer", nullable: false)
@@ -142,22 +201,22 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Shop", x => x.ShopId);
+                    table.PrimaryKey("PK_Shops", x => x.ShopId);
                     table.ForeignKey(
-                        name: "FK_Shop_Supplier_SupplierId",
+                        name: "FK_Shops_Suppliers_SupplierId",
                         column: x => x.SupplierId,
-                        principalTable: "Supplier",
+                        principalTable: "Suppliers",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Shop_Supplier_SupplierUserId",
+                        name: "FK_Shops_Suppliers_SupplierUserId",
                         column: x => x.SupplierUserId,
-                        principalTable: "Supplier",
+                        principalTable: "Suppliers",
                         principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Orders",
                 columns: table => new
                 {
                     OrderId = table.Column<int>(type: "integer", nullable: false)
@@ -174,41 +233,41 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.OrderId);
+                    table.PrimaryKey("PK_Orders", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_Order_Customer_CustomerId",
+                        name: "FK_Orders_Customers_CustomerId",
                         column: x => x.CustomerId,
-                        principalTable: "Customer",
+                        principalTable: "Customers",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_OrderStatus_OrderStatusId",
+                        name: "FK_Orders_OrderStatuses_OrderStatusId",
                         column: x => x.OrderStatusId,
-                        principalTable: "OrderStatus",
+                        principalTable: "OrderStatuses",
                         principalColumn: "OrderStatusId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_PaymentMethod_PaymentMethodId",
+                        name: "FK_Orders_PaymentMethods_PaymentMethodId",
                         column: x => x.PaymentMethodId,
-                        principalTable: "PaymentMethod",
+                        principalTable: "PaymentMethods",
                         principalColumn: "PaymentMethodId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_PaymentStatus_PaymentStatusId",
+                        name: "FK_Orders_PaymentStatuses_PaymentStatusId",
                         column: x => x.PaymentStatusId,
-                        principalTable: "PaymentStatus",
+                        principalTable: "PaymentStatuses",
                         principalColumn: "PaymentStatusId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_Shop_ShopId",
+                        name: "FK_Orders_Shops_ShopId",
                         column: x => x.ShopId,
-                        principalTable: "Shop",
+                        principalTable: "Shops",
                         principalColumn: "ShopId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "Products",
                 columns: table => new
                 {
                     ProductId = table.Column<int>(type: "integer", nullable: false)
@@ -223,23 +282,23 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.ProductId);
+                    table.PrimaryKey("PK_Products", x => x.ProductId);
                     table.ForeignKey(
-                        name: "FK_Product_ProductBrand_BrandId",
+                        name: "FK_Products_ProductBrands_BrandId",
                         column: x => x.BrandId,
-                        principalTable: "ProductBrand",
+                        principalTable: "ProductBrands",
                         principalColumn: "BrandId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Product_ProductCategory_CategoryId",
+                        name: "FK_Products_ProductCategories_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "ProductCategory",
+                        principalTable: "ProductCategories",
                         principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Product_Shop_ShopId",
+                        name: "FK_Products_Shops_ShopId",
                         column: x => x.ShopId,
-                        principalTable: "Shop",
+                        principalTable: "Shops",
                         principalColumn: "ShopId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -259,15 +318,15 @@ namespace Mps.Api.Migrations
                 {
                     table.PrimaryKey("PK_OrderProgress", x => x.OrderProgressId);
                     table.ForeignKey(
-                        name: "FK_OrderProgress_Order_OrderId",
+                        name: "FK_OrderProgress_Orders_OrderId",
                         column: x => x.OrderId,
-                        principalTable: "Order",
+                        principalTable: "Orders",
                         principalColumn: "OrderId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderDetail",
+                name: "OrderDetails",
                 columns: table => new
                 {
                     OrderDetailId = table.Column<int>(type: "integer", nullable: false)
@@ -282,28 +341,28 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderDetail", x => x.OrderDetailId);
+                    table.PrimaryKey("PK_OrderDetails", x => x.OrderDetailId);
                     table.ForeignKey(
-                        name: "FK_OrderDetail_Order_OrderId",
+                        name: "FK_OrderDetails_Orders_OrderId",
                         column: x => x.OrderId,
-                        principalTable: "Order",
+                        principalTable: "Orders",
                         principalColumn: "OrderId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetail_Order_OrderId1",
+                        name: "FK_OrderDetails_Orders_OrderId1",
                         column: x => x.OrderId1,
-                        principalTable: "Order",
+                        principalTable: "Orders",
                         principalColumn: "OrderId");
                     table.ForeignKey(
-                        name: "FK_OrderDetail_Product_ProductId",
+                        name: "FK_OrderDetails_Products_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductImage",
+                name: "ProductImages",
                 columns: table => new
                 {
                     ProductImageId = table.Column<int>(type: "integer", nullable: false)
@@ -314,58 +373,71 @@ namespace Mps.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductImage", x => x.ProductImageId);
+                    table.PrimaryKey("PK_ProductImages", x => x.ProductImageId);
                     table.ForeignKey(
-                        name: "FK_ProductImage_Product_ProductId",
+                        name: "FK_ProductImages_Products_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductImage_Product_ProductId1",
+                        name: "FK_ProductImages_Products_ProductId1",
                         column: x => x.ProductId1,
-                        principalTable: "Product",
+                        principalTable: "Products",
                         principalColumn: "ProductId");
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Order_CustomerId",
-                table: "Order",
-                column: "CustomerId");
+            migrationBuilder.InsertData(
+                table: "OrderStatuses",
+                columns: new[] { "OrderStatusId", "OrderStatusName" },
+                values: new object[,]
+                {
+                    { 1, "Pending" },
+                    { 2, "Processing" },
+                    { 3, "Delivered" },
+                    { 4, "Cancelled" },
+                    { 5, "Returned" },
+                    { 6, "Refunded" },
+                    { 7, "Completed" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "PaymentMethods",
+                columns: new[] { "PaymentMethodId", "PaymentMethodName" },
+                values: new object[,]
+                {
+                    { 1, "Cash on Delivery" },
+                    { 2, "Credit Card" },
+                    { 3, "Debit Card" },
+                    { 4, "Net Banking" },
+                    { 5, "UPI" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "PaymentStatuses",
+                columns: new[] { "PaymentStatusId", "PaymentStatusName" },
+                values: new object[,]
+                {
+                    { 1, "Pending" },
+                    { 2, "Processing" },
+                    { 3, "Paid" },
+                    { 4, "Cancelled" },
+                    { 5, "Refunded" }
+                });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_OrderStatusId",
-                table: "Order",
-                column: "OrderStatusId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Order_PaymentMethodId",
-                table: "Order",
-                column: "PaymentMethodId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Order_PaymentStatusId",
-                table: "Order",
-                column: "PaymentStatusId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Order_ShopId",
-                table: "Order",
-                column: "ShopId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderDetail_OrderId",
-                table: "OrderDetail",
+                name: "IX_OrderDetails_OrderId",
+                table: "OrderDetails",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetail_OrderId1",
-                table: "OrderDetail",
+                name: "IX_OrderDetails_OrderId1",
+                table: "OrderDetails",
                 column: "OrderId1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderDetail_ProductId",
-                table: "OrderDetail",
+                name: "IX_OrderDetails_ProductId",
+                table: "OrderDetails",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -374,90 +446,139 @@ namespace Mps.Api.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_BrandId",
-                table: "Product",
-                column: "BrandId");
+                name: "IX_Orders_CustomerId",
+                table: "Orders",
+                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_CategoryId",
-                table: "Product",
-                column: "CategoryId");
+                name: "IX_Orders_OrderStatusId",
+                table: "Orders",
+                column: "OrderStatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_ShopId",
-                table: "Product",
+                name: "IX_Orders_PaymentMethodId",
+                table: "Orders",
+                column: "PaymentMethodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_PaymentStatusId",
+                table: "Orders",
+                column: "PaymentStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_ShopId",
+                table: "Orders",
                 column: "ShopId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImage_ProductId",
-                table: "ProductImage",
+                name: "IX_PaymentSignatures_PaymentId",
+                table: "PaymentSignatures",
+                column: "PaymentId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentSignatures_PaymentId1",
+                table: "PaymentSignatures",
+                column: "PaymentId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductImages_ProductId",
+                table: "ProductImages",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImage_ProductId1",
-                table: "ProductImage",
+                name: "IX_ProductImages_ProductId1",
+                table: "ProductImages",
                 column: "ProductId1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Shop_SupplierId",
-                table: "Shop",
+                name: "IX_Products_BrandId",
+                table: "Products",
+                column: "BrandId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_CategoryId",
+                table: "Products",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_ShopId",
+                table: "Products",
+                column: "ShopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Shops_SupplierId",
+                table: "Shops",
                 column: "SupplierId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Shop_SupplierUserId",
-                table: "Shop",
+                name: "IX_Shops_SupplierUserId",
+                table: "Shops",
                 column: "SupplierUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_IdentityId",
+                table: "Users",
+                column: "IdentityId",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderDetail");
+                name: "OrderDetails");
 
             migrationBuilder.DropTable(
                 name: "OrderProgress");
 
             migrationBuilder.DropTable(
-                name: "ProductImage");
+                name: "PaymentSignatures");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "ProductImages");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Customer");
+                name: "Payments");
 
             migrationBuilder.DropTable(
-                name: "OrderStatus");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "PaymentMethod");
+                name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "PaymentStatus");
+                name: "OrderStatuses");
 
             migrationBuilder.DropTable(
-                name: "ProductBrand");
+                name: "PaymentMethods");
 
             migrationBuilder.DropTable(
-                name: "ProductCategory");
+                name: "PaymentStatuses");
 
             migrationBuilder.DropTable(
-                name: "Shop");
+                name: "ProductBrands");
 
             migrationBuilder.DropTable(
-                name: "Supplier");
+                name: "ProductCategories");
 
-            migrationBuilder.DropColumn(
-                name: "CreatedAt",
-                table: "Users");
+            migrationBuilder.DropTable(
+                name: "Shops");
 
-            migrationBuilder.DropColumn(
-                name: "UpdatedAt",
-                table: "Users");
+            migrationBuilder.DropTable(
+                name: "Suppliers");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

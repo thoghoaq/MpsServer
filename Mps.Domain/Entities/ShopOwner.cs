@@ -1,6 +1,6 @@
 ﻿namespace Mps.Domain.Entities
 {
-    public class Supplier
+    public class ShopOwner
     {
         public int UserId { get; set; }
         public DateTime CreatedAt { get; set; }

@@ -21,8 +21,10 @@ namespace Mps.Application.Features.Account
 
         public record User
         {
+            public int? UserId { get; set; }
             public string? Uid { get; set; }
             public List<string>? Role { get; set; }
+            public bool? IsActive { get; set; }
             public Data? Data { get; set; }
         }
 
@@ -67,13 +69,15 @@ namespace Mps.Application.Features.Account
                 {
                     User = new User
                     {
+                        UserId = user.UserId,
                         Uid = user?.IdentityId,
                         Role = user?.Role.Split(",").Where(r => r != "").ToList(),
+                        IsActive = user?.IsActive,
                         Data = new Data
                         {
                             Email = user?.Email,
                             DisplayName = user?.FullName,
-                            PhotoUrl = null,
+                            PhotoUrl = user?.AvatarPath,
                             Settings = new Settings
                             {
                                 Layout = new Layout(),

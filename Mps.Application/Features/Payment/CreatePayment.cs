@@ -1,9 +1,12 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
 
 namespace Mps.Application.Features.Payment
 {
@@ -27,37 +30,50 @@ namespace Mps.Application.Features.Payment
             public string? PaymentUrl { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IVnPayService vnPayService, IConfiguration configuration) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IVnPayService vnPayService, IConfiguration configuration, ILogger<CreatePayment> logger, IHttpContextAccessor httpContext) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly MpsDbContext _dbContext = dbContext;
             private readonly ILoggedUser _loggedUser = loggedUser;
             private readonly IVnPayService _vnPayService = vnPayService;
             private readonly IConfiguration _configuration = configuration;
+            private readonly ILogger<CreatePayment> _logger = logger;
+            private readonly IHttpContextAccessor _httpContext = httpContext;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
                 try
                 {
+                    var transaction = _dbContext.Database.BeginTransaction();
                     var newPayment = new Domain.Entities.Payment
                     {
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = _loggedUser.UserId,
                         PaymentDate = DateTime.UtcNow,
-                        ExpireDate = DateTime.UtcNow.AddMinutes(1),
+                        ExpireDate = DateTime.UtcNow.AddMinutes(15),
                         PaymentContent = request.PaymentContent,
                         MerchantId = request.MerchantId,
                         PaymentCurrency = request.PaymentCurrency,
                         PaymentDestinationId = request.PaymentDestinationId,
                         PaymentLanguage = request.PaymentLanguage,
                         PaymentRefId = request.PaymentRefId,
-                        RequiredAmount = request.RequiredAmount
+                        RequiredAmount = request.RequiredAmount,
+                        PaymentStatusId = (int)Domain.Enums.PaymentStatus.Pending,
+                        PaymentSignature = new PaymentSignature
+                        {
+                            IsValid = true,
+                            SignDate = DateTime.UtcNow,
+                            SignOwn = request.MerchantId,
+                            SignValue = request.Signature
+                        }
                     };
                     var createResult = await _dbContext.Payments.AddAsync(newPayment, cancellationToken);
+                    await _dbContext.SaveChangesAsync(cancellationToken);
                     var paymentUrl = string.Empty;
                     switch (request.PaymentDestinationId)
                     {
                         case "VnPay":
-                            var returnUrl = _configuration["VnPay:ReturnUrl"] ?? string.Empty;
+                            var appDomain = $"{_httpContext.HttpContext?.Request.Scheme}://{_httpContext.HttpContext?.Request.Host}";
+                            var returnUrl = $"{appDomain}{_configuration["VnPay:ReturnUrl"]}";
                             var vnPayUrl = _configuration["VnPay:PaymentUrl"] ?? string.Empty;
                             var tmnCode = _configuration["VnPay:TmnCode"] ?? string.Empty;
                             var secretKey = _configuration["VnPay:HashSecret"] ?? string.Empty;
@@ -72,8 +88,8 @@ namespace Mps.Application.Features.Payment
                         default:
                             break;
                     }
+                    transaction.Commit();
 
-                    await _dbContext.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result
                     {
                         PaymentId = createResult.Entity.PaymentId,
@@ -81,6 +97,7 @@ namespace Mps.Application.Features.Payment
                     });
                 } catch (Exception ex)
                 {
+                    _logger.LogError(ex, "CreatePaymentFailure");
                     return CommandResult<Result>.Fail(ex.Message);
                 }
             }

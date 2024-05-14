@@ -13,6 +13,7 @@ namespace Mps.Application.Features.Account
             public int? PageNumber { get; set; }
             public int? PageSize { get; set; }
             public string? Filter { get; set; }
+            public bool? IsActive { get; set; }
         }
 
         public class Result
@@ -27,6 +28,7 @@ namespace Mps.Application.Features.Account
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var query = _context.Users
+                    .Where(u => request.IsActive == null || u.IsActive == request.IsActive)
                     .Where(u => request.Role == null || u.Role.Contains(request.Role))
                     .Where(u => request.Filter == null || u.FullName.Contains(request.Filter) || u.Email.Contains(request.Filter))
                     .AsQueryable();

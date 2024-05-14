@@ -1,4 +1,4 @@
-﻿using Mps.Domain.Constants;
+﻿using Mps.Domain.Enums;
 using Mps.Domain.Extensions;
 
 namespace Mps.Application.Helpers

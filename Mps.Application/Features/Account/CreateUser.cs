@@ -6,7 +6,7 @@ using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Application.Helpers;
-using Mps.Domain.Constants;
+using Mps.Domain.Enums;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
 using System.ComponentModel.DataAnnotations;
@@ -42,17 +42,17 @@ namespace Mps.Application.Features.Account
             {
                 try
                 {
-                    if (request.Role == Role.Admin.GetDescription())
-                    {
-                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
-                    }
-                    if (request.Role == Role.Staff.GetDescription() && !_loggedUser.Roles.Contains(Role.Admin.GetDescription()))
-                    {
-                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
-                    }
                     if (!request.Role.InRoles())
                     {
                         return CommandResult<Result>.Fail(_localizer["Role is not valid"]);
+                    }
+                    if (request.Role == Role.Admin.GetDescription() && !_loggedUser.Roles.Contains(Role.SuperAdmin.GetDescription()))
+                    {
+                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
+                    }
+                    if (request.Role == Role.Staff.GetDescription() && !_loggedUser.IsAdminGroup)
+                    {
+                        return CommandResult<Result>.Fail(_localizer["You don't have permission to create this role"]);
                     }
                     var existUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
                     if (existUser != null)
@@ -102,7 +102,8 @@ namespace Mps.Application.Features.Account
                         Role = request.Role + ",",
                         FullName = request.FullName,
                         CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        UpdatedAt = DateTime.UtcNow,
+                        IsActive = true
                     };
                     _context.Add(user);
                     await _context.SaveChangesAsync(cancellationToken);

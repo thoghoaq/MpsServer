@@ -4,5 +4,9 @@
     {
         public void CreateVnPayRequest(string version, string tmnCode, DateTime createDate, string ipAddress, decimal amount, string currCode, string orderType, string orderInfo, string returnUrl, string txnRef);
         public string GetLink(string baseUrl, string secretKey);
+        public bool IsValidSignature(string secret);
+        public string GetResponseMessage(string responseCode);
+        public bool IsSuccessResponse(string responseCode);
+        public void BindingResponse(int? amount, string? bankCode, string? bankTranNo, string? cardType, string? orderInfo, string? transactionNo, string? transactionStatus, int? txnRef, string? secureHash, string? payDate, string? responseCode, string? tmnCode);
     }
 }
