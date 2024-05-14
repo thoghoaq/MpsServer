@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
@@ -27,12 +28,13 @@ namespace Mps.Application.Features.Payment
             public string? PaymentUrl { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IVnPayService vnPayService, IConfiguration configuration) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IVnPayService vnPayService, IConfiguration configuration, ILogger<CreatePayment> logger) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly MpsDbContext _dbContext = dbContext;
             private readonly ILoggedUser _loggedUser = loggedUser;
             private readonly IVnPayService _vnPayService = vnPayService;
             private readonly IConfiguration _configuration = configuration;
+            private readonly ILogger<CreatePayment> _logger = logger;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -43,14 +45,21 @@ namespace Mps.Application.Features.Payment
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = _loggedUser.UserId,
                         PaymentDate = DateTime.UtcNow,
-                        ExpireDate = DateTime.UtcNow.AddMinutes(1),
+                        ExpireDate = DateTime.UtcNow.AddMinutes(15),
                         PaymentContent = request.PaymentContent,
                         MerchantId = request.MerchantId,
                         PaymentCurrency = request.PaymentCurrency,
                         PaymentDestinationId = request.PaymentDestinationId,
                         PaymentLanguage = request.PaymentLanguage,
                         PaymentRefId = request.PaymentRefId,
-                        RequiredAmount = request.RequiredAmount
+                        RequiredAmount = request.RequiredAmount,
+                        PaymentSignature = new PaymentSignature
+                        {
+                            IsValid = true,
+                            SignDate = DateTime.UtcNow,
+                            SignOwn = request.MerchantId,
+                            SignValue = request.Signature
+                        }
                     };
                     var createResult = await _dbContext.Payments.AddAsync(newPayment, cancellationToken);
                     var paymentUrl = string.Empty;
@@ -81,6 +90,7 @@ namespace Mps.Application.Features.Payment
                     });
                 } catch (Exception ex)
                 {
+                    _logger.LogError(ex, ex.Message);
                     return CommandResult<Result>.Fail(ex.Message);
                 }
             }

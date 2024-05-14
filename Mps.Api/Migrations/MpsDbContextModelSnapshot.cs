@@ -314,16 +314,24 @@ namespace Mps.Api.Migrations
                     b.Property<int>("PaymentId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("PaymentId1")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("SignDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("SignOwn")
-                        .HasColumnType("text");
+                    b.Property<int?>("SignOwn")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SignValue")
                         .HasColumnType("text");
 
                     b.HasKey("PaymentSignatureId");
+
+                    b.HasIndex("PaymentId")
+                        .IsUnique();
+
+                    b.HasIndex("PaymentId1");
 
                     b.ToTable("PaymentSignatures");
                 });
@@ -650,6 +658,21 @@ namespace Mps.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Mps.Domain.Entities.PaymentSignature", b =>
+                {
+                    b.HasOne("Mps.Domain.Entities.Payment", null)
+                        .WithOne("PaymentSignature")
+                        .HasForeignKey("Mps.Domain.Entities.PaymentSignature", "PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Mps.Domain.Entities.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId1");
+
+                    b.Navigation("Payment");
+                });
+
             modelBuilder.Entity("Mps.Domain.Entities.Product", b =>
                 {
                     b.HasOne("Mps.Domain.Entities.ProductBrand", "Brand")
@@ -723,6 +746,11 @@ namespace Mps.Api.Migrations
                     b.Navigation("OrderDetails");
 
                     b.Navigation("Progresses");
+                });
+
+            modelBuilder.Entity("Mps.Domain.Entities.Payment", b =>
+                {
+                    b.Navigation("PaymentSignature");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Product", b =>
