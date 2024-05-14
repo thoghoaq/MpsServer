@@ -9,7 +9,7 @@ namespace Mps.Infrastructure.Middleware
     [AttributeUsage(AttributeTargets.Method)]
     public class AuthAttribute : Attribute, IAuthorizationFilter
     {
-        public string? Roles { get; set; }
+        public string[]? Roles { get; set; } = [];
         public bool AllowAnonymous { get; set; } = false;
 
         public void OnAuthorization(AuthorizationFilterContext context)
@@ -47,7 +47,7 @@ namespace Mps.Infrastructure.Middleware
             {
                 return;
             }
-            if (!user.Role.Contains(Roles!))
+            if (!Roles!.Any(x => user.Role.Contains(x)))
             {
                 context.Result = new UnauthorizedResult();
                 return;

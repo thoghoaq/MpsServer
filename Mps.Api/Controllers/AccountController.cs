@@ -11,7 +11,7 @@ namespace Mps.Api.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [Auth(Roles = "Admin")]
+        [Auth(Roles = ["Admin"])]
         [HttpGet]
         [Route("all")]
         public async Task<IActionResult> GetAllUsers(string? role, int? pageNumber, int? pageSize, string? query)
@@ -88,7 +88,7 @@ namespace Mps.Api.Controllers
             });
         }
 
-        [Auth(Roles = "Admin")]
+        [Auth(Roles = ["Admin"])]
         [HttpDelete]
         [Route("delete")]
         public async Task<IActionResult> DeleteUser([FromBody] DeleteUser.Command command)
