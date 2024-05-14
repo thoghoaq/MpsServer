@@ -4,6 +4,20 @@ namespace Mps.Domain.Entities
     public class MpsDbContext(DbContextOptions<MpsDbContext> options) : DbContext(options)
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Shop> Shops { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductBrand> ProductBrands { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<OrderStatus> OrderStatuses { get; set; }
+        public DbSet<PaymentStatus> PaymentStatuses { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<PaymentSignature> PaymentSignatures { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,6 +97,9 @@ namespace Mps.Domain.Entities
                 new PaymentMethod { PaymentMethodId = 5, PaymentMethodName = "UPI" }
                 );
 
+            modelBuilder.Entity<Payment>().HasKey(m => m.PaymentId);
+
+            modelBuilder.Entity<PaymentSignature>().HasKey(m => m.PaymentSignatureId);
         }
     }
 }

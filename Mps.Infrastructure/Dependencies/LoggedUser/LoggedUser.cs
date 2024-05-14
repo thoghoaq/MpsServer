@@ -39,5 +39,7 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
         public IEnumerable<string> Roles => GetUser()!.Role.Split(",").Where(r => !r.IsNullOrEmpty());
 
         public string IdentityId => GetUser()!.IdentityId;
+
+        public string IpAddress => _httpContext.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
     }
 }

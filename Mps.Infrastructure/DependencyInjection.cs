@@ -4,14 +4,15 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Payment;
 using Mps.Infrastructure.Dependencies.Firebase.Authentication;
 using Mps.Infrastructure.Dependencies.Localization;
 using Mps.Infrastructure.Dependencies.LoggedUser;
+using Mps.Infrastructure.Dependencies.VnPay;
 
 namespace Mps.Infrastructure
 {
@@ -64,6 +65,8 @@ namespace Mps.Infrastructure
                 options.AddSupportedUICultures(supportedCultures);
                 options.ApplyCurrentCultureToResponseHeaders = true;
             });
+
+            services.AddTransient<IVnPayService, VnPayService>();
         }
     }
 }

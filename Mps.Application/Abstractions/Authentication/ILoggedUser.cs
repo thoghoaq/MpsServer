@@ -7,5 +7,6 @@
         public string Email { get; }
         public IEnumerable<string> Roles { get; }
         public string IdentityId { get; }
+        public string IpAddress { get; }
     }
 }
