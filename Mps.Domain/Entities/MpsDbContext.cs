@@ -82,10 +82,9 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<PaymentStatus>().HasKey(s => s.PaymentStatusId);
             modelBuilder.Entity<PaymentStatus>().HasData(
                 new PaymentStatus { PaymentStatusId = 1, PaymentStatusName = "Pending" },
-                new PaymentStatus { PaymentStatusId = 2, PaymentStatusName = "Processing" },
-                new PaymentStatus { PaymentStatusId = 3, PaymentStatusName = "Paid" },
-                new PaymentStatus { PaymentStatusId = 4, PaymentStatusName = "Cancelled" },
-                new PaymentStatus { PaymentStatusId = 5, PaymentStatusName = "Refunded" }
+                new PaymentStatus { PaymentStatusId = 2, PaymentStatusName = "Success" },
+                new PaymentStatus { PaymentStatusId = 3, PaymentStatusName = "Failed" },
+                new PaymentStatus { PaymentStatusId = 4, PaymentStatusName = "Expired" }
                 );
 
             modelBuilder.Entity<PaymentMethod>().HasKey(m => m.PaymentMethodId);

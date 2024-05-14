@@ -14,7 +14,7 @@ namespace Mps.Infrastructure.Dependencies.VnPay.Helpers
                 byte[] hashValue = hmac.ComputeHash(inputBytes);
                 foreach (byte x in hashValue)
                 {
-                    hash.AppendFormat("{0:x2}", x);
+                    hash.AppendFormat(x.ToString("x2"));
                 }
             }
             return hash.ToString();

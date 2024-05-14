@@ -12,9 +12,11 @@
         public string? PaymentLanguage { get; set; }
         public int? MerchantId { get; set; }
         public string? PaymentDestinationId { get; set; }
+        public int PaymentStatusId { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
 
+        public PaymentStatus? PaymentStatus { get; set; }
         public virtual PaymentSignature? PaymentSignature { get; set; }
     }
 }
