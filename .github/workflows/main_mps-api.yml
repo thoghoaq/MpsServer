@@ -41,6 +41,8 @@ jobs:
           HangfireKey: ${{ secrets.HANGFIRE_KEY }}
           VnPay.HashSecret: ${{ secrets.VNPAY_SECRET_KEY }}
           VnPay.TmnCode: ${{ secrets.VNPAY_TMN_CODE }}
+          FirebaseStorage.Bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FirebaseStorage.ApiKey: ${{ secrets.FIREBASE_STORAGE_API_KEY }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3

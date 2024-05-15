@@ -18,6 +18,7 @@ namespace Mps.Domain.Entities
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PaymentSignature> PaymentSignatures { get; set; }
+        public DbSet<UserDevice> UserDevices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +26,9 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
             modelBuilder.Entity<User>().Property(u => u.Role).IsRequired();
             modelBuilder.Entity<User>().HasIndex(u => u.IdentityId).IsUnique();
+
+            modelBuilder.Entity<UserDevice>().HasKey(u => u.UserDeviceId);
+            modelBuilder.Entity<UserDevice>().HasOne(u => u.User).WithMany().HasForeignKey(u => u.UserId);
 
             modelBuilder.Entity<Customer>().HasKey(c => c.UserId);
             modelBuilder.Entity<Customer>().HasOne(c => c.User).WithOne().HasForeignKey<Customer>(c => c.UserId);
