@@ -136,5 +136,37 @@ namespace Mps.Api.Controllers
                 reason = result.FailureReason
             });
         }
+
+        /// <summary>
+        /// Get all devices of logged user
+        /// </summary>
+        /// <returns></returns>
+        [Auth]
+        [HttpGet]
+        [Route("devices")]
+        public async Task<IActionResult> GetDevices()
+        {
+            var result = await _mediator.Send(new GetDevices.Query());
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        [Auth]
+        [HttpPut]
+        [Route("devices")]
+        public async Task<IActionResult> CreateUpdateDevices([FromBody] CreateUpdateDevices.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
     }
 }
