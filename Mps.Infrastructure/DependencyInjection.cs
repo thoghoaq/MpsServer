@@ -8,8 +8,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Messaging;
 using Mps.Application.Abstractions.Payment;
+using Mps.Application.Abstractions.Storage;
 using Mps.Infrastructure.Dependencies.Firebase.Authentication;
+using Mps.Infrastructure.Dependencies.Firebase.Messaging;
+using Mps.Infrastructure.Dependencies.Firebase.Storage;
 using Mps.Infrastructure.Dependencies.Localization;
 using Mps.Infrastructure.Dependencies.LoggedUser;
 using Mps.Infrastructure.Dependencies.VnPay;
@@ -67,6 +71,10 @@ namespace Mps.Infrastructure
             });
 
             services.AddTransient<IVnPayService, VnPayService>();
+
+            services.AddTransient<INotificationService, FirebaseNotificationService>();
+
+            services.AddTransient<IStorageService, FirebaseStorageService>();
         }
     }
 }

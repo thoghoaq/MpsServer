@@ -138,6 +138,9 @@
   <data name="Successfully created new user" xml:space="preserve">
     <value>Tạo mới người dùng thành công</value>
   </data>
+  <data name="Update device successfully" xml:space="preserve">
+    <value>Cập nhật thiết bị thành công</value>
+  </data>
   <data name="User already has this role" xml:space="preserve">
     <value>Người dùng đã có role này</value>
   </data>
