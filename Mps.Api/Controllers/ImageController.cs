@@ -41,6 +41,25 @@ namespace Mps.Api.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("upload")]
+        public async Task<IActionResult> UploadImages([Required][FromForm] List<IFormFile> files, [Required][FromQuery] ImageType type)
+        {
+            try
+            {
+                var folderPath = $"/{type.GetDescription()}";
+                var fileUrls = await _storageService.UploadMultipleImagesAsync(files, folderPath);
+                return Ok(fileUrls);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
         [HttpDelete]
         [Route("delete/test")]
         public async Task<IActionResult> Delete([Required]string imageUrl)

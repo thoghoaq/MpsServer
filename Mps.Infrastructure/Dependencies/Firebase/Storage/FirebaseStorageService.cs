@@ -34,7 +34,7 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Storage
             } catch (Exception ex)
             {
                 _logger.LogError(ex, "FirebaseStorageServiceFailure");
-                throw new Exception("Error uploading image to Firebase Storage", ex);
+                throw;
             }
         }
 
@@ -57,6 +57,21 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Storage
                 _logger.LogError(ex, "FirebaseStorageServiceFailure");
                 throw new Exception("Error deleting image from Firebase Storage", ex);
             }
+        }
+
+        public async Task<List<string>> UploadMultipleImagesAsync(List<IFormFile> files, string folderPath)
+        {
+            if (files.Any(x => x.ContentType != "image/png" && x.ContentType != "image/jpeg" && x.ContentType != "image/jpg"))
+            {
+                throw new Exception("Invalid file type. Only PNG, JPG and JPEG are allowed.");
+            }
+            var fileUrls = new List<string>();
+            foreach (var file in files)
+            {
+                var url = await UploadImageAsync(file, folderPath);
+                fileUrls.Add(url);
+            }
+            return fileUrls;
         }
     }
 }

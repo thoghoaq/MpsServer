@@ -47,7 +47,7 @@ namespace Mps.Infrastructure.Middleware
             }
             if (user.IsActive == false)
             {
-                context.Result = new UnauthorizedResult();
+                context.Result = new ForbidResult();
                 return;
             }
             if (Roles.IsNullOrEmpty())
@@ -60,7 +60,7 @@ namespace Mps.Infrastructure.Middleware
             }
             if (!Roles!.Any(x => user.Role.Contains(x)))
             {
-                context.Result = new UnauthorizedResult();
+                context.Result = new ForbidResult();
                 return;
             }
             return;
