@@ -20,14 +20,26 @@ namespace Mps.Application.Features.Account
             [EmailAddress]
             public required string Email { get; set; }
             [MinLength(6)]
-            public required string Password { get; set; }
+            public string? Password { get; set; }
             public required string FullName { get; set; }
             public required string Role { get; set; }
+            public string? PhoneNumber { get; set; }
+            public string? AvatarPath { get; set; }
+            public StaffData? StaffData { get; set; }
         }
 
         public class Result
         {
             public string? Message { get; set; }
+        }
+
+        public record StaffData
+        {
+            public string? IdentityCard { get; set; }
+            public string? IdentityCardFrontPath { get; set; }
+            public string? IdentityCardBackPath { get; set; }
+            public string? Address { get; set; }
+            public string? CertificatePath { get; set; }
         }
 
         public class Handler(IAuthenticationService authenticationService, MpsDbContext context, ILoggedUser loggedUser, ILogger<CreateUser> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
@@ -77,6 +89,7 @@ namespace Mps.Application.Features.Account
                     }
                     user.Role = user.Role + request.Role + ",";
                     user.UpdatedAt = DateTime.UtcNow;
+                    CreateRoleData(user, request);
                     await _context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new role"] });
                 } catch (Exception ex)
@@ -90,6 +103,10 @@ namespace Mps.Application.Features.Account
             {
                 try
                 {
+                    if (string.IsNullOrEmpty(request.Password))
+                    {
+                        request.Password = GeneratePassword();
+                    }
                     var identityId = await _authenticationService.RegisterAsync(request.Email, request.Password, cancellationToken);
                     if (string.IsNullOrEmpty(identityId))
                     {
@@ -105,6 +122,7 @@ namespace Mps.Application.Features.Account
                         UpdatedAt = DateTime.UtcNow,
                         IsActive = true
                     };
+                    CreateRoleData(user, request);
                     _context.Add(user);
                     await _context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new user"]});
@@ -118,6 +136,63 @@ namespace Mps.Application.Features.Account
                     }
                     return CommandResult<Result>.Fail(ex.Message);
                 }
+            }
+
+            private void CreateRoleData(User user, Command request)
+            {
+                if (request.Role == Role.Staff.GetDescription())
+                {
+                    CreateStaffData(user, request);
+                }
+                if (request.Role == Role.ShopOwner.GetDescription())
+                {
+                    CreateShopOwnerData(user, request);
+                }
+                if (request.Role == Role.Customer.GetDescription())
+                {
+                    CreateCustomerData(user, request);
+                }
+            }
+
+            private void CreateStaffData(User user, Command request)
+            {
+                var staff = new Staff
+                {
+                    IdentityCard = request.StaffData?.IdentityCard,
+                    IdentityCardFrontPath = request.StaffData?.IdentityCardFrontPath,
+                    IdentityCardBackPath = request.StaffData?.IdentityCardBackPath,
+                    Address = request.StaffData?.Address,
+                    CertificatePath = request.StaffData?.CertificatePath,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                user.Staff = staff;
+            }
+
+            private void CreateShopOwnerData(User user, Command request)
+            {
+                var shopOwner = new ShopOwner
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                user.ShopOwner = shopOwner;
+            }
+
+            private async Task CreateCustomerData(User user, Command request)
+            {
+                var customer = new Customer
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                user.Customer = customer;
+            }
+
+            private string GeneratePassword()
+            {
+                var random = new Random();
+                return random.Next(100000, 999999).ToString();
             }
         }
     }

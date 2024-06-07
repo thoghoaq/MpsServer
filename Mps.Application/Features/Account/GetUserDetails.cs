@@ -23,18 +23,30 @@ namespace Mps.Application.Features.Account
             public string? PhoneNumber { get; set; }
             public string? AvatarPath { get; set; }
             public string? Role { get; set; }
-            public CustomerInfo? CustomerInfo { get; set; }
-            public ShopOwnerInfo? ShopOwnerInfo { get; set; }
+            public CustomerData? CustomerData { get; set; }
+            public ShopOwnerData? ShopOwnerData { get; set; }
+            public StaffData? StaffData { get; set; }
         }
 
-        public class CustomerInfo
+        public class CustomerData
         {
             
         }
 
-        public class ShopOwnerInfo
+        public class ShopOwnerData
         {
 
+        }
+
+        public class StaffData
+        {
+            public string? IdentityCard { get; set; }
+            public string? IdentityCardFrontPath { get; set; }
+            public string? IdentityCardBackPath { get; set; }
+            public string? Address { get; set; }
+            public string? CertificatePath { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime? UpdatedAt { get; set; }
         }
 
         public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IAppLocalizer localizer) : IRequestHandler<Query, CommandResult<Result>>
@@ -49,7 +61,11 @@ namespace Mps.Application.Features.Account
                 {
                     return CommandResult<Result>.Fail(_localizer["You are not authorized to view this user"]);
                 }
-                var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
+                var user = await _dbContext.Users
+                    .Include(x => x.Customer)
+                    .Include(x => x.ShopOwner)
+                    .Include(x => x.Staff)
+                    .FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
                 if (user == null)
                 {
                     return CommandResult<Result>.Fail("User not found");
@@ -60,24 +76,26 @@ namespace Mps.Application.Features.Account
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber,
                     AvatarPath = user.AvatarPath,
-                    Role = user.Role
+                    Role = user.Role,
+                    CustomerData = user.Customer != null ? new CustomerData
+                    {
+                        
+                    } : null,
+                    ShopOwnerData = user.ShopOwner != null ? new ShopOwnerData
+                    {
+                        
+                    } : null,
+                    StaffData = user.Staff != null ? new StaffData
+                    {
+                        IdentityCard = user.Staff.IdentityCard,
+                        IdentityCardFrontPath = user.Staff.IdentityCardFrontPath,
+                        IdentityCardBackPath = user.Staff.IdentityCardBackPath,
+                        Address = user.Staff.Address,
+                        CertificatePath = user.Staff.CertificatePath,
+                        CreatedAt = user.Staff.CreatedAt,
+                        UpdatedAt = user.Staff.UpdatedAt
+                    } : null
                 };
-                if (user.Role.Contains(Role.Customer.GetDescription()))
-                {
-                    var customer = await _dbContext.Customers.FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
-                    result.CustomerInfo = new CustomerInfo
-                    {
-                        
-                    };
-                }
-                if (user.Role.Contains(Role.ShopOwner.GetDescription()))
-                {
-                    var shopOwner = await _dbContext.ShopOwners.FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
-                    result.ShopOwnerInfo = new ShopOwnerInfo
-                    {
-                        
-                    };
-                }
 
                 return CommandResult<Result>.Success(result);
             }

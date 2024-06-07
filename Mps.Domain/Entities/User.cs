@@ -14,5 +14,8 @@
         public DateTime? UpdatedAt { get; set; }
 
         public virtual ICollection<UserDevice>? UserDevices { get; set; }
+        public virtual Customer? Customer { get; set; }
+        public virtual ShopOwner? ShopOwner { get; set; }
+        public virtual Staff? Staff { get; set; }
     }
 }

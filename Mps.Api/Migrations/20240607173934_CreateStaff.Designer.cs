@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mps.Domain.Entities;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Mps.Api.Migrations
 {
     [DbContext(typeof(MpsDbContext))]
-    partial class MpsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240607173934_CreateStaff")]
+    partial class CreateStaff
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -536,26 +539,11 @@ namespace Mps.Api.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Address")
+                    b.Property<string>("AvatarPath")
                         .HasColumnType("text");
 
-                    b.Property<string>("CertificatePath")
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("IdentityCard")
-                        .HasColumnType("text");
-
-                    b.Property<string>("IdentityCardBackPath")
-                        .HasColumnType("text");
-
-                    b.Property<string>("IdentityCardFrontPath")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("UserId");
 
@@ -658,11 +646,13 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.Customer", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.User", null)
-                        .WithOne("Customer")
+                    b.HasOne("Mps.Domain.Entities.User", "User")
+                        .WithOne()
                         .HasForeignKey("Mps.Domain.Entities.Customer", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Order", b =>
@@ -825,20 +815,24 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.ShopOwner", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.User", null)
-                        .WithOne("ShopOwner")
+                    b.HasOne("Mps.Domain.Entities.User", "User")
+                        .WithOne()
                         .HasForeignKey("Mps.Domain.Entities.ShopOwner", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Staff", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.User", null)
-                        .WithOne("Staff")
+                    b.HasOne("Mps.Domain.Entities.User", "User")
+                        .WithOne()
                         .HasForeignKey("Mps.Domain.Entities.Staff", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.UserDevice", b =>
@@ -880,12 +874,6 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Customer");
-
-                    b.Navigation("ShopOwner");
-
-                    b.Navigation("Staff");
-
                     b.Navigation("UserDevices");
                 });
 #pragma warning restore 612, 618
