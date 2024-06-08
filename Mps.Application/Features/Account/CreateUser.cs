@@ -179,7 +179,7 @@ namespace Mps.Application.Features.Account
                 user.ShopOwner = shopOwner;
             }
 
-            private async Task CreateCustomerData(User user, Command request)
+            private void CreateCustomerData(User user, Command request)
             {
                 var customer = new Customer
                 {

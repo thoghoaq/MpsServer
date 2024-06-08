@@ -60,6 +60,22 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth]
+        [HttpPut]
+        [Route("update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUser.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
         /// <summary>
         /// Login with email and password
         /// </summary>
