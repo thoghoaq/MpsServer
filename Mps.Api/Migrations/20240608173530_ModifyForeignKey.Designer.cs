@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mps.Domain.Entities;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Mps.Api.Migrations
 {
     [DbContext(typeof(MpsDbContext))]
-    partial class MpsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240608173530_ModifyForeignKey")]
+    partial class ModifyForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -514,12 +517,17 @@ namespace Mps.Api.Migrations
                     b.Property<int>("ShopOwnerId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ShopOwnerUserId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ShopOwnerId");
+
+                    b.HasIndex("ShopOwnerUserId");
 
                     b.ToTable("Shops");
                 });
@@ -785,11 +793,17 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.Shop", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.ShopOwner", null)
-                        .WithMany("Shops")
+                    b.HasOne("Mps.Domain.Entities.ShopOwner", "ShopOwner")
+                        .WithMany()
                         .HasForeignKey("ShopOwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Mps.Domain.Entities.ShopOwner", null)
+                        .WithMany("Shops")
+                        .HasForeignKey("ShopOwnerUserId");
+
+                    b.Navigation("ShopOwner");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.ShopOwner", b =>

@@ -30,17 +30,17 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<User>().HasOne(u => u.Customer).WithOne().HasForeignKey<Customer>(u => u.Id);
             modelBuilder.Entity<User>().HasOne(u => u.ShopOwner).WithOne().HasForeignKey<ShopOwner>(u => u.UserId);
             modelBuilder.Entity<User>().HasOne(u => u.Staff).WithOne().HasForeignKey<Staff>(u => u.UserId);
+            modelBuilder.Entity<User>().HasMany(u => u.UserDevices).WithOne().HasForeignKey(u => u.UserId);
 
             modelBuilder.Entity<UserDevice>().HasKey(u => u.Id);
-            modelBuilder.Entity<UserDevice>().HasOne(u => u.User).WithMany().HasForeignKey(u => u.UserId);
 
             modelBuilder.Entity<Customer>().HasKey(c => c.Id);
 
             modelBuilder.Entity<ShopOwner>().HasKey(s => s.UserId);
+            modelBuilder.Entity<ShopOwner>().HasMany(s => s.Shops).WithOne().HasForeignKey(s => s.ShopOwnerId);
 
             modelBuilder.Entity<Shop>().HasKey(s => s.Id);
             modelBuilder.Entity<Shop>().Property(s => s.ShopName).IsRequired();
-            modelBuilder.Entity<Shop>().HasOne(s => s.ShopOwner).WithMany().HasForeignKey(s => s.ShopOwnerId);
 
             modelBuilder.Entity<Staff>().HasKey(s => s.UserId);
 
@@ -51,6 +51,7 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<Product>().Property(s => s.Stock).IsRequired();
             modelBuilder.Entity<Product>().HasOne(s => s.Category).WithMany().HasForeignKey(s => s.CategoryId);
             modelBuilder.Entity<Product>().HasOne(s => s.Brand).WithMany().HasForeignKey(s => s.BrandId);
+            modelBuilder.Entity<Product>().HasMany(s => s.Images).WithOne().HasForeignKey(s => s.ProductId);
 
             modelBuilder.Entity<ProductCategory>().HasKey(c => c.Id);
             modelBuilder.Entity<ProductCategory>().Property(c => c.Name).IsRequired();
@@ -60,7 +61,6 @@ namespace Mps.Domain.Entities
 
             modelBuilder.Entity<ProductImage>().HasKey(i => i.Id);
             modelBuilder.Entity<ProductImage>().Property(i => i.ImagePath).IsRequired();
-            modelBuilder.Entity<ProductImage>().HasOne(i => i.Product).WithMany().HasForeignKey(i => i.ProductId);
 
             modelBuilder.Entity<Order>().HasKey(o => o.Id);
             modelBuilder.Entity<Order>().HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId);
@@ -68,13 +68,12 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<Order>().HasOne(o => o.OrderStatus).WithMany().HasForeignKey(o => o.OrderStatusId);
             modelBuilder.Entity<Order>().HasOne(o => o.PaymentStatus).WithMany().HasForeignKey(o => o.PaymentStatusId);
             modelBuilder.Entity<Order>().HasOne(o => o.PaymentMethod).WithMany().HasForeignKey(o => o.PaymentMethodId);
+            modelBuilder.Entity<Order>().HasMany(o => o.OrderDetails).WithOne().HasForeignKey(o => o.OrderId);
+            modelBuilder.Entity<Order>().HasMany(o => o.Progresses).WithOne().HasForeignKey(o => o.OrderId);
 
             modelBuilder.Entity<OrderDetail>().HasKey(o => o.Id);
-            modelBuilder.Entity<OrderDetail>().HasOne(o => o.Product).WithMany().HasForeignKey(o => o.ProductId);
-            modelBuilder.Entity<OrderDetail>().HasOne(o => o.Order).WithMany().HasForeignKey(o => o.OrderId);
 
             modelBuilder.Entity<OrderProgress>().HasKey(o => o.Id);
-            modelBuilder.Entity<OrderProgress>().HasOne(o => o.Order).WithMany().HasForeignKey(o => o.OrderId);
 
             modelBuilder.Entity<OrderStatus>().HasKey(s => s.Id);
             modelBuilder.Entity<OrderStatus>().HasData(
@@ -105,9 +104,9 @@ namespace Mps.Domain.Entities
                 );
 
             modelBuilder.Entity<Payment>().HasKey(m => m.Id);
+            modelBuilder.Entity<Payment>().HasOne(m => m.PaymentSignature).WithMany().HasForeignKey(m => m.PaymentSignatureId);
 
             modelBuilder.Entity<PaymentSignature>().HasKey(m => m.Id);
-            modelBuilder.Entity<PaymentSignature>().HasOne(m => m.Payment).WithOne().HasForeignKey<PaymentSignature>(m => m.PaymentId);
             
         }
     }
