@@ -37,7 +37,7 @@ namespace Mps.Application.Features.Account
                 try
                 {
                     var userId = _loggedUser.UserId;
-                    var device = await _dbContext.UserDevices.FirstOrDefaultAsync(d => (d.UserDeviceId == request.UserDeviceId || d.DeviceToken == request.DeviceToken) && d.UserId == userId, cancellationToken);
+                    var device = await _dbContext.UserDevices.FirstOrDefaultAsync(d => (d.Id == request.UserDeviceId || d.DeviceToken == request.DeviceToken) && d.UserId == userId, cancellationToken);
                     if (device == null)
                     {
                         device = new UserDevice

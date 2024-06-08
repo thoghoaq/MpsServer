@@ -2,7 +2,7 @@
 {
     public class UserDevice
     {
-        public int UserDeviceId { get; set; }
+        public int Id { get; set; }
         public int UserId { get; set; }
         public string? DeviceToken { get; set; }
         public string? DeviceName { get; set; }

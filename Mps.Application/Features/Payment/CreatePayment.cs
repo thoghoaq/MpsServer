@@ -50,12 +50,12 @@ namespace Mps.Application.Features.Payment
                         CreatedBy = _loggedUser.UserId,
                         PaymentDate = DateTime.UtcNow,
                         ExpireDate = DateTime.UtcNow.AddMinutes(15),
-                        PaymentContent = request.PaymentContent,
+                        Content = request.PaymentContent,
                         MerchantId = request.MerchantId,
-                        PaymentCurrency = request.PaymentCurrency,
+                        Currency = request.PaymentCurrency,
                         PaymentDestinationId = request.PaymentDestinationId,
-                        PaymentLanguage = request.PaymentLanguage,
-                        PaymentRefId = request.PaymentRefId,
+                        Language = request.PaymentLanguage,
+                        RefId = request.PaymentRefId,
                         RequiredAmount = request.RequiredAmount,
                         PaymentStatusId = (int)Domain.Enums.PaymentStatus.Pending,
                         PaymentSignature = new PaymentSignature
@@ -82,7 +82,7 @@ namespace Mps.Application.Features.Payment
                             var userIpAddress = _loggedUser.IpAddress;
                             var orderType = "other";
                             var paymentCurrency = request.PaymentCurrency ?? "VND";
-                            _vnPayService.CreateVnPayRequest(version, tmnCode, createDate, userIpAddress, request.RequiredAmount, paymentCurrency, orderType, request.PaymentContent ?? string.Empty, returnUrl, createResult.Entity.PaymentId.ToString());
+                            _vnPayService.CreateVnPayRequest(version, tmnCode, createDate, userIpAddress, request.RequiredAmount, paymentCurrency, orderType, request.PaymentContent ?? string.Empty, returnUrl, createResult.Entity.Id.ToString());
                             paymentUrl = _vnPayService.GetLink(vnPayUrl, secretKey);
                             break;
                         default:
@@ -92,7 +92,7 @@ namespace Mps.Application.Features.Payment
 
                     return CommandResult<Result>.Success(new Result
                     {
-                        PaymentId = createResult.Entity.PaymentId,
+                        PaymentId = createResult.Entity.Id,
                         PaymentUrl = paymentUrl
                     });
                 } catch (Exception ex)

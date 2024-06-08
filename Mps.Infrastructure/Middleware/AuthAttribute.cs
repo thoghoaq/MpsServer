@@ -54,7 +54,7 @@ namespace Mps.Infrastructure.Middleware
             {
                 return;
             }
-            if (Roles!.Contains(Role.Admin.GetDescription()) && user.Role.Contains(Role.SuperAdmin.GetDescription()))
+            if (user.Role.Contains(Role.Admin.GetDescription()) || user.Role.Contains(Role.SuperAdmin.GetDescription()))
             {
                 return;
             }

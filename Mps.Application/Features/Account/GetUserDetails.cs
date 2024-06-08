@@ -65,7 +65,7 @@ namespace Mps.Application.Features.Account
                     .Include(x => x.Customer)
                     .Include(x => x.ShopOwner)
                     .Include(x => x.Staff)
-                    .FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                 if (user == null)
                 {
                     return CommandResult<Result>.Fail("User not found");

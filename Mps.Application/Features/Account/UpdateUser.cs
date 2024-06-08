@@ -51,7 +51,7 @@ namespace Mps.Application.Features.Account
                 {
                     var user = await _dbContext.Users
                         .Include(x => x.Staff)
-                        .Where(x => x.UserId == request.UserId)
+                        .Where(x => x.Id == request.UserId)
                         .FirstOrDefaultAsync(cancellationToken);
                     if (user == null)
                     {

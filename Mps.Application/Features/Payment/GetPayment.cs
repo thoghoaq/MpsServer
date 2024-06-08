@@ -55,7 +55,7 @@ namespace Mps.Application.Features.Payment
                     var secretKey = _configuration["VnPay:HashSecret"] ?? string.Empty;
                     _vnPayService.BindingResponse(request.Vnp_Amount, request.Vnp_BankCode, request.Vnp_BankTranNo, request.Vnp_CardType, request.Vnp_OrderInfo, request.Vnp_TransactionNo, request.Vnp_TransactionStatus, request.Vnp_TxnRef, request.Vnp_SecureHash, request.Vnp_PayDate, request.Vnp_ResponseCode, request.Vnp_TmnCode);
                     //var isValidSignature = _vnPayService.IsValidSignature(secretKey);
-                    var payment = await _dbContext.Payments.Include(x => x.PaymentSignature).FirstOrDefaultAsync(x => x.PaymentId == request.Vnp_TxnRef, cancellationToken: cancellationToken);
+                    var payment = await _dbContext.Payments.Include(x => x.PaymentSignature).FirstOrDefaultAsync(x => x.Id == request.Vnp_TxnRef, cancellationToken: cancellationToken);
                     if (payment != null)
                     {
                         resultData.PaymentMessage = _vnPayService.GetResponseMessage(request.Vnp_ResponseCode ?? string.Empty);
@@ -63,9 +63,9 @@ namespace Mps.Application.Features.Payment
                         var isSuccess = _vnPayService.IsSuccessResponse(request.Vnp_ResponseCode ?? string.Empty);
                         if (isSuccess)
                         {
-                            resultData.PaymentId = payment.PaymentId;
+                            resultData.PaymentId = payment.Id;
                             resultData.PaymentDate = payment.PaymentDate?.ToString("yyyyMMddHHmmss");
-                            resultData.PaymentRefId = payment.PaymentRefId;
+                            resultData.PaymentRefId = payment.RefId;
                             resultData.Amount = payment.RequiredAmount;
                             resultData.Signature = payment.PaymentSignature?.SignValue;
 

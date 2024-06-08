@@ -2,7 +2,7 @@
 {
     public class ProductCategory
     {
-        public int CategoryId { get; set; }
-        public required string CategoryName { get; set; }
+        public int Id { get; set; }
+        public required string Name { get; set; }
     }
 }

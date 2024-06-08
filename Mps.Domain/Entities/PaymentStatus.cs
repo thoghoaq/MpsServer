@@ -2,7 +2,7 @@
 {
     public class PaymentStatus
     {
-        public int PaymentStatusId { get; set; }
-        public required string PaymentStatusName { get; set; }
+        public int Id { get; set; }
+        public required string Name { get; set; }
     }
 }

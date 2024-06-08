@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mps.Domain.Entities;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Mps.Api.Migrations
 {
     [DbContext(typeof(MpsDbContext))]
-    partial class MpsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240608164222_ShopData")]
+    partial class ShopData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,7 +27,7 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.Customer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
@@ -33,18 +36,18 @@ namespace Mps.Api.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Order", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderId"));
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
@@ -73,7 +76,7 @@ namespace Mps.Api.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId");
 
                     b.HasIndex("CustomerId");
 
@@ -90,11 +93,11 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.OrderDetail", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("OrderDetailId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderDetailId"));
 
                     b.Property<decimal>("Discount")
                         .HasColumnType("numeric");
@@ -117,7 +120,7 @@ namespace Mps.Api.Migrations
                     b.Property<decimal>("Total")
                         .HasColumnType("numeric");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderDetailId");
 
                     b.HasIndex("OrderId");
 
@@ -130,101 +133,93 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.OrderProgress", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("OrderProgressId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderProgressId"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("OrderId1")
-                        .HasColumnType("integer");
+                    b.Property<string>("OrderProgressName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderProgressId");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("OrderId1");
 
                     b.ToTable("OrderProgress");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.OrderStatus", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("OrderStatusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderStatusId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("OrderStatusName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderStatusId");
 
                     b.ToTable("OrderStatuses");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            Name = "Pending"
+                            OrderStatusId = 1,
+                            OrderStatusName = "Pending"
                         },
                         new
                         {
-                            Id = 2,
-                            Name = "Processing"
+                            OrderStatusId = 2,
+                            OrderStatusName = "Processing"
                         },
                         new
                         {
-                            Id = 3,
-                            Name = "Delivered"
+                            OrderStatusId = 3,
+                            OrderStatusName = "Delivered"
                         },
                         new
                         {
-                            Id = 4,
-                            Name = "Cancelled"
+                            OrderStatusId = 4,
+                            OrderStatusName = "Cancelled"
                         },
                         new
                         {
-                            Id = 5,
-                            Name = "Returned"
+                            OrderStatusId = 5,
+                            OrderStatusName = "Returned"
                         },
                         new
                         {
-                            Id = 6,
-                            Name = "Refunded"
+                            OrderStatusId = 6,
+                            OrderStatusName = "Refunded"
                         },
                         new
                         {
-                            Id = 7,
-                            Name = "Completed"
+                            OrderStatusId = 7,
+                            OrderStatusName = "Completed"
                         });
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Payment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PaymentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentId"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -232,17 +227,17 @@ namespace Mps.Api.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Currency")
-                        .HasColumnType("text");
-
                     b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Language")
-                        .HasColumnType("text");
-
                     b.Property<int?>("MerchantId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("PaymentContent")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentCurrency")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("timestamp with time zone");
@@ -250,24 +245,19 @@ namespace Mps.Api.Migrations
                     b.Property<string>("PaymentDestinationId")
                         .HasColumnType("text");
 
-                    b.Property<int?>("PaymentSignatureId")
-                        .HasColumnType("integer");
+                    b.Property<string>("PaymentLanguage")
+                        .HasColumnType("text");
 
-                    b.Property<int?>("PaymentSignatureId2")
+                    b.Property<int?>("PaymentRefId")
                         .HasColumnType("integer");
 
                     b.Property<int>("PaymentStatusId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("RefId")
-                        .HasColumnType("integer");
-
                     b.Property<decimal>("RequiredAmount")
                         .HasColumnType("numeric");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("PaymentSignatureId2");
+                    b.HasKey("PaymentId");
 
                     b.HasIndex("PaymentStatusId");
 
@@ -276,60 +266,63 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.PaymentMethod", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PaymentMethodId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentMethodId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("PaymentMethodName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("PaymentMethodId");
 
                     b.ToTable("PaymentMethods");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            Name = "Cash on Delivery"
+                            PaymentMethodId = 1,
+                            PaymentMethodName = "Cash on Delivery"
                         },
                         new
                         {
-                            Id = 2,
-                            Name = "Credit Card"
+                            PaymentMethodId = 2,
+                            PaymentMethodName = "Credit Card"
                         },
                         new
                         {
-                            Id = 3,
-                            Name = "Debit Card"
+                            PaymentMethodId = 3,
+                            PaymentMethodName = "Debit Card"
                         },
                         new
                         {
-                            Id = 4,
-                            Name = "Net Banking"
+                            PaymentMethodId = 4,
+                            PaymentMethodName = "Net Banking"
                         },
                         new
                         {
-                            Id = 5,
-                            Name = "UPI"
+                            PaymentMethodId = 5,
+                            PaymentMethodName = "UPI"
                         });
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.PaymentSignature", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PaymentSignatureId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentSignatureId"));
 
                     b.Property<bool>("IsValid")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("PaymentId")
+                    b.Property<int>("PaymentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PaymentId1")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("SignDate")
@@ -341,60 +334,62 @@ namespace Mps.Api.Migrations
                     b.Property<string>("SignValue")
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("PaymentSignatureId");
 
                     b.HasIndex("PaymentId")
                         .IsUnique();
+
+                    b.HasIndex("PaymentId1");
 
                     b.ToTable("PaymentSignatures");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.PaymentStatus", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PaymentStatusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentStatusId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("PaymentStatusName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("PaymentStatusId");
 
                     b.ToTable("PaymentStatuses");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            Name = "Pending"
+                            PaymentStatusId = 1,
+                            PaymentStatusName = "Pending"
                         },
                         new
                         {
-                            Id = 2,
-                            Name = "Success"
+                            PaymentStatusId = 2,
+                            PaymentStatusName = "Success"
                         },
                         new
                         {
-                            Id = 3,
-                            Name = "Failed"
+                            PaymentStatusId = 3,
+                            PaymentStatusName = "Failed"
                         },
                         new
                         {
-                            Id = 4,
-                            Name = "Expired"
+                            PaymentStatusId = 4,
+                            PaymentStatusName = "Expired"
                         });
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Product", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductId"));
 
                     b.Property<int>("BrandId")
                         .HasColumnType("integer");
@@ -405,12 +400,12 @@ namespace Mps.Api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("ShopId")
                         .HasColumnType("integer");
@@ -418,7 +413,7 @@ namespace Mps.Api.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductId");
 
                     b.HasIndex("BrandId");
 
@@ -431,45 +426,45 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.ProductBrand", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("BrandId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BrandId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("BrandName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("BrandId");
 
                     b.ToTable("ProductBrands");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.ProductCategory", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("CategoryId");
 
                     b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.ProductImage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ProductImageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductImageId"));
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
@@ -481,7 +476,7 @@ namespace Mps.Api.Migrations
                     b.Property<int?>("ProductId1")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductImageId");
 
                     b.HasIndex("ProductId");
 
@@ -492,11 +487,11 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.Shop", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ShopId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ShopId"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -546,7 +541,7 @@ namespace Mps.Api.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("ShopId");
 
                     b.HasIndex("ShopOwnerId");
 
@@ -604,11 +599,11 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("AvatarPath")
                         .HasColumnType("text");
@@ -641,7 +636,7 @@ namespace Mps.Api.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -654,11 +649,11 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.UserDevice", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserDeviceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserDeviceId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -687,7 +682,7 @@ namespace Mps.Api.Migrations
                     b.Property<int?>("UserId1")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserDeviceId");
 
                     b.HasIndex("UserId");
 
@@ -700,7 +695,7 @@ namespace Mps.Api.Migrations
                 {
                     b.HasOne("Mps.Domain.Entities.User", null)
                         .WithOne("Customer")
-                        .HasForeignKey("Mps.Domain.Entities.Customer", "Id")
+                        .HasForeignKey("Mps.Domain.Entities.Customer", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -773,41 +768,35 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.OrderProgress", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.Order", "Order")
-                        .WithMany()
+                    b.HasOne("Mps.Domain.Entities.Order", null)
+                        .WithMany("Progresses")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Mps.Domain.Entities.Order", null)
-                        .WithMany("Progresses")
-                        .HasForeignKey("OrderId1");
-
-                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Payment", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.PaymentSignature", "PaymentSignature")
-                        .WithMany()
-                        .HasForeignKey("PaymentSignatureId2");
-
                     b.HasOne("Mps.Domain.Entities.PaymentStatus", "PaymentStatus")
                         .WithMany()
                         .HasForeignKey("PaymentStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PaymentSignature");
-
                     b.Navigation("PaymentStatus");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.PaymentSignature", b =>
                 {
+                    b.HasOne("Mps.Domain.Entities.Payment", null)
+                        .WithOne("PaymentSignature")
+                        .HasForeignKey("Mps.Domain.Entities.PaymentSignature", "PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Mps.Domain.Entities.Payment", "Payment")
-                        .WithOne()
-                        .HasForeignKey("Mps.Domain.Entities.PaymentSignature", "PaymentId");
+                        .WithMany()
+                        .HasForeignKey("PaymentId1");
 
                     b.Navigation("Payment");
                 });
@@ -841,14 +830,14 @@ namespace Mps.Api.Migrations
 
             modelBuilder.Entity("Mps.Domain.Entities.ProductImage", b =>
                 {
-                    b.HasOne("Mps.Domain.Entities.Product", "Product")
-                        .WithMany()
+                    b.HasOne("Mps.Domain.Entities.Product", null)
+                        .WithMany("Images")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Mps.Domain.Entities.Product", null)
-                        .WithMany("Images")
+                    b.HasOne("Mps.Domain.Entities.Product", "Product")
+                        .WithMany()
                         .HasForeignKey("ProductId1");
 
                     b.Navigation("Product");
@@ -907,6 +896,11 @@ namespace Mps.Api.Migrations
                     b.Navigation("OrderDetails");
 
                     b.Navigation("Progresses");
+                });
+
+            modelBuilder.Entity("Mps.Domain.Entities.Payment", b =>
+                {
+                    b.Navigation("PaymentSignature");
                 });
 
             modelBuilder.Entity("Mps.Domain.Entities.Product", b =>

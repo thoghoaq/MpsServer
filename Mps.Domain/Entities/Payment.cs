@@ -2,17 +2,18 @@
 {
     public class Payment
     {
-        public int PaymentId { get; set; }
-        public string? PaymentContent { get; set; }
-        public string? PaymentCurrency { get; set; }
-        public int? PaymentRefId { get; set; }
+        public int Id { get; set; }
+        public string? Content { get; set; }
+        public string? Currency { get; set; }
+        public int? RefId { get; set; }
         public decimal RequiredAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
         public DateTime? ExpireDate { get; set; }
-        public string? PaymentLanguage { get; set; }
+        public string? Language { get; set; }
         public int? MerchantId { get; set; }
         public string? PaymentDestinationId { get; set; }
         public int PaymentStatusId { get; set; }
+        public int? PaymentSignatureId { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
 

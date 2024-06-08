@@ -35,7 +35,7 @@ namespace Mps.Application.Features.Account
             {
                 try
                 {
-                    var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken);
+                    var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
                     if (user == null)
                     {
                         return CommandResult<Result>.Fail(_localizer["User not found"]);
@@ -56,7 +56,7 @@ namespace Mps.Application.Features.Account
                     user.IsActive = request.IsActive;
                     user.UpdatedAt = DateTime.UtcNow;
                     await _dbContext.SaveChangesAsync(cancellationToken);
-                    return CommandResult<Result>.Success(new Result { UserId = user.UserId, IsActive = user.IsActive });
+                    return CommandResult<Result>.Success(new Result { UserId = user.Id, IsActive = user.IsActive });
                 } catch (Exception ex)
                 {
                     logger.LogError(ex, "ActiveUserFailure");

@@ -2,7 +2,13 @@
 {
     public class Order
     {
-        public int OrderId { get; set; }
+        public Order()
+        {
+            OrderDetails = [];
+            Progresses = [];
+        }
+
+        public int Id { get; set; }
         public int CustomerId { get; set; }
         public int ShopId { get; set; }
         public DateTime OrderDate { get; set; }
@@ -18,7 +24,7 @@
         public virtual OrderStatus? OrderStatus { get; set; }
         public virtual PaymentStatus? PaymentStatus { get; set; }
         public virtual PaymentMethod? PaymentMethod { get; set; }
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
-        public virtual ICollection<OrderProgress>? Progresses { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<OrderProgress> Progresses { get; set; }
     }
 }

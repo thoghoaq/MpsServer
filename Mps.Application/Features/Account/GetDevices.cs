@@ -37,7 +37,7 @@ namespace Mps.Application.Features.Account
                 var device = await _dbContext.UserDevices.Where(d => d.UserId == userId).ToListAsync(cancellationToken);
                 var result = device.Select(d => new Result
                 {
-                    UserDeviceId = d.UserDeviceId,
+                    UserDeviceId = d.Id,
                     UserId = d.UserId,
                     DeviceToken = d.DeviceToken,
                     DeviceName = d.DeviceName,

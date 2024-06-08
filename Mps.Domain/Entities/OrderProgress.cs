@@ -2,10 +2,12 @@
 {
     public class OrderProgress
     {
-        public int OrderProgressId { get; set; }
-        public required string OrderProgressName { get; set; }
+        public int Id { get; set; }
+        public required string Name { get; set; }
         public int OrderId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+
+        public virtual Order? Order { get; set; }
     }
 }

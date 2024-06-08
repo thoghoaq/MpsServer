@@ -66,7 +66,7 @@ namespace Mps.Application.Features.Account
             private readonly IAppLocalizer _localizer = localizer;
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var user = await _dbContext.Users.FirstOrDefaultAsync(u => request.Email != null ? u.Email == request.Email : u.UserId == _loggedUser.UserId, cancellationToken);
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => request.Email != null ? u.Email == request.Email : u.Id == _loggedUser.UserId, cancellationToken);
                 if (user == null)
                 {
                     return CommandResult<Result>.Fail(_localizer["User not found"]);
@@ -75,7 +75,7 @@ namespace Mps.Application.Features.Account
                 {
                     User = new User
                     {
-                        UserId = user.UserId,
+                        UserId = user.Id,
                         Uid = user!.IdentityId,
                         Role = user!.Role.Split(",").Where(r => r != "").ToList(),
                         IsActive = user!.IsActive,

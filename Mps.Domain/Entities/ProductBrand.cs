@@ -2,7 +2,7 @@
 {
     public class ProductBrand
     {
-        public int BrandId { get; set; }
-        public required string BrandName { get; set; }
+        public int Id { get; set; }
+        public required string Name { get; set; }
     }
 }

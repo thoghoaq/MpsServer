@@ -32,7 +32,7 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
             return _user;
         }
 
-        public int UserId => GetUser()!.UserId;
+        public int UserId => GetUser()!.Id;
 
         public string FullName => GetUser()!.FullName;
 
