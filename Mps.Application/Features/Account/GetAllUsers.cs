@@ -36,7 +36,9 @@ namespace Mps.Application.Features.Account
                 {
                     query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                 }
-                var users = await query.ToListAsync(cancellationToken: cancellationToken);
+                var users = await query
+                    .OrderByDescending(u => u.UpdatedAt)
+                    .ToListAsync(cancellationToken: cancellationToken);
                 return CommandResult<Result>.Success(new Result { Users = users });
             }
         }
