@@ -30,7 +30,12 @@ namespace Mps.Application.Features.Account
                 var query = _context.Users
                     .Where(u => request.IsActive == null || u.IsActive == request.IsActive)
                     .Where(u => request.Role == null || u.Role.Contains(request.Role))
-                    .Where(u => request.Filter == null || u.FullName.Contains(request.Filter) || u.Email.Contains(request.Filter))
+                    .Where(u => request.Filter == null 
+                            || u.FullName.Contains(request.Filter) 
+                            || u.Email.Contains(request.Filter) 
+                            || u.Role.Contains(request.Filter)
+                            || (u.PhoneNumber != null && u.PhoneNumber.Contains(request.Filter))
+                        )
                     .AsQueryable();
                 if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
