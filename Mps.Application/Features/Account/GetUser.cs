@@ -4,6 +4,8 @@ using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Account
 {
@@ -25,6 +27,10 @@ namespace Mps.Application.Features.Account
             public string? Uid { get; set; }
             public List<string>? Role { get; set; }
             public bool? IsActive { get; set; }
+            public bool? IsAdminGroup { get; set; }
+            public bool? IsManagerGroup { get; set; }
+            public bool? IsShopOwner { get; set; }
+            public bool? IsCustomer { get; set; }
             public Data? Data { get; set; }
         }
 
@@ -70,9 +76,13 @@ namespace Mps.Application.Features.Account
                     User = new User
                     {
                         UserId = user.UserId,
-                        Uid = user?.IdentityId,
-                        Role = user?.Role.Split(",").Where(r => r != "").ToList(),
-                        IsActive = user?.IsActive,
+                        Uid = user!.IdentityId,
+                        Role = user!.Role.Split(",").Where(r => r != "").ToList(),
+                        IsActive = user!.IsActive,
+                        IsAdminGroup = user!.Role.Contains(Role.Admin.GetDescription()) || user!.Role.Contains(Role.SuperAdmin.GetDescription()),
+                        IsManagerGroup = user!.Role.Contains(Role.SuperAdmin.GetDescription()) || user!.Role.Contains(Role.Admin.GetDescription()) || user!.Role.Contains(Role.Staff.GetDescription()),
+                        IsCustomer = user!.Role.Contains(Role.Customer.GetDescription()),
+                        IsShopOwner = user!.Role.Contains(Role.ShopOwner.GetDescription()),
                         Data = new Data
                         {
                             Email = user?.Email,

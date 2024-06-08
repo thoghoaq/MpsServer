@@ -49,5 +49,9 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
         public bool IsManagerGroup => GetUser()!.Role.Contains(Role.SuperAdmin.GetDescription()) || GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.Staff.GetDescription());
 
         public bool IsAdminGroup => GetUser()!.Role.Contains(Role.Admin.GetDescription()) || GetUser()!.Role.Contains(Role.SuperAdmin.GetDescription());
+
+        public bool IsShopOwner => GetUser()!.Role.Contains(Role.ShopOwner.GetDescription());
+
+        public bool IsCustomer => GetUser()!.Role.Contains(Role.Customer.GetDescription());
     }
 }

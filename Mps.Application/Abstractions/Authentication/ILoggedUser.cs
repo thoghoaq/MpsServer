@@ -11,5 +11,7 @@
         public bool IsAuthenticated { get; }
         public bool IsManagerGroup { get; }
         public bool IsAdminGroup { get; }
+        public bool IsShopOwner { get; }
+        public bool IsCustomer { get; }
     }
 }
