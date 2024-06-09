@@ -27,6 +27,7 @@ namespace Mps.Application.Features.ProductCategory
             {
                 var query = _context.ProductCategories
                     .Include(s => s.Children)
+                    .ThenInclude(s => s.Children)
                     .Where(s => s.ParentId == null)
                     .Where(s => request.Filter == null || s.Name.Contains(request.Filter))
                     .AsQueryable();
