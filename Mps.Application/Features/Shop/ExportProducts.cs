@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Excel;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
@@ -20,6 +19,17 @@ namespace Mps.Application.Features.Shop
         public class Result
         {
             public required MemoryStream FileStream { get; set; }
+        }
+
+        public record ExportedProduct
+        {
+            public int Id { get; set; }
+            public required string Name { get; set; }
+            public required decimal Price { get; set; }
+            public required int Stock { get; set; }
+            public string? Description { get; set; }
+            public int CategoryId { get; set; }
+            public int BrandId { get; set; }
         }
 
         public class Handler(IExcelService excelService, IMediator mediator, IAppLocalizer localizer, ILogger<ExportProducts> logger) : IRequestHandler<Query, CommandResult<Result>>
@@ -45,7 +55,18 @@ namespace Mps.Application.Features.Shop
                         return CommandResult<Result>.Fail(_localizer[result.FailureReason ?? "Error when get products"]);
                     }
 
-                    var fileStream = _excelService.ExportToExcel(result.Payload?.Products ?? []);
+                    var exportedProducts = result.Payload?.Products?.Select(p => new ExportedProduct
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Price = p.Price,
+                        Stock = p.Stock,
+                        Description = p.Description,
+                        CategoryId = p.CategoryId,
+                        BrandId = p.BrandId
+                    }).ToList();
+
+                    var fileStream = _excelService.ExportToExcel(exportedProducts ?? []);
                     return CommandResult<Result>.Success(new Result
                     {
                         FileStream = fileStream

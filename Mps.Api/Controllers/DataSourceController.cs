@@ -53,7 +53,7 @@ namespace Mps.Api.Controllers
         }
 
         [HttpGet]
-        [Route("/categories/export")]
+        [Route("categories/export")]
         public async Task<IActionResult> ExportCategories([FromQuery] ExportCategories.Query query)
         {
             var result = await _mediator.Send(query);
@@ -72,7 +72,7 @@ namespace Mps.Api.Controllers
         }
 
         [HttpPost]
-        [Route("/categories/import")]
+        [Route("categories/import")]
         public async Task<IActionResult> ImportCategories([FromForm] ImportCategories.Command command)
         {
             var result = await _mediator.Send(command);
@@ -83,7 +83,7 @@ namespace Mps.Api.Controllers
         }
 
         [HttpGet]
-        [Route("/brands/export")]
+        [Route("brands/export")]
         public async Task<IActionResult> ExportBrands([FromQuery] ExportBrands.Query query)
         {
             var result = await _mediator.Send(query);
@@ -99,6 +99,17 @@ namespace Mps.Api.Controllers
             var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
             var fileName = "product-brands.xlsx";
             return File(content, contentType, fileName);
+        }
+
+        [HttpPost]
+        [Route("brands/import")]
+        public async Task<IActionResult> ImportBrands([FromForm] ImportBrands.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
         }
     }
 }
