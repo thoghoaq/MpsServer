@@ -51,5 +51,54 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [HttpGet]
+        [Route("/categories/export")]
+        public async Task<IActionResult> ExportCategories([FromQuery] ExportCategories.Query query)
+        {
+            var result = await _mediator.Send(query);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    Reason = result.FailureReason
+                });
+            }
+            var stream = result.Payload?.FileStream;
+            var content = stream?.ToArray() ?? [];
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var fileName = "product-categories.xlsx";
+            return File(content, contentType, fileName);
+        }
+
+        [HttpPost]
+        [Route("/categories/import")]
+        public async Task<IActionResult> ImportCategories([FromForm] ImportCategories.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
+        [HttpGet]
+        [Route("/brands/export")]
+        public async Task<IActionResult> ExportBrands([FromQuery] ExportBrands.Query query)
+        {
+            var result = await _mediator.Send(query);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    Reason = result.FailureReason
+                });
+            }
+            var stream = result.Payload?.FileStream;
+            var content = stream?.ToArray() ?? [];
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var fileName = "product-brands.xlsx";
+            return File(content, contentType, fileName);
+        }
     }
 }
