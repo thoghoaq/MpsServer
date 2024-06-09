@@ -64,19 +64,19 @@ namespace Mps.Application.Features.ProductCategory
                     var deletedCategories = databaseCategories.Where(c => !executeResults.Any(e => e.Id == c.Id && e.Id != null));
                     if (deletedCategories.Any())
                     {
-                        await _context.BulkDeleteAsync(deletedCategories);
+                        await _context.BulkDeleteAsync(deletedCategories.ToList());
                     }
 
                     var existingCategories = executeResults.Where(c => c.Id != null && c.IsSuccess);
                     if (existingCategories.Any())
                     {
-                        await _context.BulkUpdateAsync(existingCategories.Select(c => new Domain.Entities.ProductCategory { Id = c.Id!.Value, Name = c.Name! }));
+                        await _context.BulkUpdateAsync(existingCategories.Select(c => new Domain.Entities.ProductCategory { Id = c.Id!.Value, Name = c.Name! }).ToList());
                     }
 
                     var newCategories = executeResults.Where(c => c.Id == null && c.IsSuccess);
                     if (newCategories.Any())
                     {
-                        await _context.BulkInsertAsync(newCategories.Select(c => new Domain.Entities.ProductCategory { Name = c.Name! }));
+                        await _context.BulkInsertAsync(newCategories.Select(c => new Domain.Entities.ProductCategory { Name = c.Name! }).ToList());
                     }
 
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Imported successfully"], Results = executeResults.ToList() });

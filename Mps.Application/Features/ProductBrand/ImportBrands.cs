@@ -64,19 +64,19 @@ namespace Mps.Application.Features.ProductBrand
                     var deletedBrands = databaseBrands.Where(c => !executeResults.Any(e => e.Id == c.Id && e.Id != null));
                     if (deletedBrands.Any())
                     {
-                        await _context.BulkDeleteAsync(deletedBrands);
+                        await _context.BulkDeleteAsync(deletedBrands.ToList());
                     }
 
                     var existingBrands = executeResults.Where(c => c.Id != null && c.IsSuccess);
                     if (existingBrands.Any())
                     {
-                        await _context.BulkUpdateAsync(existingBrands.Select(c => new Domain.Entities.ProductBrand { Id = c.Id!.Value, Name = c.Name! }));
+                        await _context.BulkUpdateAsync(existingBrands.Select(c => new Domain.Entities.ProductBrand { Id = c.Id!.Value, Name = c.Name! }).ToList());
                     }
 
                     var newBrands = executeResults.Where(c => c.Id == null && c.IsSuccess);
                     if (newBrands.Any())
                     {
-                        await _context.BulkInsertAsync(newBrands.Select(c => new Domain.Entities.ProductBrand { Name = c.Name! }));
+                        await _context.BulkInsertAsync(newBrands.Select(c => new Domain.Entities.ProductBrand { Name = c.Name! }).ToList());
                     }
 
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Imported successfully"], Results = executeResults.ToList() });
