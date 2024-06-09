@@ -37,7 +37,6 @@ namespace Mps.Application.Features.ProductCategory
                     query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                 }
                 var categories = await query
-                    .OrderBy(s => s.Name)
                     .ToListAsync(cancellationToken: cancellationToken);
                 return CommandResult<Result>.Success(new Result { Categories = categories });
             }
