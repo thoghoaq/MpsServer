@@ -55,6 +55,7 @@ namespace Mps.Domain.Entities
 
             modelBuilder.Entity<ProductCategory>().HasKey(c => c.Id);
             modelBuilder.Entity<ProductCategory>().Property(c => c.Name).IsRequired();
+            modelBuilder.Entity<ProductCategory>().HasMany(c => c.Children).WithOne().HasForeignKey(c => c.ParentId);
 
             modelBuilder.Entity<ProductBrand>().HasKey(b => b.Id);
             modelBuilder.Entity<ProductBrand>().Property(b => b.Name).IsRequired();

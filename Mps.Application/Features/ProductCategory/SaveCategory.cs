@@ -12,6 +12,7 @@ namespace Mps.Application.Features.ProductCategory
         {
             public int? Id { get; set; }
             public required string Name { get; set; }
+            public int? ParentId { get; set; }
         }
 
         public class Result
@@ -37,11 +38,16 @@ namespace Mps.Application.Features.ProductCategory
                             return CommandResult<Result>.Fail(_localizer["Category not found"]);
                         }
                         category.Name = request.Name;
+                        category.ParentId = request.ParentId;
                         _context.ProductCategories.Update(category);
                     }
                     else
                     {
-                        var category = new Domain.Entities.ProductCategory { Name = request.Name };
+                        var category = new Domain.Entities.ProductCategory 
+                        { 
+                            Name = request.Name, 
+                            ParentId = request.ParentId
+                        };
                         _context.ProductCategories.Add(category);
                     }
                     await _context.SaveChangesAsync(cancellationToken);

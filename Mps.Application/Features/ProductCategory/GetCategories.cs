@@ -26,6 +26,7 @@ namespace Mps.Application.Features.ProductCategory
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var query = _context.ProductCategories
+                    .Include(s => s.Children)
                     .Where(s => request.Filter == null || s.Name.Contains(request.Filter))
                     .AsQueryable();
 
