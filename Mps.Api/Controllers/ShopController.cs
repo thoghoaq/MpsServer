@@ -55,5 +55,24 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [HttpGet]
+        [Route("products/export")]
+        public async Task<IActionResult> ExportProducts([FromQuery] ExportProducts.Query query)
+        {
+            var result = await _mediator.Send(query);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    Reason = result.FailureReason
+                });
+            }
+            var stream = result.Payload?.FileStream;
+            var content = stream?.ToArray() ?? [];
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var fileName = "products.xlsx";
+            return File(content, contentType, fileName);
+        }
     }
 }
