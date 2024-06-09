@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
@@ -27,7 +28,7 @@ namespace Mps.Application.Features.Seller
             public string? Message { get; set; }
         }
 
-        public class CommandHandler(MpsDbContext context, ILoggedUser loggedUser, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
+        public class CommandHandler(MpsDbContext context, ILoggedUser loggedUser, IAppLocalizer localizer, ILogger<CreateShop> logger) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly MpsDbContext _context = context;
             private readonly ILoggedUser _loggedUser = loggedUser;
@@ -37,7 +38,7 @@ namespace Mps.Application.Features.Seller
             {
                 try
                 {
-                    var shop = new Shop
+                    var shop = new Domain.Entities.Shop
                     {
                         ShopOwnerId = _loggedUser.UserId,
                         ShopName = request.ShopName,
@@ -50,7 +51,7 @@ namespace Mps.Application.Features.Seller
                         Description = request.Description,
                         Avatar = request.Avatar,
                         Cover = request.Cover,
-                        IsActive = true,
+                        IsActive = false,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
                     };
@@ -61,6 +62,7 @@ namespace Mps.Application.Features.Seller
                     });
                 } catch (Exception ex)
                 {
+                    logger.LogError(ex, "CreateShopFailure");
                     return CommandResult<Result>.Fail(_localizer[ex.Message]);
                 }
             }

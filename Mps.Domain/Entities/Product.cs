@@ -15,6 +15,9 @@
         public int CategoryId { get; set; }
         public int BrandId { get; set; }
         public required int ShopId { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         public virtual ProductCategory? Category { get; set; }
         public virtual ProductBrand? Brand { get; set; }

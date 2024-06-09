@@ -14,6 +14,7 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
         private readonly IHttpContextAccessor _httpContext = httpContext;
         private User? _user;
 
+        #region Account
         private User? GetUser()
         {
             if (_user == null)
@@ -53,5 +54,23 @@ namespace Mps.Infrastructure.Dependencies.LoggedUser
         public bool IsShopOwner => GetUser()!.Role.Contains(Role.ShopOwner.GetDescription());
 
         public bool IsCustomer => GetUser()!.Role.Contains(Role.Customer.GetDescription());
+        #endregion Account
+
+        #region Shop
+        private IEnumerable<int>? _shopIds;
+
+        private IEnumerable<int> GetShopIds()
+        {
+            if (_shopIds == null)
+            {
+                _shopIds = _dbContext.Shops.Where(s => s.ShopOwnerId == UserId).Select(s => s.Id).ToList(); 
+            }
+            return _shopIds;
+        }
+
+        public IEnumerable<int> ShopIds => IsShopOwner ? GetShopIds() : [];
+
+        public bool IsShopOwnerOf(int shopId) => ShopIds.Contains(shopId);
+        #endregion Shop
     }
 }

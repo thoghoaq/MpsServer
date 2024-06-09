@@ -8,7 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Mps.Infrastructure.Middleware
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthAttribute : Attribute, IAuthorizationFilter
     {
         public string[]? Roles { get; set; } = [];

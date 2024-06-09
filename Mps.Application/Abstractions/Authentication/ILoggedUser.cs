@@ -13,5 +13,8 @@
         public bool IsAdminGroup { get; }
         public bool IsShopOwner { get; }
         public bool IsCustomer { get; }
+
+        public IEnumerable<int> ShopIds { get; }
+        public bool IsShopOwnerOf(int shopId);
     }
 }

@@ -156,7 +156,7 @@ namespace Mps.Application.Features.Account
 
             private void CreateStaffData(User user, Command request)
             {
-                var staff = new Staff
+                var staff = new Domain.Entities.Staff
                 {
                     IdentityCard = request.StaffData?.IdentityCard,
                     IdentityCardFrontPath = request.StaffData?.IdentityCardFrontPath,
