@@ -24,5 +24,10 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Authentication
         {
             throw new NotImplementedException();
         }
+
+        public async Task<string> GeneratePasswordResetLinkAsync(string email)
+        {
+            return await FirebaseAuth.DefaultInstance.GeneratePasswordResetLinkAsync(email);
+        }
     }
 }

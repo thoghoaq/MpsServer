@@ -42,13 +42,14 @@ namespace Mps.Application.Features.Account
             public string? CertificatePath { get; set; }
         }
 
-        public class Handler(IAuthenticationService authenticationService, MpsDbContext context, ILoggedUser loggedUser, ILogger<CreateUser> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(IAuthenticationService authenticationService, MpsDbContext context, ILoggedUser loggedUser, ILogger<CreateUser> logger, IAppLocalizer localizer, IMediator mediator) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly IAuthenticationService _authenticationService = authenticationService;
             private readonly MpsDbContext _context = context;
             private readonly ILogger<CreateUser> _logger = logger;
             private readonly ILoggedUser _loggedUser = loggedUser;
             private readonly IAppLocalizer _localizer = localizer;
+            private readonly IMediator _mediator = mediator;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -125,6 +126,12 @@ namespace Mps.Application.Features.Account
                     CreateRoleData(user, request);
                     _context.Add(user);
                     await _context.SaveChangesAsync(cancellationToken);
+
+                    await _mediator.Send(new SendPasswordResetEmail.Command
+                    {
+                        Email = request.Email
+                    });
+
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new user"]});
                 }
                 catch (Exception ex)

@@ -104,6 +104,21 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [HttpPost]
+        [Route("send-password-reset-email")]
+        public async Task<IActionResult> SendPasswordResetEmail([FromBody] SendPasswordResetEmail.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
         [Auth(Roles = ["SuperAdmin"])]
         [HttpDelete]
         [Route("delete")]

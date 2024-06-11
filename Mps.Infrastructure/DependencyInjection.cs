@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mps.Application.Abstractions.Authentication;
+using Mps.Application.Abstractions.Email;
 using Mps.Application.Abstractions.Excel;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Messaging;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Abstractions.Storage;
+using Mps.Infrastructure.Dependencies.Email;
 using Mps.Infrastructure.Dependencies.Excel;
 using Mps.Infrastructure.Dependencies.Firebase.Authentication;
 using Mps.Infrastructure.Dependencies.Firebase.Messaging;
@@ -79,6 +81,8 @@ namespace Mps.Infrastructure
             services.AddTransient<IStorageService, FirebaseStorageService>();
 
             services.AddTransient<IExcelService, ExcelService>();
+
+            services.AddTransient<IEmailService, EmailService>();
         }
     }
 }
