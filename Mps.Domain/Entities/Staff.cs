@@ -3,6 +3,7 @@
     public class Staff
     {
         public int UserId { get; set; }
+        public string StaffCode { get; set; } = null!;
         public string? IdentityCard { get; set; }
         public string? IdentityCardFrontPath { get; set; }
         public string? IdentityCardBackPath { get; set; }

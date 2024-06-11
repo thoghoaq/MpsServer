@@ -34,7 +34,7 @@ namespace Mps.Application.Features.ProductCategory
 
                 if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
-                    query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
+                    query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                 }
                 var categories = await query
                     .ToListAsync(cancellationToken: cancellationToken);

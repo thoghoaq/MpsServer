@@ -49,7 +49,7 @@ namespace Mps.Application.Features.Shop
 
                     if (request.PageNumber.HasValue && request.PageSize.HasValue)
                     {
-                        query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
+                        query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                     }
                     var products = await query
                         .OrderBy(s => s.Name)

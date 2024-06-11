@@ -43,6 +43,7 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<Shop>().Property(s => s.ShopName).IsRequired();
 
             modelBuilder.Entity<Staff>().HasKey(s => s.UserId);
+            modelBuilder.Entity<Staff>().Property(s => s.StaffCode).HasDefaultValueSql("generate_staff_code()");
 
             modelBuilder.Entity<Product>().HasKey(s => s.Id);
             modelBuilder.Entity<Product>().HasOne(s => s.Shop).WithMany().HasForeignKey(s => s.ShopId);

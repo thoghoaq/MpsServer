@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Account
 {
@@ -37,9 +39,22 @@ namespace Mps.Application.Features.Account
                             || (u.PhoneNumber != null && u.PhoneNumber.Contains(request.Filter))
                         )
                     .AsQueryable();
+
+                if (request.Role == Role.Staff.GetDescription())
+                {
+                    query = query.Include(u => u.Staff);
+                }
+                if (request.Role == Role.ShopOwner.GetDescription())
+                {
+                    query = query.Include(u => u.ShopOwner);
+                }
+                if (request.Role == Role.Customer.GetDescription())
+                {
+                    query = query.Include(u => u.Customer);
+                }
                 if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
-                    query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
+                    query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                 }
                 var users = await query
                     .OrderByDescending(u => u.UpdatedAt)
