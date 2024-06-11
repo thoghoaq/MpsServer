@@ -43,7 +43,7 @@ namespace Mps.Application.Features.Account
                     }
 
                     var link = await _authenticationService.GeneratePasswordResetLinkAsync(user.Email);
-                    var subject = "[SMPS System] Reset Password";
+                    var subject = _localizer["[SMPS System] Reset Password"];
                     var currentCulture = System.Globalization.CultureInfo.CurrentCulture.Name;
                     var language = currentCulture switch
                     {
