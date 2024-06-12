@@ -1,5 +1,6 @@
 ﻿using Mps.Application.Abstractions.Excel;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System.Reflection;
 
 namespace Mps.Infrastructure.Dependencies.Excel
@@ -17,19 +18,31 @@ namespace Mps.Infrastructure.Dependencies.Excel
                 var properties = typeof(T).GetProperties();
                 for (int i = 0; i < properties.Length; i++)
                 {
-                    worksheet.Cells[1, i + 1].Value = properties[i].Name;
-                    worksheet.Cells[1, i + 1].Style.Font.Bold = true;
+                    var cell = worksheet.Cells[1, i + 1];
+                    cell.Value = properties[i].Name;
+                    cell.Style.Font.Bold = true;
+                    cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGreen);
+                    cell.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                 }
 
                 for (int row = 0; row < data.Count; row++)
                 {
                     var item = data[row];
+                    var rowColor = row % 2 == 0 ? System.Drawing.Color.LightGray : System.Drawing.Color.White;
+
                     for (int col = 0; col < properties.Length; col++)
                     {
-                        var value = properties[col].GetValue(item);
-                        worksheet.Cells[row + 2, col + 1].Value = value;
+                        var cell = worksheet.Cells[row + 2, col + 1];
+                        cell.Value = properties[col].GetValue(item);
+                        cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        cell.Style.Fill.BackgroundColor.SetColor(rowColor);
+                        cell.Style.Border.BorderAround(ExcelBorderStyle.Thin);
                     }
                 }
+
+                worksheet.Cells.AutoFitColumns();
 
                 package.SaveAs(stream);
             }

@@ -156,6 +156,26 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["Admin"])]
+        [HttpGet]
+        [Route("staffs/export")]
+        public async Task<IActionResult> ExportStaffs([FromQuery] ExportStaffs.Query query)
+        {
+            var result = await _mediator.Send(query);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new
+                {
+                    Reason = result.FailureReason
+                });
+            }
+            var stream = result.Payload?.FileStream;
+            var content = stream?.ToArray() ?? [];
+            var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            var fileName = "staffs.xlsx";
+            return File(content, contentType, fileName);
+        }
+
         [Auth]
         [HttpGet]
         [Route("details/{userId}")]
