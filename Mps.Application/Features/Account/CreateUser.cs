@@ -123,6 +123,8 @@ namespace Mps.Application.Features.Account
                         IdentityId = identityId,
                         Role = request.Role + ",",
                         FullName = request.FullName,
+                        PhoneNumber = request.PhoneNumber,
+                        AvatarPath = request.AvatarPath,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
                         IsActive = true

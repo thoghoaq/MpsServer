@@ -176,6 +176,22 @@ namespace Mps.Api.Controllers
             return File(content, contentType, fileName);
         }
 
+        [Auth(Roles = ["Admin"])]
+        [HttpPost]
+        [Route("staffs/import")]
+        public async Task<IActionResult> ImportStaffs([FromForm] ImportStaffs.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
         [Auth]
         [HttpGet]
         [Route("details/{userId}")]
