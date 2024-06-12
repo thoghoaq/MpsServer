@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
@@ -40,7 +41,7 @@ namespace Mps.Application.Features.Seller
 
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var shop = _context.Shops.Where(s => s.Id == request.Id && s.ShopOwnerId == _loggedUser.UserId).FirstOrDefault();
+                var shop = await _context.Shops.Where(s => s.Id == request.Id && s.ShopOwnerId == _loggedUser.UserId).FirstOrDefaultAsync();
                 if (shop == null)
                 {
                     return CommandResult<Result>.Fail(_localizer["Shop not found"]);

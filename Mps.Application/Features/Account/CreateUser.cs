@@ -10,6 +10,7 @@ using Mps.Domain.Enums;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
 using System.ComponentModel.DataAnnotations;
+using Mps.Application.Validations;
 
 namespace Mps.Application.Features.Account
 {
@@ -19,10 +20,13 @@ namespace Mps.Application.Features.Account
         {
             [EmailAddress]
             public required string Email { get; set; }
-            [MinLength(6)]
+            [MinLength(8)]
             public string? Password { get; set; }
+            [MinLength(3), FullName]
             public required string FullName { get; set; }
+            [AllowedValues("Admin", "Staff", "ShopOwner", "Customer")]
             public required string Role { get; set; }
+            [Phone]
             public string? PhoneNumber { get; set; }
             public string? AvatarPath { get; set; }
             public StaffData? StaffData { get; set; }
