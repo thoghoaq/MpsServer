@@ -197,7 +197,7 @@ namespace Mps.Application.Features.Account
                     result.Message = _localizer["Name is not valid"];
                 }
 
-                if (data.PhoneNumber != null && !Regex.IsMatch(data.PhoneNumber, @"^0[0-9]{9,10}$"))
+                if (!string.IsNullOrEmpty(data.PhoneNumber) && !Regex.IsMatch(data.PhoneNumber, @"\+?[1-9]\d{1,14}|\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"))
                 {
                     result.Message = _localizer["Phone number is not valid"];
                 }
