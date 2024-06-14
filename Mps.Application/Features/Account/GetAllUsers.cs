@@ -51,6 +51,7 @@ namespace Mps.Application.Features.Account
                             || u.Email.SearchIgnoreCase(request.Filter)
                             || u.Role.SearchIgnoreCase(request.Filter)
                             || (u.PhoneNumber != null && u.PhoneNumber.SearchIgnoreCase(request.Filter))
+                            || (u.Staff != null && u.Staff.StaffCode.SearchIgnoreCase(request.Filter))
                         )
                     .ToList();
 
