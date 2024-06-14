@@ -6,11 +6,11 @@ using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Application.Helpers;
-using Mps.Domain.Enums;
+using Mps.Application.Validations;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
 using Mps.Domain.Extensions;
 using System.ComponentModel.DataAnnotations;
-using Mps.Application.Validations;
 
 namespace Mps.Application.Features.Account
 {
@@ -77,7 +77,8 @@ namespace Mps.Application.Features.Account
                         return await AppendNewRole(existUser, request, cancellationToken);
                     }
                     return await CreateNewUser(request, cancellationToken);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "CreateUserFailure");
                     return CommandResult<Result>.Fail(ex.Message);
@@ -90,14 +91,15 @@ namespace Mps.Application.Features.Account
                 {
                     if (user.Role.Contains(request.Role))
                     {
-                        return CommandResult<Result>.Fail(_localizer["User already has this role"]);
+                        return CommandResult<Result>.Fail(_localizer["Email is existed"]);
                     }
                     user.Role = user.Role + request.Role + ",";
                     user.UpdatedAt = DateTime.UtcNow;
                     CreateRoleData(user, request);
                     await _context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new role"] });
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "AppendNewRoleFailure");
                     return CommandResult<Result>.Fail(ex.Message);
@@ -138,7 +140,7 @@ namespace Mps.Application.Features.Account
                         Email = request.Email
                     });
 
-                    return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new user"]});
+                    return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new user"] });
                 }
                 catch (Exception ex)
                 {

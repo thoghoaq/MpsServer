@@ -20,10 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="EFCore.BulkExtensions" Version="7.0.0" />
     <PackageReference Include="FirebaseAdmin" Version="3.0.0" />
     <PackageReference Include="MediatR" Version="12.2.0" />

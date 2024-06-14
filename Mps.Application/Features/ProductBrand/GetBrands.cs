@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.ProductBrand
 {
@@ -25,17 +25,15 @@ namespace Mps.Application.Features.ProductBrand
 
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var query = _context.ProductBrands
-                    .Where(s => request.Filter == null || s.Name.Contains(request.Filter))
-                    .AsQueryable();
+                var query = _context.ProductBrands.AsEnumerable()
+                    .Where(s => request.Filter == null || s.Name.SearchIgnoreCase(request.Filter));
 
                 if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
                     query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                 }
-                var brands = await query
-                    .OrderBy(s => s.Name)
-                    .ToListAsync(cancellationToken: cancellationToken);
+                var brands = query
+                    .OrderBy(s => s.Name).ToList();
                 return CommandResult<Result>.Success(new Result { Brands = brands });
             }
         }

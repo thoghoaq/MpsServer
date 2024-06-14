@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.ProductCategory
 {
@@ -29,15 +30,14 @@ namespace Mps.Application.Features.ProductCategory
                     .Include(s => s.Children)
                     .ThenInclude(s => s.Children)
                     .Where(s => s.ParentId == null)
-                    .Where(s => request.Filter == null || s.Name.Contains(request.Filter))
-                    .AsQueryable();
+                    .AsEnumerable()
+                    .Where(s => request.Filter == null || s.Name.SearchIgnoreCase(request.Filter));
 
                 if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
                     query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                 }
-                var categories = await query
-                    .ToListAsync(cancellationToken: cancellationToken);
+                var categories = query.ToList();
                 return CommandResult<Result>.Success(new Result { Categories = categories });
             }
         }

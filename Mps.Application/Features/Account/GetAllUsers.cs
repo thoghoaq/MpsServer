@@ -31,15 +31,7 @@ namespace Mps.Application.Features.Account
             {
                 var query = _context.Users
                     .Where(u => request.IsActive == null || u.IsActive == request.IsActive)
-                    .Where(u => request.Role == null || u.Role.Contains(request.Role))
-                    .Where(u => request.Filter == null 
-                            || u.FullName.Contains(request.Filter) 
-                            || u.Email.Contains(request.Filter) 
-                            || u.Role.Contains(request.Filter)
-                            || (u.PhoneNumber != null && u.PhoneNumber.Contains(request.Filter))
-                        )
                     .AsQueryable();
-
                 if (request.Role == Role.Staff.GetDescription())
                 {
                     query = query.Include(u => u.Staff);
@@ -52,13 +44,22 @@ namespace Mps.Application.Features.Account
                 {
                     query = query.Include(u => u.Customer);
                 }
+                var matches = query.AsEnumerable()
+                    .Where(u => request.Role == null || u.Role.SearchIgnoreCase(request.Role))
+                    .Where(u => request.Filter == null
+                            || u.FullName.SearchIgnoreCase(request.Filter)
+                            || u.Email.SearchIgnoreCase(request.Filter)
+                            || u.Role.SearchIgnoreCase(request.Filter)
+                            || (u.PhoneNumber != null && u.PhoneNumber.SearchIgnoreCase(request.Filter))
+                        )
+                    .ToList();
+
                 if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
-                    query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
+                    matches = matches.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value).ToList();
                 }
-                var users = await query
-                    .OrderByDescending(u => u.UpdatedAt)
-                    .ToListAsync(cancellationToken: cancellationToken);
+
+                var users = matches.OrderByDescending(u => u.UpdatedAt).ToList();
                 return CommandResult<Result>.Success(new Result { Users = users });
             }
         }
