@@ -13,6 +13,8 @@ namespace Mps.Application.Features.Shop
         {
             public required int ShopId { get; set; }
             public required int Id { get; set; }
+            public string? ProductCode { get; set; }
+            public string? ProductSKU { get; set; }
             public string? Name { get; set; }
             public decimal? Price { get; set; }
             public int? Stock { get; set; }
@@ -83,6 +85,16 @@ namespace Mps.Application.Features.Shop
                     if (request.BrandId != null)
                     {
                         product.BrandId = request.BrandId.Value;
+                    }
+
+                    if (request.ProductCode != null)
+                    {
+                        product.ProductCode = request.ProductCode;
+                    }
+
+                    if (request.ProductSKU != null)
+                    {
+                        product.ProductSKU = request.ProductSKU;
                     }
 
                     if (request.Images != null)
