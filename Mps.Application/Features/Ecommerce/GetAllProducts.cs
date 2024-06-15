@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Ecommerce
 {
@@ -11,6 +12,9 @@ namespace Mps.Application.Features.Ecommerce
     {
         public class Query : IRequest<CommandResult<Result>>
         {
+            public List<int>? CategoriesId { get; set; }
+            public List<int>? BrandsId { get; set; }
+            public List<int>? ShopsId { get; set; }
             public int? PageNumber { get; set; }
             public int? PageSize { get; set; }
             public string? Filter { get; set; }
@@ -38,9 +42,26 @@ namespace Mps.Application.Features.Ecommerce
                         .Include(p => p.Shop)
                         .Where(p => p.IsActive)
                         .Where(s => request.Filter == null
-                            || s.Name.Contains(request.Filter)
+                            || s.Name.SearchIgnoreCase(request.Filter)
+                            || s.ProductCode.SearchIgnoreCase(request.Filter)
+                            || s.ProductSKU.SearchIgnoreCase(request.Filter)
                         )
                         .AsQueryable();
+
+                    if (request.CategoriesId != null && request.CategoriesId.Any())
+                    {
+                        query = query.Where(p => request.CategoriesId.Contains(p.CategoryId));
+                    }
+
+                    if (request.BrandsId != null && request.BrandsId.Any())
+                    {
+                        query = query.Where(p => p.BrandId != null && request.BrandsId.Contains((int)p.BrandId));
+                    }
+
+                    if (request.ShopsId != null && request.ShopsId.Any())
+                    {
+                        query = query.Where(p => request.ShopsId.Contains(p.ShopId));
+                    }
 
                     if (request.PageNumber.HasValue && request.PageSize.HasValue)
                     {
