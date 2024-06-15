@@ -16,7 +16,7 @@ namespace Mps.Application.Features.Shop
             public required int Stock { get; set; }
             public string? Description { get; set; }
             public int CategoryId { get; set; }
-            public int BrandId { get; set; }
+            public int? BrandId { get; set; }
             public List<Image>? Images { get; set; }
         }
 
@@ -64,7 +64,8 @@ namespace Mps.Application.Features.Shop
                     _context.Products.Add(product);
                     await _context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Product created successfully"] });
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "CreateProductFailure");
                     return CommandResult<Result>.Fail(_localizer[ex.Message]);

@@ -24,7 +24,7 @@ namespace Mps.Application.Features.Shop
             public required int Stock { get; set; }
             public string? Description { get; set; }
             public int CategoryId { get; set; }
-            public int BrandId { get; set; }
+            public int? BrandId { get; set; }
             public required int ShopId { get; set; }
             public bool IsActive { get; set; }
             public DateTime CreatedAt { get; set; }

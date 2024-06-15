@@ -109,7 +109,7 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<Payment>().HasOne(m => m.PaymentSignature).WithMany().HasForeignKey(m => m.PaymentSignatureId);
 
             modelBuilder.Entity<PaymentSignature>().HasKey(m => m.Id);
-            
+
         }
     }
 }

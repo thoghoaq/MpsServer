@@ -29,7 +29,7 @@ namespace Mps.Application.Features.Shop
             public required int Stock { get; set; }
             public string? Description { get; set; }
             public int CategoryId { get; set; }
-            public int BrandId { get; set; }
+            public int? BrandId { get; set; }
         }
 
         public class Handler(IExcelService excelService, IMediator mediator, IAppLocalizer localizer, ILogger<ExportProducts> logger) : IRequestHandler<Query, CommandResult<Result>>
