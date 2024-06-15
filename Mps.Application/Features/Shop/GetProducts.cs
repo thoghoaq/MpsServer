@@ -41,6 +41,8 @@ namespace Mps.Application.Features.Shop
 
                     var query = _context.Products
                         .Include(p => p.Images)
+                        .Include(p => p.Category)
+                        .Include(p => p.Brand)
                         .Where(p => p.ShopId == request.ShopId)
                         .Where(s => request.Filter == null
                             || s.Name.Contains(request.Filter)
@@ -56,7 +58,8 @@ namespace Mps.Application.Features.Shop
                         .ToListAsync(cancellationToken: cancellationToken);
 
                     return CommandResult<Result>.Success(new Result { Products = products });
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "GetProductsFailure");
                     return CommandResult<Result>.Fail(_localizer[ex.Message]);
