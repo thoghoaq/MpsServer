@@ -17,5 +17,13 @@ namespace Mps.Api.Controllers
             var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload?.Products) : BadRequest(result.FailureReason);
         }
+
+        [HttpGet]
+        [Route("products/{Id}")]
+        public async Task<IActionResult> GetProductById([FromRoute] GetProductDetails.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Product) : BadRequest(result.FailureReason);
+        }
     }
 }

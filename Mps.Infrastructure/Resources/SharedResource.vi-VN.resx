@@ -258,4 +258,7 @@
   <data name="[SMPS System] Reset Password" xml:space="preserve">
     <value>[SMPS System] Đặt lại mật khẩu</value>
   </data>
+  <data name="Not Found" xml:space="preserve">
+    <value>Không tìm thấy</value>
+  </data>
 </root>
