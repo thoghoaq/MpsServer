@@ -261,4 +261,7 @@
   <data name="Not Found" xml:space="preserve">
     <value>Không tìm thấy</value>
   </data>
+  <data name="Order has been created successfully" xml:space="preserve">
+    <value>Đơn hàng được tạo thành công</value>
+  </data>
 </root>

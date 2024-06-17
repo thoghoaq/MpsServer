@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Mps.Application.Features.Ecommerce;
+using Mps.Infrastructure.Middleware;
 
 namespace Mps.Api.Controllers
 {
@@ -24,6 +25,18 @@ namespace Mps.Api.Controllers
         {
             var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload?.Product) : BadRequest(result.FailureReason);
+        }
+
+        [Auth(Roles = ["Customer"])]
+        [HttpPost]
+        [Route("checkout")]
+        public async Task<IActionResult> Checkout([FromBody] Checkout.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
         }
     }
 }

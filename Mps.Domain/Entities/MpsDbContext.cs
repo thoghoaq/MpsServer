@@ -98,11 +98,7 @@ namespace Mps.Domain.Entities
 
             modelBuilder.Entity<PaymentMethod>().HasKey(m => m.Id);
             modelBuilder.Entity<PaymentMethod>().HasData(
-                new PaymentMethod { Id = 1, Name = "Cash on Delivery" },
-                new PaymentMethod { Id = 2, Name = "Credit Card" },
-                new PaymentMethod { Id = 3, Name = "Debit Card" },
-                new PaymentMethod { Id = 4, Name = "Net Banking" },
-                new PaymentMethod { Id = 5, Name = "UPI" }
+                new PaymentMethod { Id = 1, Name = "VnPay" }
                 );
 
             modelBuilder.Entity<Payment>().HasKey(m => m.Id);
