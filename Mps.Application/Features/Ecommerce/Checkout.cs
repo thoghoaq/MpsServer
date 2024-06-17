@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
+using Mps.Application.Features.Payment;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
 
@@ -26,6 +27,8 @@ namespace Mps.Application.Features.Ecommerce
         public class Result
         {
             public int OrderId { get; set; }
+            public int PaymentId { get; set; }
+            public string? PaymentUrl { get; set; }
         }
 
         public class CheckoutItem
@@ -37,12 +40,13 @@ namespace Mps.Application.Features.Ecommerce
             public decimal? Discount { get; set; }
         }
 
-        public class Handler(MpsDbContext context, ILogger<Checkout> logger, ILoggedUser loggedUser, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext context, ILogger<Checkout> logger, ILoggedUser loggedUser, IAppLocalizer localizer, IMediator mediator) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly MpsDbContext _context = context;
             private readonly ILogger<Checkout> _logger = logger;
             private readonly ILoggedUser _loggedUser = loggedUser;
             private readonly IAppLocalizer _localizer = localizer;
+            private readonly IMediator _mediator = mediator;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -85,9 +89,26 @@ namespace Mps.Application.Features.Ecommerce
                     };
                     await _context.Orders.AddAsync(order, cancellationToken);
                     await _context.SaveChangesAsync(cancellationToken);
+
+                    var paymentResult = await _mediator.Send(new CreatePayment.Command
+                    {
+                        MerchantId = request.ShopId,
+                        PaymentContent = $"Thanh toán đơn hàng {order.Id}",
+                        PaymentCurrency = "VND",
+                        PaymentDestinationId = request.PaymentMethod.GetDescription(),
+                        PaymentLanguage = "vn",
+                        PaymentRefId = order.Id,
+                        RequiredAmount = order.TotalAmount
+                    }, cancellationToken);
+                    if (!paymentResult.IsSuccess)
+                    {
+                        return CommandResult<Result>.Fail(paymentResult.FailureReason!);
+                    }
                     return CommandResult<Result>.Success(new Result
                     {
-                        OrderId = order.Id
+                        OrderId = order.Id,
+                        PaymentId = paymentResult.Payload!.PaymentId,
+                        PaymentUrl = paymentResult.Payload?.PaymentUrl
                     });
                 }
                 catch (Exception ex)
@@ -95,7 +116,6 @@ namespace Mps.Application.Features.Ecommerce
                     _logger.LogError(ex, ex.Message);
                     return CommandResult<Result>.Fail(_localizer[ex.Message]);
                 }
-
             }
         }
     }

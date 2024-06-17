@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
+using Mps.Application.Helpers;
 using Mps.Domain.Entities;
-using Mps.Domain.Enums;
 
 namespace Mps.Application.Features.Payment
 {
@@ -19,9 +19,8 @@ namespace Mps.Application.Features.Payment
             public int? PaymentRefId { get; set; }
             public decimal RequiredAmount { get; set; }
             public string? PaymentLanguage { get; set; }
-            public int? MerchantId { get; set; }
+            public int MerchantId { get; set; }
             public string? PaymentDestinationId { get; set; }
-            public string? Signature { get; set; }
         }
 
         public class Result
@@ -43,7 +42,6 @@ namespace Mps.Application.Features.Payment
             {
                 try
                 {
-                    var transaction = _dbContext.Database.BeginTransaction();
                     var newPayment = new Domain.Entities.Payment
                     {
                         CreatedAt = DateTime.UtcNow,
@@ -63,7 +61,7 @@ namespace Mps.Application.Features.Payment
                             IsValid = true,
                             SignDate = DateTime.UtcNow,
                             SignOwn = request.MerchantId,
-                            SignValue = request.Signature
+                            SignValue = GenerateSignature(request.MerchantId.ToString(), request.PaymentContent ?? string.Empty, request.PaymentCurrency ?? string.Empty, request.PaymentDestinationId ?? string.Empty, request.PaymentLanguage ?? string.Empty, request.PaymentRefId ?? 0, request.RequiredAmount, _configuration["VnPay:HashSecret"] ?? string.Empty)
                         }
                     };
                     var createResult = await _dbContext.Payments.AddAsync(newPayment, cancellationToken);
@@ -88,18 +86,23 @@ namespace Mps.Application.Features.Payment
                         default:
                             break;
                     }
-                    transaction.Commit();
-
                     return CommandResult<Result>.Success(new Result
                     {
                         PaymentId = createResult.Entity.Id,
                         PaymentUrl = paymentUrl
                     });
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "CreatePaymentFailure");
                     return CommandResult<Result>.Fail(ex.Message);
                 }
+            }
+
+            private string GenerateSignature(string merchantId, string paymentContent, string paymentCurrency, string paymentDestinationId, string paymentLanguage, int paymentRefId, decimal requiredAmount, string secretKey)
+            {
+                var data = $"{merchantId}{paymentContent}{paymentCurrency}{paymentDestinationId}{paymentLanguage}{paymentRefId}{requiredAmount}";
+                return secretKey.HmacSHA512(data);
             }
         }
     }

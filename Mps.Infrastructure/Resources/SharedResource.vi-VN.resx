@@ -267,4 +267,10 @@
   <data name="Invalid refresh token" xml:space="preserve">
     <value>Token không hợp lệ</value>
   </data>
+  <data name="User not found in database" xml:space="preserve">
+    <value>Không tìm thấy dữ liệu người dùng</value>
+  </data>
+  <data name="User is not active" xml:space="preserve">
+    <value>Người dùng bị vô hiệu hóa</value>
+  </data>
 </root>

@@ -6,7 +6,6 @@ using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
-using Mps.Domain.Enums;
 
 namespace Mps.Application.Features.Payment
 {
@@ -71,17 +70,30 @@ namespace Mps.Application.Features.Payment
 
                             payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Success;
                             await _dbContext.SaveChangesAsync(cancellationToken);
+                            await ChangeOrderStatus(payment.RefId, (int)Domain.Enums.OrderStatus.Processing, cancellationToken);
                             return CommandResult<Result>.Success(resultData);
                         }
                         payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Failed;
                         await _dbContext.SaveChangesAsync(cancellationToken);
+                        await ChangeOrderStatus(payment.RefId, (int)Domain.Enums.OrderStatus.Cancelled, cancellationToken);
                         return CommandResult<Result>.Fail(_localizer[resultData.PaymentMessage]);
                     }
                     return CommandResult<Result>.Fail(_localizer["Payment not found"]);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "GetPaymentFailure");
                     return CommandResult<Result>.Fail(ex.Message);
+                }
+            }
+
+            private async Task ChangeOrderStatus(int? orderId, int status, CancellationToken cancellationToken)
+            {
+                var order = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
+                if (order != null)
+                {
+                    order.OrderStatusId = status;
+                    await _dbContext.SaveChangesAsync(cancellationToken);
                 }
             }
         }

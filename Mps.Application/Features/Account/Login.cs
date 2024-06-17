@@ -35,14 +35,26 @@ namespace Mps.Application.Features.Account
                 {
                     return CommandResult<Result>.Fail(_localizer["Wrong email or password"]);
                 }
-                var commandResult = _mediator.Send(new GetUser.Query { Email = request.Email }, cancellationToken);
-                return CommandResult<Result>.Success(new Result
+                var commandResult = await _mediator.Send(new GetUser.Query { Email = request.Email }, cancellationToken);
+                if (commandResult.IsSuccess)
                 {
-                    AccessToken = response!.IdToken,
-                    RefreshToken = response.RefreshToken!,
-                    ExpiresIn = response.ExpiresIn,
-                    User = commandResult.Result.Payload?.User
-                });
+                    if (commandResult.Payload?.User == null)
+                    {
+                        return CommandResult<Result>.Fail(_localizer["User not found in database"]);
+                    }
+                    if (commandResult.Payload.User.IsActive != true)
+                    {
+                        return CommandResult<Result>.Fail(_localizer["User is not active"]);
+                    }
+                    return CommandResult<Result>.Success(new Result
+                    {
+                        AccessToken = response!.IdToken,
+                        RefreshToken = response.RefreshToken!,
+                        ExpiresIn = response.ExpiresIn,
+                        User = commandResult.Payload?.User
+                    });
+                }
+                return CommandResult<Result>.Fail(commandResult.FailureReason!);
             }
         }
     }

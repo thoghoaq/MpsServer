@@ -267,4 +267,10 @@
   <data name="Invalid refresh token" xml:space="preserve">
     <value>Invalid refresh token</value>
   </data>
+  <data name="User not found in database" xml:space="preserve">
+    <value>User not found in database</value>
+  </data>
+  <data name="User is not active" xml:space="preserve">
+    <value>User is not active</value>
+  </data>
 </root>

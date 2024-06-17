@@ -25,7 +25,7 @@ namespace Mps.Infrastructure.Middleware
             .GetService(typeof(MpsDbContext)) as MpsDbContext;
 
             var token = context.HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-            
+
             if (token.IsNullOrEmpty())
             {
                 context.Result = new UnauthorizedResult();
