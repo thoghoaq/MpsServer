@@ -1,7 +1,10 @@
-﻿namespace Mps.Application.Abstractions.Authentication
+﻿using Mps.Domain.Dtos;
+
+namespace Mps.Application.Abstractions.Authentication
 {
     public interface IJwtProvider
     {
-        Task<string> GenerateTokenAsync(string email, string password, CancellationToken cancellationToken);
+        Task<AuthToken?> GenerateTokenAsync(string email, string password, CancellationToken cancellationToken);
+        Task<AuthRefreshToken?> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
     }
 }

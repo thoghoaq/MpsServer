@@ -11,7 +11,7 @@ namespace Mps.Api.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
-        [Auth(Roles = ["Admin","Staff"])]
+        [Auth(Roles = ["Admin", "Staff"])]
         [HttpGet]
         [Route("all")]
         public async Task<IActionResult> GetAllUsers(string? role, int? pageNumber, int? pageSize, string? query, bool? isActive)
@@ -105,6 +105,21 @@ namespace Mps.Api.Controllers
         }
 
         [HttpPost]
+        [Route("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] Refresh.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        [HttpPost]
         [Route("send-password-reset-email")]
         public async Task<IActionResult> SendPasswordResetEmail([FromBody] SendPasswordResetEmail.Command command)
         {
@@ -140,7 +155,7 @@ namespace Mps.Api.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        [Auth(Roles = ["Admin","Staff"])]
+        [Auth(Roles = ["Admin", "Staff"])]
         [HttpPut]
         [Route("status")]
         public async Task<IActionResult> ActiveUser([FromBody] ActiveUser.Command command)

@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Mps.Application.Features.Payment;
-using Mps.Domain.Extensions;
 using Mps.Infrastructure.Dependencies.VnPay.Models;
 using Mps.Infrastructure.Middleware;
 
@@ -71,7 +70,17 @@ namespace Mps.Api.Controllers
             {
                 reason = processResult.FailureReason
             });
+        }
 
+        [HttpGet]
+        [Route("payment-methods")]
+        public async Task<IActionResult> GetPaymentMethods()
+        {
+            var result = await _mediator.Send(new GetPaymentMethods.Query());
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
         }
     }
 }

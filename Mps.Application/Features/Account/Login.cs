@@ -18,6 +18,8 @@ namespace Mps.Application.Features.Account
         public class Result
         {
             public required string AccessToken { get; set; }
+            public required string RefreshToken { get; set; }
+            public string? ExpiresIn { get; set; }
             public GetUser.User? User { get; set; }
         }
 
@@ -29,13 +31,16 @@ namespace Mps.Application.Features.Account
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var response = await _jwtProvider.GenerateTokenAsync(request.Email, request.Password, cancellationToken);
-                if (string.IsNullOrEmpty(response))
+                if (string.IsNullOrEmpty(response?.IdToken))
                 {
-                    return CommandResult<Result>.Fail(_localizer["Invalid email or password"]);
+                    return CommandResult<Result>.Fail(_localizer["Wrong email or password"]);
                 }
                 var commandResult = _mediator.Send(new GetUser.Query { Email = request.Email }, cancellationToken);
-                return CommandResult<Result>.Success(new Result { 
-                    AccessToken = response,
+                return CommandResult<Result>.Success(new Result
+                {
+                    AccessToken = response!.IdToken,
+                    RefreshToken = response.RefreshToken!,
+                    ExpiresIn = response.ExpiresIn,
                     User = commandResult.Result.Payload?.User
                 });
             }

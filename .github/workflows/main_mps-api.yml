@@ -36,6 +36,7 @@ jobs:
           ConnectionStrings.DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
           FirebaseAdminSdk: ${{ secrets.FIREBASE_ADMIN_SDK }}
           Authentication.TokenUri: ${{ secrets.AUTHENTICATION_TOKEN_URI }}
+          Authentication.RefreshUri: ${{ secrets.AUTHENTICATION_REFRESH_URI }}
           Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
           Authentication.ValidIssuer: ${{ secrets.AUTHENTICATION_VALID_ISSUER }}
           HangfireKey: ${{ secrets.HANGFIRE_KEY }}

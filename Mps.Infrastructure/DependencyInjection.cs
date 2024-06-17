@@ -42,10 +42,7 @@ namespace Mps.Infrastructure
 
             services.AddHttpContextAccessor();
 
-            services.AddHttpClient<IJwtProvider, JwtProvider>(client =>
-            {
-                client.BaseAddress = new Uri(configuration.GetSection("Authentication:TokenUri").Value!);
-            });
+            services.AddHttpClient<IJwtProvider, JwtProvider>();
 
             services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

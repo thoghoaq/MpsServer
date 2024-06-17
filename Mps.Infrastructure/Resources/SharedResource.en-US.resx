@@ -180,8 +180,8 @@
   <data name="Imported successfully" xml:space="preserve">
     <value>Imported successfully</value>
   </data>
-  <data name="Invalid email or password" xml:space="preserve">
-    <value>Invalid email or password</value>
+  <data name="Wrong email or password" xml:space="preserve">
+    <value>Wrong email or password</value>
   </data>
   <data name="Name is not valid" xml:space="preserve">
     <value>Name is not valid</value>
@@ -263,5 +263,8 @@
   </data>
   <data name="Order has been created successfully" xml:space="preserve">
     <value>Order has been created successfully</value>
+  </data>
+  <data name="Invalid refresh token" xml:space="preserve">
+    <value>Invalid refresh token</value>
   </data>
 </root>

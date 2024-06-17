@@ -177,8 +177,8 @@
   <data name="Imported successfully" xml:space="preserve">
     <value>Import thành công</value>
   </data>
-  <data name="Invalid email or password" xml:space="preserve">
-    <value>Email hoặc mật khẩu không hợp lệ</value>
+  <data name="Wrong email or password" xml:space="preserve">
+    <value>Email hoặc mật khẩu không đúng</value>
   </data>
   <data name="Mps" xml:space="preserve">
     <value>Hệ thống cung cấp phụ tùng xe moto</value>
@@ -263,5 +263,8 @@
   </data>
   <data name="Order has been created successfully" xml:space="preserve">
     <value>Đơn hàng được tạo thành công</value>
+  </data>
+  <data name="Invalid refresh token" xml:space="preserve">
+    <value>Token không hợp lệ</value>
   </data>
 </root>
