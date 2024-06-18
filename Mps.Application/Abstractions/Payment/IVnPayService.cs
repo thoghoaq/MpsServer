@@ -7,6 +7,6 @@
         public bool IsValidSignature(string secret);
         public string GetResponseMessage(string responseCode);
         public bool IsSuccessResponse(string responseCode);
-        public void BindingResponse(int? amount, string? bankCode, string? bankTranNo, string? cardType, string? orderInfo, string? transactionNo, string? transactionStatus, int? txnRef, string? secureHash, string? payDate, string? responseCode, string? tmnCode);
+        public void BindingResponse(int? amount, string? bankCode, string? bankTranNo, string? cardType, string? orderInfo, string? transactionNo, string? transactionStatus, string? txnRef, string? secureHash, string? payDate, string? responseCode, string? tmnCode);
     }
 }

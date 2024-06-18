@@ -16,17 +16,22 @@ namespace Mps.Application.Features.Payment
         {
             public string? PaymentContent { get; set; }
             public string? PaymentCurrency { get; set; }
-            public int? PaymentRefId { get; set; }
             public decimal RequiredAmount { get; set; }
             public string? PaymentLanguage { get; set; }
-            public int MerchantId { get; set; }
             public string? PaymentDestinationId { get; set; }
+            public List<Merchant> Merchants { get; set; } = [];
         }
 
         public class Result
         {
             public int PaymentId { get; set; }
             public string? PaymentUrl { get; set; }
+        }
+
+        public class Merchant
+        {
+            public int? PaymentRefId { get; set; }
+            public int MerchantId { get; set; }
         }
 
         public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IVnPayService vnPayService, IConfiguration configuration, ILogger<CreatePayment> logger, IHttpContextAccessor httpContext) : IRequestHandler<Command, CommandResult<Result>>
@@ -42,30 +47,34 @@ namespace Mps.Application.Features.Payment
             {
                 try
                 {
-                    var newPayment = new Domain.Entities.Payment
+                    var newPayment = new Domain.Entities.Payment()
                     {
                         CreatedAt = DateTime.UtcNow,
                         CreatedBy = _loggedUser.UserId,
                         PaymentDate = DateTime.UtcNow,
                         ExpireDate = DateTime.UtcNow.AddMinutes(15),
                         Content = request.PaymentContent,
-                        MerchantId = request.MerchantId,
                         Currency = request.PaymentCurrency,
                         PaymentDestinationId = request.PaymentDestinationId,
                         Language = request.PaymentLanguage,
-                        RefId = request.PaymentRefId,
                         RequiredAmount = request.RequiredAmount,
                         PaymentStatusId = (int)Domain.Enums.PaymentStatus.Pending,
                         PaymentSignature = new PaymentSignature
                         {
                             IsValid = true,
                             SignDate = DateTime.UtcNow,
-                            SignOwn = request.MerchantId,
-                            SignValue = GenerateSignature(request.MerchantId.ToString(), request.PaymentContent ?? string.Empty, request.PaymentCurrency ?? string.Empty, request.PaymentDestinationId ?? string.Empty, request.PaymentLanguage ?? string.Empty, request.PaymentRefId ?? 0, request.RequiredAmount, _configuration["VnPay:HashSecret"] ?? string.Empty)
-                        }
+                            SignOwn = _loggedUser.UserId,
+                            SignValue = GenerateSignature(_loggedUser.UserId.ToString(), request.PaymentContent ?? string.Empty, request.PaymentCurrency ?? string.Empty, request.PaymentDestinationId ?? string.Empty, request.PaymentLanguage ?? string.Empty, string.Join(',', request.Merchants.Select(x => x.PaymentRefId)), request.RequiredAmount, _configuration["VnPay:HashSecret"] ?? string.Empty)
+                        },
+                        PaymentRefs = request.Merchants.Select(x => new PaymentRef
+                        {
+                            MerchantId = x.MerchantId,
+                            RefId = x.PaymentRefId
+                        }).ToList()
                     };
-                    var createResult = await _dbContext.Payments.AddAsync(newPayment, cancellationToken);
-                    await _dbContext.SaveChangesAsync(cancellationToken);
+
+                    await _dbContext.Payments.AddAsync(newPayment);
+                    await _dbContext.SaveChangesAsync();
                     var paymentUrl = string.Empty;
                     switch (request.PaymentDestinationId)
                     {
@@ -80,7 +89,7 @@ namespace Mps.Application.Features.Payment
                             var userIpAddress = _loggedUser.IpAddress;
                             var orderType = "other";
                             var paymentCurrency = request.PaymentCurrency ?? "VND";
-                            _vnPayService.CreateVnPayRequest(version, tmnCode, createDate, userIpAddress, request.RequiredAmount, paymentCurrency, orderType, request.PaymentContent ?? string.Empty, returnUrl, createResult.Entity.Id.ToString());
+                            _vnPayService.CreateVnPayRequest(version, tmnCode, createDate, userIpAddress, request.RequiredAmount, paymentCurrency, orderType, request.PaymentContent ?? string.Empty, returnUrl, newPayment.Id.ToString());
                             paymentUrl = _vnPayService.GetLink(vnPayUrl, secretKey);
                             break;
                         default:
@@ -88,7 +97,7 @@ namespace Mps.Application.Features.Payment
                     }
                     return CommandResult<Result>.Success(new Result
                     {
-                        PaymentId = createResult.Entity.Id,
+                        PaymentId = newPayment.Id,
                         PaymentUrl = paymentUrl
                     });
                 }
@@ -99,9 +108,9 @@ namespace Mps.Application.Features.Payment
                 }
             }
 
-            private string GenerateSignature(string merchantId, string paymentContent, string paymentCurrency, string paymentDestinationId, string paymentLanguage, int paymentRefId, decimal requiredAmount, string secretKey)
+            private string GenerateSignature(string merchantId, string paymentContent, string paymentCurrency, string paymentDestinationId, string paymentLanguage, string paymentRefIds, decimal requiredAmount, string secretKey)
             {
-                var data = $"{merchantId}{paymentContent}{paymentCurrency}{paymentDestinationId}{paymentLanguage}{paymentRefId}{requiredAmount}";
+                var data = $"{merchantId}{paymentContent}{paymentCurrency}{paymentDestinationId}{paymentLanguage}{paymentRefIds}{requiredAmount}";
                 return secretKey.HmacSHA512(data);
             }
         }

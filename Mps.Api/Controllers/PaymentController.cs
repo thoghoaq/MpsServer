@@ -8,10 +8,9 @@ namespace Mps.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PaymentController(IMediator mediator, IConfiguration configuration) : ControllerBase
+    public class PaymentController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
-        private readonly IConfiguration _configuration = configuration;
 
         /// <summary>
         /// Create payment to get link
@@ -22,12 +21,16 @@ namespace Mps.Api.Controllers
         ///     {
         ///         "paymentContent": "Thanh toán đơn hàng 001",
         ///         "paymentCurrency": "VND",
-        ///         "paymentRefId": 1,
         ///         "requiredAmount": 10000,
         ///         "paymentLanguage": "vn",
-        ///         "merchantId": 1,
         ///         "paymentDestinationId": "VnPay",
-        ///         "signature": "12345ABCDE"
+        ///         "signature": "12345ABCDE",
+        ///         "merchants": [
+        ///             {
+        ///                 "paymentRefId": 1,
+        ///                 "merchantId": 1
+        ///             }
+        ///         ]
         ///     }
         /// </remarks>
         /// <param name="command"></param>

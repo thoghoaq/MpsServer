@@ -11,7 +11,7 @@ namespace Mps.Infrastructure.Dependencies.VnPay.Models
         public string? Vnp_OrderInfo { get; set; }
         public string? Vnp_TransactionNo { get; set; }
         public string? Vnp_TransactionStatus { get; set; }
-        public int? Vnp_TxnRef { get; set; }
+        public string? Vnp_TxnRef { get; set; }
         public string? Vnp_SecureHash { get; set; }
         public int? Vnp_Amount { get; set; }
         public string? Vnp_PayDate { get; set; }

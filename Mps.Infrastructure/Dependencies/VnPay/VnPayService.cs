@@ -62,7 +62,7 @@ namespace Mps.Infrastructure.Dependencies.VnPay
             Request.Vnp_TmnCode = tmnCode;
         }
 
-        public void BindingResponse(int? amount, string? bankCode, string? bankTranNo, string? cardType, string? orderInfo, string? transactionNo, string? transactionStatus, int? txnRef, string? secureHash, string? payDate, string? responseCode, string? tmnCode)
+        public void BindingResponse(int? amount, string? bankCode, string? bankTranNo, string? cardType, string? orderInfo, string? transactionNo, string? transactionStatus, string? txnRef, string? secureHash, string? payDate, string? responseCode, string? tmnCode)
         {
             Response.Vnp_Amount = amount;
             Response.Vnp_BankCode = bankCode;

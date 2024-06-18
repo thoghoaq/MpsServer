@@ -20,7 +20,7 @@ namespace Mps.Application.Features.Payment
             public string? Vnp_OrderInfo { get; set; }
             public string? Vnp_TransactionNo { get; set; }
             public string? Vnp_TransactionStatus { get; set; }
-            public int? Vnp_TxnRef { get; set; }
+            public string? Vnp_TxnRef { get; set; }
             public string? Vnp_SecureHash { get; set; }
             public int? Vnp_Amount { get; set; }
             public string? Vnp_PayDate { get; set; }
@@ -33,7 +33,7 @@ namespace Mps.Application.Features.Payment
             public string? PaymentStatus { get; set; }
             public string? PaymentMessage { get; set; }
             public string? PaymentDate { get; set; }
-            public int? PaymentRefId { get; set; }
+            public List<int?> PaymentRefId { get; set; } = [];
             public decimal? Amount { get; set; }
             public string? Signature { get; set; }
         }
@@ -50,35 +50,47 @@ namespace Mps.Application.Features.Payment
             {
                 try
                 {
-                    var resultData = new Result();
+                    var paymentResult = new Result();
                     var secretKey = _configuration["VnPay:HashSecret"] ?? string.Empty;
                     _vnPayService.BindingResponse(request.Vnp_Amount, request.Vnp_BankCode, request.Vnp_BankTranNo, request.Vnp_CardType, request.Vnp_OrderInfo, request.Vnp_TransactionNo, request.Vnp_TransactionStatus, request.Vnp_TxnRef, request.Vnp_SecureHash, request.Vnp_PayDate, request.Vnp_ResponseCode, request.Vnp_TmnCode);
                     //var isValidSignature = _vnPayService.IsValidSignature(secretKey);
-                    var payment = await _dbContext.Payments.Include(x => x.PaymentSignature).FirstOrDefaultAsync(x => x.Id == request.Vnp_TxnRef, cancellationToken: cancellationToken);
-                    if (payment != null)
+                    if (string.IsNullOrEmpty(request.Vnp_TxnRef))
                     {
-                        resultData.PaymentMessage = _vnPayService.GetResponseMessage(request.Vnp_ResponseCode ?? string.Empty);
-                        resultData.PaymentStatus = request.Vnp_ResponseCode;
-                        var isSuccess = _vnPayService.IsSuccessResponse(request.Vnp_ResponseCode ?? string.Empty);
-                        if (isSuccess)
-                        {
-                            resultData.PaymentId = payment.Id;
-                            resultData.PaymentDate = payment.PaymentDate?.ToString("yyyyMMddHHmmss");
-                            resultData.PaymentRefId = payment.RefId;
-                            resultData.Amount = payment.RequiredAmount;
-                            resultData.Signature = payment.PaymentSignature?.SignValue;
-
-                            payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Success;
-                            await _dbContext.SaveChangesAsync(cancellationToken);
-                            await ChangeOrderStatus(payment.RefId, (int)Domain.Enums.OrderStatus.Processing, cancellationToken);
-                            return CommandResult<Result>.Success(resultData);
-                        }
-                        payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Failed;
-                        await _dbContext.SaveChangesAsync(cancellationToken);
-                        await ChangeOrderStatus(payment.RefId, (int)Domain.Enums.OrderStatus.Cancelled, cancellationToken);
-                        return CommandResult<Result>.Fail(_localizer[resultData.PaymentMessage]);
+                        return CommandResult<Result>.Fail(_localizer["Payment not found"]);
                     }
-                    return CommandResult<Result>.Fail(_localizer["Payment not found"]);
+                    var requestId = int.Parse(request.Vnp_TxnRef);
+                    var payment = await _dbContext.Payments.Include(x => x.PaymentSignature).Include(x => x.PaymentRefs).FirstOrDefaultAsync(x => requestId == x.Id, cancellationToken);
+                    if (payment == null)
+                    {
+                        return CommandResult<Result>.Fail(_localizer["Payment not found"]);
+                    }
+
+                    var paymentMessage = _vnPayService.GetResponseMessage(request.Vnp_ResponseCode ?? string.Empty);
+                    var isSuccess = _vnPayService.IsSuccessResponse(request.Vnp_ResponseCode ?? string.Empty);
+                    paymentResult.PaymentMessage = paymentMessage;
+                    paymentResult.PaymentStatus = request.Vnp_ResponseCode;
+                    if (isSuccess)
+                    {
+                        paymentResult.PaymentId = payment.Id;
+                        paymentResult.PaymentDate = payment.PaymentDate?.ToString("yyyyMMddHHmmss");
+                        paymentResult.PaymentRefId = payment.PaymentRefs.Select(x => x.RefId).ToList();
+                        paymentResult.Amount = payment.RequiredAmount;
+                        paymentResult.Signature = payment.PaymentSignature?.SignValue;
+
+                        payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Success;
+                    }
+                    else
+                    {
+                        payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Failed;
+                    }
+
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                    await ChangeOrderStatus(payment.PaymentRefs.Select(x => x.RefId).ToList(), isSuccess ? (int)Domain.Enums.OrderStatus.Processing : (int)Domain.Enums.OrderStatus.Cancelled, cancellationToken);
+                    if (isSuccess)
+                    {
+                        return CommandResult<Result>.Success(paymentResult);
+                    }
+                    return CommandResult<Result>.Fail(_localizer[paymentMessage]);
                 }
                 catch (Exception ex)
                 {
@@ -87,12 +99,15 @@ namespace Mps.Application.Features.Payment
                 }
             }
 
-            private async Task ChangeOrderStatus(int? orderId, int status, CancellationToken cancellationToken)
+            private async Task ChangeOrderStatus(List<int?> orderId, int status, CancellationToken cancellationToken)
             {
-                var order = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == orderId, cancellationToken);
-                if (order != null)
+                var orders = _dbContext.Orders.Where(x => orderId.Contains(x.Id));
+                if (orders.Any())
                 {
-                    order.OrderStatusId = status;
+                    foreach (var item in orders)
+                    {
+                        item.OrderStatusId = status;
+                    }
                     await _dbContext.SaveChangesAsync(cancellationToken);
                 }
             }

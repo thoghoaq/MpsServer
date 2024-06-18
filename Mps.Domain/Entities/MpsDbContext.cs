@@ -19,6 +19,7 @@ namespace Mps.Domain.Entities
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PaymentSignature> PaymentSignatures { get; set; }
         public DbSet<UserDevice> UserDevices { get; set; }
+        public DbSet<PaymentRef> PaymentRef { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -103,9 +104,11 @@ namespace Mps.Domain.Entities
 
             modelBuilder.Entity<Payment>().HasKey(m => m.Id);
             modelBuilder.Entity<Payment>().HasOne(m => m.PaymentSignature).WithMany().HasForeignKey(m => m.PaymentSignatureId);
+            modelBuilder.Entity<Payment>().HasMany(m => m.PaymentRefs).WithOne().HasForeignKey(m => m.PaymentId);
 
             modelBuilder.Entity<PaymentSignature>().HasKey(m => m.Id);
 
+            modelBuilder.Entity<PaymentRef>().HasKey(m => m.Id);
         }
     }
 }

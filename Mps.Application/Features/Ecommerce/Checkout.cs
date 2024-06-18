@@ -13,7 +13,6 @@ namespace Mps.Application.Features.Ecommerce
     {
         public class Command : IRequest<CommandResult<Result>>
         {
-            public int ShopId { get; set; }
             public required string CustomerName { get; set; }
             public required string Address { get; set; }
             public required string Email { get; set; }
@@ -26,8 +25,7 @@ namespace Mps.Application.Features.Ecommerce
 
         public class Result
         {
-            public int OrderId { get; set; }
-            public int PaymentId { get; set; }
+            public List<int> OrderIds { get; set; }
             public string? PaymentUrl { get; set; }
         }
 
@@ -38,6 +36,7 @@ namespace Mps.Application.Features.Ecommerce
             public decimal Price { get; set; }
             public int Quantity { get; set; }
             public decimal? Discount { get; set; }
+            public int ShopId { get; set; }
         }
 
         public class Handler(MpsDbContext context, ILogger<Checkout> logger, ILoggedUser loggedUser, IAppLocalizer localizer, IMediator mediator) : IRequestHandler<Command, CommandResult<Result>>
@@ -52,53 +51,65 @@ namespace Mps.Application.Features.Ecommerce
             {
                 try
                 {
-                    var order = new Order
+                    var listOrders = new List<Order>();
+                    foreach (var item in request.Items)
                     {
-                        CustomerId = _loggedUser.UserId,
-                        ShopId = request.ShopId,
-                        CustomerName = request.CustomerName,
-                        Address = request.Address,
-                        Email = request.Email,
-                        PhoneNumber = request.PhoneNumber,
-                        Note = request.Note,
-                        Discount = request.Discount,
-                        TotalAmount = request.Items.Sum(x => x.Price * x.Quantity - (x.Discount ?? 0)) - (request.Discount ?? 0),
-                        PaymentMethodId = (int)request.PaymentMethod,
-                        OrderDetails = request.Items.Select(x => new OrderDetail
+                        var order = new Order
                         {
-                            ProductId = x.ProductId,
-                            ProductName = x.ProductName,
-                            Quantity = x.Quantity,
-                            Price = x.Price,
-                            Discount = x.Discount ?? 0,
-                            Total = x.Price * x.Quantity - (x.Discount ?? 0)
-                        }).ToList(),
-                        OrderDate = DateTime.UtcNow,
-                        DeliveryDate = DateTime.UtcNow.AddDays(7),
-                        OrderStatusId = (int)Domain.Enums.OrderStatus.Pending,
-                        PaymentStatusId = (int)Domain.Enums.PaymentStatus.Pending,
-                        Progresses =
-                        [
-                            new()
+                            CustomerId = _loggedUser.UserId,
+                            ShopId = item.ShopId,
+                            CustomerName = request.CustomerName,
+                            Address = request.Address,
+                            Email = request.Email,
+                            PhoneNumber = request.PhoneNumber,
+                            Note = request.Note,
+                            Discount = request.Discount,
+                            TotalAmount = item.Price * item.Quantity - (item.Discount ?? 0) - (request.Discount ?? 0),
+                            PaymentMethodId = (int)request.PaymentMethod,
+                            OrderDetails = new List<OrderDetail>
                             {
-                                Name = Domain.Enums.OrderStatus.Pending.GetDescription(),
-                                CreatedDate = DateTime.UtcNow,
-                                UpdatedDate = DateTime.UtcNow,
-                            }
-                        ]
-                    };
-                    await _context.Orders.AddAsync(order, cancellationToken);
+                                new OrderDetail
+                                {
+                                    ProductId = item.ProductId,
+                                    ProductName = item.ProductName,
+                                    Quantity = item.Quantity,
+                                    Price = item.Price,
+                                    Discount = item.Discount ?? 0,
+                                    Total = item.Price * item.Quantity - (item.Discount ?? 0)
+                                }
+                            },
+                            OrderDate = DateTime.UtcNow,
+                            DeliveryDate = DateTime.UtcNow.AddDays(7),
+                            OrderStatusId = (int)Domain.Enums.OrderStatus.Pending,
+                            PaymentStatusId = (int)Domain.Enums.PaymentStatus.Pending,
+                            Progresses =
+                            [
+                                new()
+                                {
+                                    Name = Domain.Enums.OrderStatus.Pending.GetDescription(),
+                                    CreatedDate = DateTime.UtcNow,
+                                    UpdatedDate = DateTime.UtcNow,
+                                }
+                            ]
+                        };
+                        listOrders.Add(order);
+                    }
+
+                    await _context.Orders.AddRangeAsync(listOrders, cancellationToken);
                     await _context.SaveChangesAsync(cancellationToken);
 
                     var paymentResult = await _mediator.Send(new CreatePayment.Command
                     {
-                        MerchantId = request.ShopId,
-                        PaymentContent = $"Thanh toán đơn hàng {order.Id}",
+                        PaymentContent = $"Thanh toán đơn hàng {string.Join(',', listOrders.Select(x => x.Id))}",
                         PaymentCurrency = "VND",
                         PaymentDestinationId = request.PaymentMethod.GetDescription(),
                         PaymentLanguage = "vn",
-                        PaymentRefId = order.Id,
-                        RequiredAmount = order.TotalAmount
+                        RequiredAmount = listOrders.Sum(x => x.TotalAmount),
+                        Merchants = listOrders.Select(x => new CreatePayment.Merchant
+                        {
+                            PaymentRefId = x.Id,
+                            MerchantId = x.ShopId
+                        }).ToList()
                     }, cancellationToken);
                     if (!paymentResult.IsSuccess)
                     {
@@ -106,8 +117,7 @@ namespace Mps.Application.Features.Ecommerce
                     }
                     return CommandResult<Result>.Success(new Result
                     {
-                        OrderId = order.Id,
-                        PaymentId = paymentResult.Payload!.PaymentId,
+                        OrderIds = listOrders.Select(x => x.Id).ToList(),
                         PaymentUrl = paymentResult.Payload?.PaymentUrl
                     });
                 }
