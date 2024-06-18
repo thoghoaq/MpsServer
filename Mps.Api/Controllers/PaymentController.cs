@@ -71,7 +71,7 @@ namespace Mps.Api.Controllers
             });
 
             var webApp = configuration.GetSection("AllowedOrigins:MpsWebApp").Value;
-            string url = $"{webApp}/vnpay-return?success={processResult.IsSuccess}";
+            string url = $"{webApp}?redirect=vnpay-return&success={processResult.IsSuccess}";
             if (processResult.IsSuccess)
             {
                 url += $"&paymentId={processResult.Payload?.PaymentId}";
