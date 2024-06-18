@@ -8,7 +8,7 @@ namespace Mps.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PaymentController(IMediator mediator, IConfiguration configuration) : ControllerBase
+    public class PaymentController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
 
@@ -69,18 +69,10 @@ namespace Mps.Api.Controllers
                 Vnp_ResponseCode = response.Vnp_ResponseCode,
                 Vnp_TmnCode = response.Vnp_TmnCode
             });
-
-            var webApp = configuration.GetSection("AllowedOrigins:MpsWebApp").Value;
-            string url = $"{webApp}/vnpay-return?success={processResult.IsSuccess}";
-            if (processResult.IsSuccess)
+            return processResult.IsSuccess ? Ok(processResult.Payload) : BadRequest(new
             {
-                url += $"&paymentId={processResult.Payload?.PaymentId}";
-            }
-            else
-            {
-                url += $"&reason={processResult.FailureReason}";
-            }
-            return Redirect(url);
+                reason = processResult.FailureReason
+            });
         }
 
         [HttpGet]
