@@ -93,5 +93,17 @@ namespace Mps.Api.Controllers
                 reason = result.FailureReason
             });
         }
+
+        [Auth]
+        [HttpGet]
+        [Route("details")]
+        public async Task<IActionResult> GetPaymentDetails([FromQuery] GetPaymentDetails.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
     }
 }
