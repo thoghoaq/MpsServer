@@ -32,17 +32,17 @@
     <PackageReference Include="GoogleApi" Version="5.4.3" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.12" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.20.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
