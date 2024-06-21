@@ -27,8 +27,8 @@ namespace Mps.Application.Features.ProductCategory
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var query = _context.ProductCategories.Where(s => !s.IsDeleted)
-                    .Include(s => s.Children)
-                    .ThenInclude(s => s.Children)
+                    .Include(s => s.Children.Where(c => !c.IsDeleted))
+                    .ThenInclude(s => s.Children.Where(c => !c.IsDeleted))
                     .Where(s => s.ParentId == null)
                     .AsEnumerable()
                     .Where(s => request.Filter == null || s.Name.SearchIgnoreCase(request.Filter));
