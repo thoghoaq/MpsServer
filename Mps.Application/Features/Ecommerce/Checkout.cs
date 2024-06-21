@@ -25,7 +25,7 @@ namespace Mps.Application.Features.Ecommerce
 
         public class Result
         {
-            public List<int> OrderIds { get; set; }
+            public List<int> OrderIds { get; set; } = [];
             public string? PaymentUrl { get; set; }
         }
 
@@ -52,32 +52,30 @@ namespace Mps.Application.Features.Ecommerce
                 try
                 {
                     var listOrders = new List<Order>();
-                    foreach (var item in request.Items)
+                    var groupOrders = request.Items.GroupBy(x => x.ShopId).ToList();
+                    foreach (var group in groupOrders)
                     {
                         var order = new Order
                         {
                             CustomerId = _loggedUser.UserId,
-                            ShopId = item.ShopId,
+                            ShopId = group.Key,
                             CustomerName = request.CustomerName,
                             Address = request.Address,
                             Email = request.Email,
                             PhoneNumber = request.PhoneNumber,
                             Note = request.Note,
                             Discount = request.Discount,
-                            TotalAmount = item.Price * item.Quantity - (item.Discount ?? 0) - (request.Discount ?? 0),
+                            TotalAmount = group.Sum(x => x.Price * x.Quantity - (x.Discount ?? 0)) - (request.Discount ?? 0),
                             PaymentMethodId = (int)request.PaymentMethod,
-                            OrderDetails = new List<OrderDetail>
+                            OrderDetails = group.Select(x => new OrderDetail
                             {
-                                new OrderDetail
-                                {
-                                    ProductId = item.ProductId,
-                                    ProductName = item.ProductName,
-                                    Quantity = item.Quantity,
-                                    Price = item.Price,
-                                    Discount = item.Discount ?? 0,
-                                    Total = item.Price * item.Quantity - (item.Discount ?? 0)
-                                }
-                            },
+                                ProductId = x.ProductId,
+                                ProductName = x.ProductName,
+                                Quantity = x.Quantity,
+                                Price = x.Price,
+                                Discount = x.Discount ?? 0,
+                                Total = x.Price * x.Quantity - (x.Discount ?? 0)
+                            }).ToList(),
                             OrderDate = DateTime.UtcNow,
                             DeliveryDate = DateTime.UtcNow.AddDays(7),
                             OrderStatusId = (int)Domain.Enums.OrderStatus.Pending,
