@@ -26,7 +26,7 @@ namespace Mps.Application.Features.ProductCategory
 
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var query = _context.ProductCategories
+                var query = _context.ProductCategories.Where(s => !s.IsDeleted)
                     .Include(s => s.Children)
                     .ThenInclude(s => s.Children)
                     .Where(s => s.ParentId == null)

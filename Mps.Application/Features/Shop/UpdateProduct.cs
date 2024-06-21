@@ -87,16 +87,6 @@ namespace Mps.Application.Features.Shop
                         product.BrandId = request.BrandId.Value;
                     }
 
-                    if (request.ProductCode != null)
-                    {
-                        product.ProductCode = request.ProductCode;
-                    }
-
-                    if (request.ProductSKU != null)
-                    {
-                        product.ProductSKU = request.ProductSKU;
-                    }
-
                     if (request.Images != null)
                     {
                         var images = request.Images.Select(i => new ProductImage { Id = i.Id, ImagePath = i.ImagePath }).ToList();

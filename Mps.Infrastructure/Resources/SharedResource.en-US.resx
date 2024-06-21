@@ -273,4 +273,7 @@
   <data name="User is not active" xml:space="preserve">
     <value>User is not active</value>
   </data>
+  <data name="Category deleted successfully" xml:space="preserve">
+    <value>Category deleted successfully</value>
+  </data>
 </root>

@@ -43,9 +43,9 @@ namespace Mps.Application.Features.ProductCategory
                     }
                     else
                     {
-                        var category = new Domain.Entities.ProductCategory 
-                        { 
-                            Name = request.Name, 
+                        var category = new Domain.Entities.ProductCategory
+                        {
+                            Name = request.Name,
                             ParentId = request.ParentId
                         };
                         _context.ProductCategories.Add(category);

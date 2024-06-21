@@ -43,8 +43,6 @@ namespace Mps.Application.Features.Ecommerce
                         .Where(p => p.IsActive)
                         .Where(s => request.Filter == null
                             || s.Name.SearchIgnoreCase(request.Filter)
-                            || s.ProductCode.SearchIgnoreCase(request.Filter)
-                            || s.ProductSKU.SearchIgnoreCase(request.Filter)
                         )
                         .AsQueryable();
 

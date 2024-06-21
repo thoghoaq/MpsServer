@@ -52,8 +52,6 @@ namespace Mps.Application.Features.Shop
                     {
                         ShopId = request.ShopId,
                         Name = request.Name,
-                        ProductCode = request.ProductCode,
-                        ProductSKU = request.ProductSKU,
                         Description = request.Description,
                         Price = request.Price,
                         Stock = request.Stock,

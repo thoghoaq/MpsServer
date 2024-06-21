@@ -25,8 +25,6 @@ namespace Mps.Application.Features.Shop
         {
             public int Id { get; set; }
             public required string Name { get; set; }
-            public required string ProductCode { get; set; }
-            public required string ProductSKU { get; set; }
             public required decimal Price { get; set; }
             public required int Stock { get; set; }
             public string? Description { get; set; }
@@ -61,8 +59,6 @@ namespace Mps.Application.Features.Shop
                     {
                         Id = p.Id,
                         Name = p.Name,
-                        ProductCode = p.ProductCode,
-                        ProductSKU = p.ProductSKU,
                         Price = p.Price,
                         Stock = p.Stock,
                         Description = p.Description,

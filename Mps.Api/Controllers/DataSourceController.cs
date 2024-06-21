@@ -32,6 +32,18 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["Staff"])]
+        [HttpDelete]
+        [Route("category/{Id}")]
+        public async Task<IActionResult> DeleteCategory([FromRoute] DeleteCategory.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
         [HttpGet]
         [Route("brands")]
         public async Task<IActionResult> GetBrands([FromQuery] GetBrands.Query query)

@@ -273,4 +273,7 @@
   <data name="User is not active" xml:space="preserve">
     <value>Người dùng bị vô hiệu hóa</value>
   </data>
+  <data name="Category deleted successfully" xml:space="preserve">
+    <value>Danh mục được xóa thành công</value>
+  </data>
 </root>

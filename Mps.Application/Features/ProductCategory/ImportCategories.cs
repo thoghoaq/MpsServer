@@ -1,12 +1,12 @@
-﻿using MediatR;
+﻿using EFCore.BulkExtensions;
+using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Excel;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
-using EFCore.BulkExtensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Mps.Application.Features.ProductCategory
 {
@@ -94,11 +94,13 @@ namespace Mps.Application.Features.ProductCategory
                 if (string.IsNullOrEmpty(category.Id))
                 {
                     result.Id = null;
-                } else if (!int.TryParse(category.Id, out int id) || id <= 0)
+                }
+                else if (!int.TryParse(category.Id, out int id) || id <= 0)
                 {
                     result.Message = _localizer["Id is not valid"];
                     result.Id = null;
-                } else
+                }
+                else
                 {
                     result.Id = id;
                 }
