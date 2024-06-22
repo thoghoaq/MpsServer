@@ -74,5 +74,17 @@ namespace Mps.Api.Controllers
             var fileName = "products.xlsx";
             return File(content, contentType, fileName);
         }
+
+        [Auth(Roles = ["ShopOwner", "Staff"])]
+        [HttpGet]
+        [Route("orders")]
+        public async Task<IActionResult> GetOrders([FromQuery] GetOrders.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Orders) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }
