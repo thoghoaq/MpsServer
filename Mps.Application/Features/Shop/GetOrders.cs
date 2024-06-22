@@ -13,6 +13,7 @@ namespace Mps.Application.Features.Shop
         public class Query : IRequest<CommandResult<Result>>
         {
             public int ShopId { get; set; }
+            public int? StatusId { get; set; }
             public int? PageNumber { get; set; }
             public int? PageSize { get; set; }
             public string? Filter { get; set; }
@@ -47,6 +48,7 @@ namespace Mps.Application.Features.Shop
                         .Include(o => o.PaymentMethod)
                         .Include(o => o.PaymentStatus)
                         .Where(o => o.ShopId == request.ShopId)
+                        .Where(o => request.StatusId == null || o.OrderStatusId == request.StatusId)
                         .Where(s => request.Filter == null
                                    || (s.CustomerName != null && s.CustomerName.Contains(request.Filter))
                                    || (s.PhoneNumber != null && s.PhoneNumber.Contains(request.Filter))
