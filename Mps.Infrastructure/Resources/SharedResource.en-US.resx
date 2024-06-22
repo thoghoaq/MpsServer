@@ -276,4 +276,7 @@
   <data name="Category deleted successfully" xml:space="preserve">
     <value>Category deleted successfully</value>
   </data>
+  <data name="Product out of stock" xml:space="preserve">
+    <value>Product out of stock</value>
+  </data>
 </root>

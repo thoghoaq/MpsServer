@@ -69,6 +69,8 @@ namespace Mps.Application.Features.Payment
                     var isSuccess = _vnPayService.IsSuccessResponse(request.Vnp_ResponseCode ?? string.Empty);
                     paymentResult.PaymentMessage = paymentMessage;
                     paymentResult.PaymentStatus = request.Vnp_ResponseCode;
+
+                    var orderIds = payment.PaymentRefs.Select(x => x.RefId).ToList();
                     if (isSuccess)
                     {
                         paymentResult.PaymentId = payment.Id;
@@ -78,14 +80,23 @@ namespace Mps.Application.Features.Payment
                         paymentResult.Signature = payment.PaymentSignature?.SignValue;
 
                         payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Success;
+
+                        var orderDetails = _dbContext.OrderDetails
+                            .Include(x => x.Product)
+                            .Where(x => orderIds.Contains(x.OrderId))
+                            .ToList();
+
+                        foreach (var orderDetail in orderDetails)
+                        {
+                            orderDetail.Product!.Stock -= orderDetail.Quantity;
+                        }
                     }
                     else
                     {
                         payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Failed;
                     }
 
-                    await _dbContext.SaveChangesAsync(cancellationToken);
-                    await ChangeOrderStatus(payment.PaymentRefs.Select(x => x.RefId).ToList(), isSuccess ? (int)Domain.Enums.OrderStatus.Processing : (int)Domain.Enums.OrderStatus.Cancelled, cancellationToken);
+                    await ChangeOrderStatus(orderIds, isSuccess ? (int)Domain.Enums.OrderStatus.Processing : (int)Domain.Enums.OrderStatus.Cancelled, cancellationToken);
                     if (isSuccess)
                     {
                         return CommandResult<Result>.Success(paymentResult);

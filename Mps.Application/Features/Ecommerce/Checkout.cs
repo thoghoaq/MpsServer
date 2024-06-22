@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
@@ -51,6 +52,22 @@ namespace Mps.Application.Features.Ecommerce
             {
                 try
                 {
+                    // check stock
+                    var listProductIds = request.Items.Select(x => x.ProductId).ToList();
+                    var listProducts = await _context.Products.Where(x => listProductIds.Contains(x.Id)).ToListAsync(cancellationToken);
+                    foreach (var item in request.Items)
+                    {
+                        var product = listProducts.Find(x => x.Id == item.ProductId);
+                        if (product == null)
+                        {
+                            return CommandResult<Result>.Fail(_localizer["Product not found"]);
+                        }
+                        if (product.Stock < item.Quantity)
+                        {
+                            return CommandResult<Result>.Fail(_localizer["Product out of stock"]);
+                        }
+                    }
+
                     var listOrders = new List<Order>();
                     var groupOrders = request.Items.GroupBy(x => x.ShopId).ToList();
                     foreach (var group in groupOrders)

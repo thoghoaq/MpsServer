@@ -75,6 +75,7 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<Order>().HasMany(o => o.Progresses).WithOne().HasForeignKey(o => o.OrderId);
 
             modelBuilder.Entity<OrderDetail>().HasKey(o => o.Id);
+            modelBuilder.Entity<OrderDetail>().HasOne(o => o.Product).WithMany().HasForeignKey(o => o.ProductId);
 
             modelBuilder.Entity<OrderProgress>().HasKey(o => o.Id);
 

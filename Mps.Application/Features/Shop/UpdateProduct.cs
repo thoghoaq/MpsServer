@@ -13,8 +13,6 @@ namespace Mps.Application.Features.Shop
         {
             public required int ShopId { get; set; }
             public required int Id { get; set; }
-            public string? ProductCode { get; set; }
-            public string? ProductSKU { get; set; }
             public string? Name { get; set; }
             public decimal? Price { get; set; }
             public int? Stock { get; set; }

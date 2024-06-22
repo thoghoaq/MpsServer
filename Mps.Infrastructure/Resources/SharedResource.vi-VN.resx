@@ -276,4 +276,7 @@
   <data name="Category deleted successfully" xml:space="preserve">
     <value>Danh mục được xóa thành công</value>
   </data>
+  <data name="Product out of stock" xml:space="preserve">
+    <value>Sản phẩm đã hết hàng</value>
+  </data>
 </root>
