@@ -86,5 +86,17 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [Auth(Roles = ["ShopOwner", "Staff"])]
+        [HttpPost]
+        [Route("order/status")]
+        public async Task<IActionResult> ChangeOrderStatus([FromBody] ChangeOrderStatus.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }
