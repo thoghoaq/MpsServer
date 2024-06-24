@@ -279,4 +279,7 @@
   <data name="Product out of stock" xml:space="preserve">
     <value>Product out of stock</value>
   </data>
+  <data name="Order status changed" xml:space="preserve">
+    <value>Order status changed</value>
+  </data>
 </root>

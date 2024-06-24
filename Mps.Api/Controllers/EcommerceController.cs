@@ -38,5 +38,14 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [Auth(Roles = ["Customer"])]
+        [HttpGet]
+        [Route("orders")]
+        public async Task<IActionResult> GetOrders([FromQuery] GetOrders.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Orders) : BadRequest(result.FailureReason);
+        }
     }
 }

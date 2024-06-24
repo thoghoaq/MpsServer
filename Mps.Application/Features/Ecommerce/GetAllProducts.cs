@@ -48,7 +48,8 @@ namespace Mps.Application.Features.Ecommerce
 
                     if (request.CategoriesId != null && request.CategoriesId.Any())
                     {
-                        query = query.Where(p => request.CategoriesId.Contains(p.CategoryId));
+                        var categories = GetAllCategoriesId(request.CategoriesId);
+                        query = query.Where(p => categories.Contains(p.CategoryId));
                     }
 
                     if (request.BrandsId != null && request.BrandsId.Any())
@@ -76,6 +77,17 @@ namespace Mps.Application.Features.Ecommerce
                     _logger.LogError(ex, "GetAllProductsFailure");
                     return CommandResult<Result>.Fail(_localizer[ex.Message]);
                 }
+            }
+
+            private List<int> GetAllCategoriesId(List<int> categoriesId)
+            {
+                return _context.ProductCategories
+                    .Include(c => c.Children)
+                    .Where(c => categoriesId.Contains(c.Id)
+                        || (c.ParentId.HasValue && categoriesId.Contains(c.ParentId.Value))
+                        || c.Children.Any(x => x.ParentId.HasValue && categoriesId.Contains(x.ParentId.Value))
+                    )
+                    .Select(x => x.Id).ToList();
             }
         }
     }

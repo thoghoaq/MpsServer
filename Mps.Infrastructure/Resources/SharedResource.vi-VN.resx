@@ -279,4 +279,7 @@
   <data name="Product out of stock" xml:space="preserve">
     <value>Sản phẩm đã hết hàng</value>
   </data>
+  <data name="Order status changed" xml:space="preserve">
+    <value>Trạng thái đơn hàng đã được thay đổi</value>
+  </data>
 </root>
