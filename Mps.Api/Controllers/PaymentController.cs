@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Mps.Application.Abstractions.Payment;
 using Mps.Application.Features.Payment;
 using Mps.Infrastructure.Dependencies.VnPay.Models;
 using Mps.Infrastructure.Middleware;
@@ -8,7 +9,7 @@ namespace Mps.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PaymentController(IMediator mediator, IConfiguration configuration) : ControllerBase
+    public class PaymentController(IMediator mediator, IConfiguration configuration, IPayPalService payPalService) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
 
@@ -100,6 +101,38 @@ namespace Mps.Api.Controllers
         public async Task<IActionResult> GetPaymentDetails([FromQuery] GetPaymentDetails.Query query)
         {
             var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["Staff"])]
+        [HttpPost]
+        [Route("accept-payout")]
+        public async Task<IActionResult> AcceptPayout([FromBody] AcceptPayout.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["ShopOwner"])]
+        [HttpPost]
+        [Route("request-payout")]
+        public async Task<IActionResult> RequestPayout([FromBody] RequestPayout.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
             return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
             {
                 reason = result.FailureReason

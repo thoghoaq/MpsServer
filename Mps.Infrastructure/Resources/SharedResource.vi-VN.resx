@@ -282,4 +282,10 @@
   <data name="Order status changed" xml:space="preserve">
     <value>Trạng thái đơn hàng đã được thay đổi</value>
   </data>
+  <data name="Payout request has been sent" xml:space="preserve">
+    <value>Yêu cầu đã được gửi đi</value>
+  </data>
+  <data name="An error occurred" xml:space="preserve">
+    <value>Có lỗi xảy ra</value>
+  </data>
 </root>

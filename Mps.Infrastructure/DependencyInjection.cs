@@ -13,6 +13,7 @@ using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Messaging;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Abstractions.Storage;
+using Mps.Infrastructure.Dependencies.CurrencyConverter;
 using Mps.Infrastructure.Dependencies.Email;
 using Mps.Infrastructure.Dependencies.Excel;
 using Mps.Infrastructure.Dependencies.Firebase.Authentication;
@@ -20,6 +21,7 @@ using Mps.Infrastructure.Dependencies.Firebase.Messaging;
 using Mps.Infrastructure.Dependencies.Firebase.Storage;
 using Mps.Infrastructure.Dependencies.Localization;
 using Mps.Infrastructure.Dependencies.LoggedUser;
+using Mps.Infrastructure.Dependencies.PayPal;
 using Mps.Infrastructure.Dependencies.VnPay;
 
 namespace Mps.Infrastructure
@@ -43,6 +45,8 @@ namespace Mps.Infrastructure
             services.AddHttpContextAccessor();
 
             services.AddHttpClient<IJwtProvider, JwtProvider>();
+
+            services.AddHttpClient<ICurrencyConverter, CurrencyConverter>();
 
             services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -80,6 +84,10 @@ namespace Mps.Infrastructure
             services.AddTransient<IExcelService, ExcelService>();
 
             services.AddTransient<IEmailService, EmailService>();
+
+            services.AddTransient<IPayPalService, PayPalService>();
+
+            services.AddTransient<ICurrencyConverter, CurrencyConverter>();
         }
     }
 }

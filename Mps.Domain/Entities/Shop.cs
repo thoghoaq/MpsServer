@@ -15,6 +15,9 @@
         public string? Avatar { get; set; }
         public string? Cover { get; set; }
         public bool IsActive { get; set; }
+
+        public string? PayPalAccount { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }

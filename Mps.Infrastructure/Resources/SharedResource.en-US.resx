@@ -282,4 +282,10 @@
   <data name="Order status changed" xml:space="preserve">
     <value>Order status changed</value>
   </data>
+  <data name="Payout request has been sent" xml:space="preserve">
+    <value>Payout request has been sent</value>
+  </data>
+  <data name="An error occurred" xml:space="preserve">
+    <value>An error occurred</value>
+  </data>
 </root>

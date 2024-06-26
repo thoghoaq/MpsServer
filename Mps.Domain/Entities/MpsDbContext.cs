@@ -20,6 +20,8 @@ namespace Mps.Domain.Entities
         public DbSet<PaymentSignature> PaymentSignatures { get; set; }
         public DbSet<UserDevice> UserDevices { get; set; }
         public DbSet<PaymentRef> PaymentRef { get; set; }
+        public DbSet<Payout> Payouts { get; set; }
+        public DbSet<PayoutStatus> PayoutStatuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -110,6 +112,17 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<PaymentSignature>().HasKey(m => m.Id);
 
             modelBuilder.Entity<PaymentRef>().HasKey(m => m.Id);
+
+            modelBuilder.Entity<Payout>().HasKey(p => p.Id);
+            modelBuilder.Entity<Payout>().HasOne(p => p.Shop).WithMany().HasForeignKey(p => p.ShopId);
+            modelBuilder.Entity<Payout>().HasOne(p => p.PayoutStatus).WithMany().HasForeignKey(p => p.PayoutStatusId);
+
+            modelBuilder.Entity<PayoutStatus>().HasKey(s => s.Id);
+            modelBuilder.Entity<PayoutStatus>().HasData(
+                new PayoutStatus { Id = 1, Name = "Pending" },
+                new PayoutStatus { Id = 2, Name = "Success" },
+                new PayoutStatus { Id = 3, Name = "Failed" }
+            );
         }
     }
 }
