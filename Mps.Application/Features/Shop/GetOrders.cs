@@ -47,7 +47,7 @@ namespace Mps.Application.Features.Shop
                         .Include(o => o.Shop)
                         .Include(o => o.PaymentMethod)
                         .Include(o => o.PaymentStatus)
-                        .Where(o => o.ShopId == request.ShopId)
+                        .Where(o => o.ShopId == request.ShopId && o.OrderStatusId != (int)Domain.Enums.OrderStatus.Pending)
                         .Where(o => request.StatusId == null || o.OrderStatusId == request.StatusId)
                         .Where(s => request.Filter == null
                                    || (s.CustomerName != null && s.CustomerName.Contains(request.Filter))
