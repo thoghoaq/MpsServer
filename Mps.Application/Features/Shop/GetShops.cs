@@ -54,7 +54,7 @@ namespace Mps.Application.Features.Shop
                 try
                 {
                     var revenueQuery = context.Orders
-                        .Where(o => request.MonthToDate == null || o.OrderDate.Month == request.MonthToDate.Value.Month && o.OrderDate.Year == request.MonthToDate.Value.Year)
+                        .Where(o => request.MonthToDate == null || (o.OrderDate.Month == request.MonthToDate.Value.Month && o.OrderDate.Year == request.MonthToDate.Value.Year))
                         .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
                         .GroupBy(o => o.ShopId)
                         .Select(g => new
@@ -89,7 +89,7 @@ namespace Mps.Application.Features.Shop
                             Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).ToList(),
                             Revenue = s.r!.Revenue,
                             TotalPayout = s.s.Payouts
-                                .Where(o => request.MonthToDate == null || o.MonthToDate.Month == request.MonthToDate.Value.Month && o.MonthToDate.Year == request.MonthToDate.Value.Year)
+                                .Where(o => request.MonthToDate == null || (o.MonthToDate.Month == request.MonthToDate.Value.Month && o.MonthToDate.Year == request.MonthToDate.Value.Year))
                                 .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success)
                                 .Sum(p => p.Amount)
                         })
