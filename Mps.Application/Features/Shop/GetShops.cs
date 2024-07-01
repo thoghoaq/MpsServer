@@ -11,6 +11,7 @@ namespace Mps.Application.Features.Shop
     {
         public class Query : IRequest<CommandResult<Result>>
         {
+            public DateTime? MonthToDate { get; set; }
         }
 
         public class Result
@@ -40,6 +41,8 @@ namespace Mps.Application.Features.Shop
             public DateTime? UpdatedAt { get; set; }
 
             public bool IsCurrentMonthPaid { get; set; }
+            public decimal? Revenue { get; set; }
+            public decimal? TotalPayout { get; set; }
             public List<Payout> Payouts { get; set; } = [];
         }
 
@@ -50,28 +53,45 @@ namespace Mps.Application.Features.Shop
             {
                 try
                 {
+                    var revenueQuery = context.Orders
+                        .Where(o => request.MonthToDate == null || o.OrderDate.Month == request.MonthToDate.Value.Month && o.OrderDate.Year == request.MonthToDate.Value.Year)
+                        .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                        .GroupBy(o => o.ShopId)
+                        .Select(g => new
+                        {
+                            ShopId = g.Key,
+                            Revenue = g.Sum(o => o.TotalAmount)
+                        });
+
                     var shops = await context.Shops
                         .Include(s => s.Payouts)
+                        .GroupJoin(revenueQuery, s => s.Id, r => r.ShopId, (s, r) => new { s, r })
+                        .SelectMany(s => s.r.DefaultIfEmpty(), (s, r) => new { s.s, r })
                         .Select(s => new Shop
                         {
-                            Id = s.Id,
-                            ShopOwnerId = s.ShopOwnerId,
-                            ShopName = s.ShopName,
-                            PhoneNumber = s.PhoneNumber,
-                            Address = s.Address,
-                            City = s.City,
-                            District = s.District,
-                            Latitude = s.Latitude,
-                            Longitude = s.Longitude,
-                            Description = s.Description,
-                            Avatar = s.Avatar,
-                            Cover = s.Cover,
-                            IsActive = s.IsActive,
-                            PayPalAccount = s.PayPalAccount,
-                            CreatedAt = s.CreatedAt,
-                            UpdatedAt = s.UpdatedAt,
-                            IsCurrentMonthPaid = s.Payouts.Any(p => p.MonthToDate.Month == DateTime.Now.Month && p.MonthToDate.Year == DateTime.Now.Year && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
-                            Payouts = s.Payouts.OrderByDescending(p => p.MonthToDate).ToList()
+                            Id = s.s.Id,
+                            ShopOwnerId = s.s.ShopOwnerId,
+                            ShopName = s.s.ShopName,
+                            PhoneNumber = s.s.PhoneNumber,
+                            Address = s.s.Address,
+                            City = s.s.City,
+                            District = s.s.District,
+                            Latitude = s.s.Latitude,
+                            Longitude = s.s.Longitude,
+                            Description = s.s.Description,
+                            Avatar = s.s.Avatar,
+                            Cover = s.s.Cover,
+                            IsActive = s.s.IsActive,
+                            PayPalAccount = s.s.PayPalAccount,
+                            CreatedAt = s.s.CreatedAt,
+                            UpdatedAt = s.s.UpdatedAt,
+                            IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == DateTime.UtcNow.Month && p.MonthToDate.Year == DateTime.UtcNow.Year && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
+                            Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).ToList(),
+                            Revenue = s.r!.Revenue,
+                            TotalPayout = s.s.Payouts
+                                .Where(o => request.MonthToDate == null || o.MonthToDate.Month == request.MonthToDate.Value.Month && o.MonthToDate.Year == request.MonthToDate.Value.Year)
+                                .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success)
+                                .Sum(p => p.Amount)
                         })
                         .OrderBy(s => s.ShopName)
                         .ToListAsync(cancellationToken);

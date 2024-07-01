@@ -21,6 +21,16 @@ namespace Mps.Application.Features.Payment
         public class Result
         {
             public string? Message { get; set; }
+            public List<PayoutResult>? PayoutResult { get; set; }
+        }
+
+        public class PayoutResult
+        {
+            public int ShopId { get; set; }
+            public decimal Amount { get; set; }
+            public required string Currency { get; set; }
+            public DateTime? UpdatedDate { get; set; }
+            public required string BatchId { get; set; }
         }
 
         public class Handler(MpsDbContext dbContext, IPayPalService payPalService, ICurrencyConverter currencyConverter, ILogger<RefundRevenue> logger) : IRequestHandler<Command, CommandResult<Result>>
@@ -90,9 +100,19 @@ namespace Mps.Application.Features.Payment
                     };
 
                     var result = await payPalService.CreatePayoutRequest(payoutRequest);
-
                     return result.StatusCode == System.Net.HttpStatusCode.Created
-                        ? CommandResult<Result>.Success(new Result { Message = "Refund revenue successfully" })
+                        ? CommandResult<Result>.Success(new Result
+                        {
+                            Message = "Refund revenue successfully",
+                            PayoutResult = request.ShopIds.Select(shopId => new PayoutResult
+                            {
+                                ShopId = shopId,
+                                Amount = Math.Round((groupShopOrders.Find(x => x.ShopId == shopId)?.TotalAmount ?? 0) * PERCENT, 2),
+                                Currency = "VND",
+                                UpdatedDate = DateTime.UtcNow,
+                                BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId
+                            }).ToList()
+                        })
                         : CommandResult<Result>.Fail("An error occurs when refund revenue");
                 }
                 catch (Exception ex)

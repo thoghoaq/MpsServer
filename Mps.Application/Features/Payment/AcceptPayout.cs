@@ -41,6 +41,14 @@ namespace Mps.Application.Features.Payment
                     };
                     var refundRevenueResult = await mediator.Send(refundRevenueCommand, cancellationToken);
                     payout.PayoutStatusId = refundRevenueResult.IsSuccess ? (int)Domain.Enums.PayoutStatus.Success : (int)Domain.Enums.PayoutStatus.Failed;
+                    if (refundRevenueResult.IsSuccess)
+                    {
+                        var payload = refundRevenueResult.Payload?.PayoutResult?.FirstOrDefault();
+                        payout.Amount = payload?.Amount;
+                        payout.Currency = payload?.Currency;
+                        payout.UpdatedDate = payload?.UpdatedDate;
+                        payout.BatchId = payload?.BatchId;
+                    }
                     await dbContext.SaveChangesAsync(cancellationToken);
                     return refundRevenueResult.IsSuccess
                         ? CommandResult<Result>.Success(new Result { Message = localizer["Payout has been accepted"] })
