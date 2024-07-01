@@ -20,12 +20,13 @@ namespace Mps.Infrastructure.Dependencies.CurrencyConverter
             return decimal.Parse(currencyResponse!.Rates.First().Value.RateForAmount!);
         }
 
-        public async Task<decimal> GetExchangeRateAsync(string fromCurrency, string toCurrency, CancellationToken cancellationToken)
+        public async Task<decimal> GetExchangeRateAsync(string fromCurrency, string toCurrency)
         {
+            var clientHttp = new HttpClient();
             string baseUrl = configuration.GetSection("CurrencyConverter:BaseUrl").Value!;
             string request = $"{baseUrl}&from={fromCurrency}&to={toCurrency}";
-            var response = await httpClient.GetAsync(new Uri(request), cancellationToken);
-            var currencyResponse = await response.Content.ReadFromJsonAsync<CurrencyResponse>(cancellationToken: cancellationToken);
+            var response = await clientHttp.GetAsync(new Uri(request));
+            var currencyResponse = await response.Content.ReadFromJsonAsync<CurrencyResponse>();
             if (currencyResponse == null || currencyResponse.Rates == null || currencyResponse.Rates.Count == 0)
             {
                 return 0;

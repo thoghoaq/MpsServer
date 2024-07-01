@@ -1,0 +1,18 @@
+﻿using MediatR;
+using Mps.Application.Features.Payment;
+
+namespace Mps.Api.Workers
+{
+    public class MonthlyPayout(IMediator mediator)
+    {
+        public async Task Process()
+        {
+            var result = await mediator.Send(new PayoutMonthly.Command { MonthToDate = DateTime.UtcNow.AddMonths(-1) });
+            if (!result.IsSuccess)
+            {
+                throw new InvalidOperationException(result.FailureReason);
+            }
+
+        }
+    }
+}

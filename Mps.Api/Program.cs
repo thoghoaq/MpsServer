@@ -1,6 +1,7 @@
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Mps.Api;
 using Mps.Application.Features.Account;
 using Mps.Domain.Entities;
 using Mps.Infrastructure;
@@ -95,6 +96,8 @@ app.UseHangfireDashboard($"/hangfire-{builder.Configuration.GetSection("Hangfire
 app.UseRequestLocalization();
 
 app.MapControllers();
+
+StartWorker.Start();
 
 app.Run();
 

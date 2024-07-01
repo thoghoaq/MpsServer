@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dependencies\Hangfire\" />
     <Folder Include="Helpers\" />
   </ItemGroup>
 
