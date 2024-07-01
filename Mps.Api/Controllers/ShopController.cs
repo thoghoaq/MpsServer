@@ -12,6 +12,7 @@ namespace Mps.Api.Controllers
     {
         private readonly IMediator _mediator = mediator;
 
+        [Auth(Roles = ["Staff"])]
         [HttpGet]
         public async Task<IActionResult> GetShops()
         {
@@ -22,6 +23,7 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["ShopOwner"])]
         [HttpGet]
         [Route("products")]
         public async Task<IActionResult> GetProducts([FromQuery] GetProducts.Query query)
@@ -33,6 +35,7 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["ShopOwner"])]
         [HttpGet]
         [Route("product")]
         public async Task<IActionResult> GetProduct([FromQuery] GetProduct.Query query)
@@ -44,6 +47,7 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["ShopOwner"])]
         [HttpPost]
         [Route("product")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProduct.Command command)
@@ -55,6 +59,7 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["ShopOwner"])]
         [HttpPut]
         [Route("product")]
         public async Task<IActionResult> UpdateProduct([FromBody] UpdateProduct.Command command)
@@ -66,6 +71,7 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["ShopOwner"])]
         [HttpGet]
         [Route("products/export")]
         public async Task<IActionResult> ExportProducts([FromQuery] ExportProducts.Query query)
@@ -103,6 +109,18 @@ namespace Mps.Api.Controllers
         public async Task<IActionResult> ChangeOrderStatus([FromBody] ChangeOrderStatus.Command command)
         {
             var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["ShopOwner", "Staff"])]
+        [HttpGet]
+        [Route("revenue")]
+        public async Task<IActionResult> GetRevenue([FromQuery] GetRevenue.Query query)
+        {
+            var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
             {
                 Reason = result.FailureReason
