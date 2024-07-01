@@ -123,10 +123,26 @@ namespace Mps.Api.Controllers
             });
         }
 
-        [Auth(Roles = ["ShopOwner"])]
+        [Auth(Roles = ["ShopOwner", "Staff"])]
         [HttpPost]
         [Route("request-payout")]
         public async Task<IActionResult> RequestPayout([FromBody] RequestPayout.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["ShopOwner", "Staff"])]
+        [HttpPost]
+        [Route("request-monthly-payout")]
+        public async Task<IActionResult> RequestMonthlyPayout([FromBody] RequestMonthlyPayout.Command command)
         {
             if (!ModelState.IsValid)
             {

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.BulkExtensions" Version="7.0.0" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="8.0.0" />
     <PackageReference Include="FirebaseAdmin" Version="3.0.0" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="PayoutsSdk" Version="1.1.1" />

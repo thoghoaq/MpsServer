@@ -30,9 +30,9 @@ namespace Mps.Application.Features.Payment
                     {
                         return CommandResult<Result>.Fail(localizer["Payout not found"]);
                     }
-                    if (payout.PayoutStatusId != (int)Domain.Enums.PayoutStatus.Pending)
+                    if (payout.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success)
                     {
-                        return CommandResult<Result>.Fail(localizer["Payout is not pending"]);
+                        return CommandResult<Result>.Fail(localizer["Payout has been paid"]);
                     }
                     var refundRevenueCommand = new RefundRevenue.Command
                     {
