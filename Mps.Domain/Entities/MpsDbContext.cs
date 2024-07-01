@@ -44,6 +44,7 @@ namespace Mps.Domain.Entities
 
             modelBuilder.Entity<Shop>().HasKey(s => s.Id);
             modelBuilder.Entity<Shop>().Property(s => s.ShopName).IsRequired();
+            modelBuilder.Entity<Shop>().HasMany(s => s.Payouts).WithOne().HasForeignKey(s => s.ShopId);
 
             modelBuilder.Entity<Staff>().HasKey(s => s.UserId);
             modelBuilder.Entity<Staff>().Property(s => s.StaffCode).HasDefaultValueSql("generate_staff_code()");
@@ -114,7 +115,6 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<PaymentRef>().HasKey(m => m.Id);
 
             modelBuilder.Entity<Payout>().HasKey(p => p.Id);
-            modelBuilder.Entity<Payout>().HasOne(p => p.Shop).WithMany().HasForeignKey(p => p.ShopId);
             modelBuilder.Entity<Payout>().HasOne(p => p.PayoutStatus).WithMany().HasForeignKey(p => p.PayoutStatusId);
 
             modelBuilder.Entity<PayoutStatus>().HasKey(s => s.Id);

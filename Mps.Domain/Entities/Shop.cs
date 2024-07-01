@@ -2,6 +2,11 @@
 {
     public class Shop
     {
+        public Shop()
+        {
+            Payouts = [];
+        }
+
         public int Id { get; set; }
         public int ShopOwnerId { get; set; }
         public required string ShopName { get; set; }
@@ -20,5 +25,7 @@
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        public ICollection<Payout> Payouts { get; set; }
     }
 }

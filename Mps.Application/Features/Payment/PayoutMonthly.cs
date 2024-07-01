@@ -108,7 +108,7 @@ namespace Mps.Application.Features.Payment
                     foreach (var payout in payouts)
                     {
                         payout.PayoutStatusId = result.StatusCode == System.Net.HttpStatusCode.Created ? (int)Domain.Enums.PayoutStatus.Success : (int)Domain.Enums.PayoutStatus.Failed;
-                        payout.Amount = Math.Round(groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.TotalAmount ?? 0 * vndToUsd * PERCENT, 2);
+                        payout.Amount = Math.Round((groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.TotalAmount ?? 0) * vndToUsd * PERCENT, 2);
                         payout.Currency = "USD";
                         payout.UpdatedDate = DateTime.UtcNow;
                         payout.BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId;

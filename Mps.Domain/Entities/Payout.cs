@@ -12,7 +12,6 @@
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
-        public virtual Shop? Shop { get; set; }
         public virtual PayoutStatus? PayoutStatus { get; set; }
     }
 }

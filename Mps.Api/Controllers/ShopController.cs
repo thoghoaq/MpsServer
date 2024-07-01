@@ -13,6 +13,16 @@ namespace Mps.Api.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
+        public async Task<IActionResult> GetShops()
+        {
+            var result = await _mediator.Send(new GetShops.Query());
+            return result.IsSuccess ? Ok(result.Payload?.Shops) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
+        [HttpGet]
         [Route("products")]
         public async Task<IActionResult> GetProducts([FromQuery] GetProducts.Query query)
         {
