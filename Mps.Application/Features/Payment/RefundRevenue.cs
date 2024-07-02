@@ -43,7 +43,6 @@ namespace Mps.Application.Features.Payment
                     {
                         return CommandResult<Result>.Fail("Cannot get exchange rate from VND to USD");
                     }
-                    logger.LogInformation($"Exchange rate from VND to USD: {vndToUsd}");
 
                     var shopBankAccounts = dbContext.Shops
                         .Where(s => request.ShopIds.Contains(s.Id))
@@ -79,9 +78,8 @@ namespace Mps.Application.Features.Payment
                         Items = groupShopOrders.Select(group =>
                         {
                             var grossInVND = group.ExpectAmount ?? 0;
-                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInVND} VND");
                             var grossInUSD = Math.Round(grossInVND * vndToUsd * PERCENT, 2);
-                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD} USD");
+                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD.ToString("F2")} USD");
                             var bankAccount = shopBankAccounts.Find(s => s.Id == group.ShopId)?.PayPalAccount;
                             return new PayoutItem()
                             {
@@ -89,7 +87,7 @@ namespace Mps.Application.Features.Payment
                                 Amount = new Currency()
                                 {
                                     CurrencyCode = "USD",
-                                    Value = grossInUSD.ToString(),
+                                    Value = grossInUSD.ToString("F2"),
                                 },
                                 Receiver = bankAccount
                             };
