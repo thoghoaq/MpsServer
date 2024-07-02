@@ -34,6 +34,10 @@ namespace Mps.Application.Features.Payment
                     {
                         return CommandResult<Result>.Fail(localizer["Payout has been paid"]);
                     }
+                    if (payout.ExpectAmount == null || payout.ExpectAmount <= 0)
+                    {
+                        return CommandResult<Result>.Fail(localizer["Payout amount is invalid"]);
+                    }
                     var refundRevenueCommand = new RefundRevenue.Command
                     {
                         ShopIds = new List<int> { payout.ShopId },

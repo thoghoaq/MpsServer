@@ -91,7 +91,7 @@ namespace Mps.Application.Features.Payment
                                 Amount = new Currency()
                                 {
                                     CurrencyCode = "USD",
-                                    Value = grossInUSD.ToString("F2"),
+                                    Value = grossInUSD.ToString("0.00"),
                                 },
                                 Receiver = bankAccount
                             };
