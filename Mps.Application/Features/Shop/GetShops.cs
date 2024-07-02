@@ -66,6 +66,7 @@ namespace Mps.Application.Features.Shop
                         });
 
                     var shops = await context.Shops
+                        .Where(s => s.IsActive)
                         .Include(s => s.Payouts)
                         .GroupJoin(revenueQuery, s => s.Id, r => r.ShopId, (s, r) => new { s, r })
                         .SelectMany(s => s.r.DefaultIfEmpty(), (s, r) => new { s.s, r })

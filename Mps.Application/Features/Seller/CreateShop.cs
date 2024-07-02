@@ -14,6 +14,7 @@ namespace Mps.Application.Features.Seller
             public required string ShopName { get; set; }
             public required string Address { get; set; }
             public required string PhoneNumber { get; set; }
+            public required string PayPalAccount { get; set; }
             public string? City { get; set; }
             public string? District { get; set; }
             public double? Latitude { get; set; }
@@ -52,15 +53,18 @@ namespace Mps.Application.Features.Seller
                         Avatar = request.Avatar,
                         Cover = request.Cover,
                         IsActive = false,
+                        PayPalAccount = request.PayPalAccount,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
                     };
                     _context.Shops.Add(shop);
                     await _context.SaveChangesAsync(cancellationToken);
-                    return CommandResult<Result>.Success(new Result {
+                    return CommandResult<Result>.Success(new Result
+                    {
                         Message = _localizer["Shop created successfully"]
                     });
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     logger.LogError(ex, "CreateShopFailure");
                     return CommandResult<Result>.Fail(_localizer[ex.Message]);

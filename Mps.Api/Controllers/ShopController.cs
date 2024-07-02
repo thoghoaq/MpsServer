@@ -23,6 +23,30 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["Staff"])]
+        [HttpGet]
+        [Route("request")]
+        public async Task<IActionResult> GetShopRequest([FromQuery] GetShopRequest.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Shops) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["Staff"])]
+        [HttpPost]
+        [Route("accept-request")]
+        public async Task<IActionResult> AcceptShopRequest([FromBody] AcceptShopRequest.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
         [Auth(Roles = ["ShopOwner"])]
         [HttpGet]
         [Route("products")]
