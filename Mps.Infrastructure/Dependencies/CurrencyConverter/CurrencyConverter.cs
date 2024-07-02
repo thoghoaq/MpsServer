@@ -19,7 +19,7 @@ namespace Mps.Infrastructure.Dependencies.CurrencyConverter
             {
                 return 0;
             }
-            return decimal.Parse(currencyResponse!.Rates.First().Value.RateForAmount!, , CultureInfo.InvariantCulture);
+            return decimal.Parse(currencyResponse!.Rates.First().Value.RateForAmount!, CultureInfo.InvariantCulture);
         }
 
         public async Task<decimal> GetExchangeRateAsync(string fromCurrency, string toCurrency)
