@@ -54,7 +54,6 @@ namespace Mps.Application.Features.Shop
             {
                 try
                 {
-                    var PERCENT = 0.9m;
                     var currentMonth = request.MonthToDate ?? DateTime.UtcNow;
                     var revenueQuery = context.Orders
                         .Where(o => request.MonthToDate == null || (o.OrderDate.Month == request.MonthToDate.Value.Month && o.OrderDate.Year == request.MonthToDate.Value.Year))
