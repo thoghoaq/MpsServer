@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public int ShopId { get; set; }
+        public decimal? ExpectAmount { get; set; }
         public decimal? Amount { get; set; }
         public string? Currency { get; set; }
         public DateTime MonthToDate { get; set; }

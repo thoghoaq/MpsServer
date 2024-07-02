@@ -42,12 +42,22 @@ namespace Mps.Application.Features.Payment
                         return CommandResult<Result>.Fail(localizer["Payout request has been sent"]);
                     }
 
+                    //expect payout amount
+                    var PERCENT = 0.9m;
+                    var revenue = await dbContext.Orders
+                        .Where(o => o.ShopId == request.ShopId)
+                        .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
+                        .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                        .SumAsync(o => o.TotalAmount, cancellationToken);
+                    var expectAmount = revenue * PERCENT;
+
                     dbContext.Payouts.Add(new Payout
                     {
                         ShopId = request.ShopId,
                         MonthToDate = request.MonthToDate,
                         CreatedDate = DateTime.UtcNow,
-                        PayoutStatusId = (int)Domain.Enums.PayoutStatus.Pending
+                        PayoutStatusId = (int)Domain.Enums.PayoutStatus.Pending,
+                        ExpectAmount = expectAmount
                     });
 
                     await dbContext.SaveChangesAsync(cancellationToken);

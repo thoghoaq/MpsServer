@@ -30,6 +30,7 @@ namespace Mps.Application.Features.Payment
                         .Select(p => p.ShopId)
                         .ToList();
 
+                    var PERCENT = 0.9m;
                     var newPayouts = dbContext.Shops
                         .Where(s => s.IsActive && s.PayPalAccount != null)
                         .Where(s => !existShop.Contains(s.Id))
@@ -39,6 +40,11 @@ namespace Mps.Application.Features.Payment
                             MonthToDate = request.MonthToDate,
                             PayoutStatusId = (int)Domain.Enums.PayoutStatus.Pending,
                             CreatedDate = DateTime.UtcNow,
+                            ExpectAmount = dbContext.Orders
+                                .Where(o => o.ShopId == s.Id)
+                                .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
+                                .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                                .Sum(o => o.TotalAmount) * PERCENT
                         })
                         .ToList();
                     await dbContext.BulkInsertAsync(newPayouts);

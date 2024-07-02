@@ -42,6 +42,7 @@ namespace Mps.Application.Features.Shop
 
             public bool IsCurrentMonthPaid { get; set; }
             public decimal? Revenue { get; set; }
+            public decimal? ExpectPayout { get; set; }
             public decimal? TotalPayout { get; set; }
             public List<Payout> Payouts { get; set; } = [];
         }
@@ -53,6 +54,8 @@ namespace Mps.Application.Features.Shop
             {
                 try
                 {
+                    var PERCENT = 0.9m;
+                    var currentMonth = request.MonthToDate ?? DateTime.UtcNow;
                     var revenueQuery = context.Orders
                         .Where(o => request.MonthToDate == null || (o.OrderDate.Month == request.MonthToDate.Value.Month && o.OrderDate.Year == request.MonthToDate.Value.Year))
                         .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
@@ -85,9 +88,10 @@ namespace Mps.Application.Features.Shop
                             PayPalAccount = s.s.PayPalAccount,
                             CreatedAt = s.s.CreatedAt,
                             UpdatedAt = s.s.UpdatedAt,
-                            IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == DateTime.UtcNow.Month && p.MonthToDate.Year == DateTime.UtcNow.Year && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
+                            IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
                             Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).ToList(),
                             Revenue = s.r!.Revenue,
+                            ExpectPayout = Math.Round(s.r!.Revenue * PERCENT, 2),
                             TotalPayout = s.s.Payouts
                                 .Where(o => request.MonthToDate == null || (o.MonthToDate.Month == request.MonthToDate.Value.Month && o.MonthToDate.Year == request.MonthToDate.Value.Year))
                                 .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success)
