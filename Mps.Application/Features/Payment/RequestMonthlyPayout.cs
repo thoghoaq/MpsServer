@@ -68,6 +68,7 @@ namespace Mps.Application.Features.Payment
                             MonthToDate = request.MonthToDate,
                             PayoutStatusId = (int)Domain.Enums.PayoutStatus.Pending,
                             CreatedDate = DateTime.UtcNow,
+                            Amount = 0,
                             ExpectAmount = dbContext.Orders
                                 .Where(o => o.ShopId == s.Id)
                                 .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)

@@ -57,6 +57,7 @@ namespace Mps.Application.Features.Payment
                         MonthToDate = request.MonthToDate,
                         CreatedDate = DateTime.UtcNow,
                         PayoutStatusId = (int)Domain.Enums.PayoutStatus.Pending,
+                        Amount = 0,
                         ExpectAmount = expectAmount
                     });
 
