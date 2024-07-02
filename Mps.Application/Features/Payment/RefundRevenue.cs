@@ -80,7 +80,6 @@ namespace Mps.Application.Features.Payment
                         {
                             var grossInVND = group.ExpectAmount ?? 0;
                             var grossInUSD = Math.Round(grossInVND * vndToUsd * PERCENT, 2);
-                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD} USD");
                             var bankAccount = shopBankAccounts.Find(s => s.Id == group.ShopId)?.PayPalAccount;
                             return new PayoutItem()
                             {

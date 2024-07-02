@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Payment;
 using Mps.Domain.Dtos;
+using System.Globalization;
 using System.Net.Http.Json;
 
 namespace Mps.Infrastructure.Dependencies.CurrencyConverter
@@ -18,7 +19,7 @@ namespace Mps.Infrastructure.Dependencies.CurrencyConverter
             {
                 return 0;
             }
-            return decimal.Parse(currencyResponse!.Rates.First().Value.RateForAmount!);
+            return decimal.Parse(currencyResponse!.Rates.First().Value.RateForAmount!, , CultureInfo.InvariantCulture);
         }
 
         public async Task<decimal> GetExchangeRateAsync(string fromCurrency, string toCurrency)
@@ -32,8 +33,7 @@ namespace Mps.Infrastructure.Dependencies.CurrencyConverter
             {
                 return 0;
             }
-            logger.LogInformation($"Exchange rate from {fromCurrency} to {toCurrency}: {currencyResponse!.Rates.First().Value.Rate}");
-            return decimal.Parse(currencyResponse!.Rates.First().Value.Rate!);
+            return decimal.Parse(currencyResponse!.Rates.First().Value.Rate!, CultureInfo.InvariantCulture);
         }
     }
 }
