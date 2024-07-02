@@ -59,6 +59,7 @@ namespace Mps.Application.Features.Payment
                     // calculate revenue
                     var groupShopOrders = dbContext.Orders
                         .Include(o => o.Shop)
+                        .Where(s => request.ShopIds.Contains(s.Id))
                         .Where(o => o.Shop != null && o.Shop.IsActive && o.Shop.PayPalAccount != null)
                         .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
                         .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)

@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Payment;
 using Mps.Domain.Dtos;
 using System.Net.Http.Json;
 
 namespace Mps.Infrastructure.Dependencies.CurrencyConverter
 {
-    public class CurrencyConverter(IConfiguration configuration, HttpClient httpClient) : ICurrencyConverter
+    public class CurrencyConverter(IConfiguration configuration, HttpClient httpClient, ILogger<CurrencyConverter> logger) : ICurrencyConverter
     {
         public async Task<decimal> ConvertAsync(decimal amount, string fromCurrency, string toCurrency, CancellationToken cancellationToken)
         {
@@ -31,6 +32,7 @@ namespace Mps.Infrastructure.Dependencies.CurrencyConverter
             {
                 return 0;
             }
+            logger.LogInformation($"Exchange rate from {fromCurrency} to {toCurrency}: {currencyResponse!.Rates.First().Value.Rate}");
             return decimal.Parse(currencyResponse!.Rates.First().Value.Rate!);
         }
     }
