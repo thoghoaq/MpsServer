@@ -38,7 +38,7 @@ namespace Mps.Application.Features.Payment
                                 .Where(o => o.ShopId == p.ShopId)
                                 .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
                                 .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount) * PERCENT > p.ExpectAmount)
+                                .Sum(o => o.TotalAmount) * PERCENT > p.Amount)
                         .Select(p => new Payout
                         {
                             Id = p.Id,

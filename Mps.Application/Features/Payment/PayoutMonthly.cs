@@ -103,11 +103,19 @@ namespace Mps.Application.Features.Payment
                     var result = await payPalService.CreatePayoutRequest(payoutRequest);
                     foreach (var payout in payouts)
                     {
-                        payout.PayoutStatusId = result.StatusCode == System.Net.HttpStatusCode.Created ? (int)Domain.Enums.PayoutStatus.Success : (int)Domain.Enums.PayoutStatus.Failed;
-                        payout.Amount = groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.TotalAmount + groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.Amount;
-                        payout.Currency = "VND";
-                        payout.UpdatedDate = DateTime.UtcNow;
-                        payout.BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId;
+                        if (result.StatusCode == System.Net.HttpStatusCode.Created)
+                        {
+                            payout.PayoutStatusId = (int)Domain.Enums.PayoutStatus.Success;
+                            payout.Amount = groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.TotalAmount + groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.Amount;
+                            payout.ExpectAmount = 0;
+                            payout.Currency = "VND";
+                            payout.UpdatedDate = DateTime.UtcNow;
+                            payout.BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId;
+                        }
+                        else
+                        {
+                            payout.PayoutStatusId = (int)Domain.Enums.PayoutStatus.Failed;
+                        }
                     }
                     await dbContext.SaveChangesAsync();
                     return result.StatusCode == System.Net.HttpStatusCode.Created

@@ -28,6 +28,7 @@ namespace Mps.Application.Features.Payment
         {
             public int ShopId { get; set; }
             public decimal Amount { get; set; }
+            public decimal ExpectAmount { get; set; }
             public required string Currency { get; set; }
             public DateTime? UpdatedDate { get; set; }
             public required string BatchId { get; set; }
@@ -106,6 +107,7 @@ namespace Mps.Application.Features.Payment
                             {
                                 ShopId = shopId,
                                 Amount = (groupShopOrders.Find(x => x.ShopId == shopId)?.ExpectAmount ?? 0) + (groupShopOrders.Find(x => x.ShopId == shopId)?.Amount ?? 0),
+                                ExpectAmount = 0,
                                 Currency = "VND",
                                 UpdatedDate = DateTime.UtcNow,
                                 BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId

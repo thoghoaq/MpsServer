@@ -49,6 +49,7 @@ namespace Mps.Application.Features.Payment
                     {
                         var payload = refundRevenueResult.Payload?.PayoutResult?.FirstOrDefault();
                         payout.Amount = payload?.Amount;
+                        payout.ExpectAmount = payload?.ExpectAmount;
                         payout.Currency = payload?.Currency;
                         payout.UpdatedDate = payload?.UpdatedDate;
                         payout.BatchId = payload?.BatchId;
