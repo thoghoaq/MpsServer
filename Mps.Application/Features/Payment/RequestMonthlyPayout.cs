@@ -34,7 +34,7 @@ namespace Mps.Application.Features.Payment
 
                     var toUpdatePayouts = dbContext.Payouts
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
-                        .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending)
+                        .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending || p.ExpectAmount > p.Amount)
                         .Select(p => new Payout
                         {
                             Id = p.Id,
@@ -46,7 +46,7 @@ namespace Mps.Application.Features.Payment
                                 .Where(o => o.ShopId == p.ShopId)
                                 .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
                                 .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount) * PERCENT
+                                .Sum(o => o.TotalAmount) * PERCENT - p.Amount
                         })
                         .ToList();
                     await dbContext.BulkUpdateAsync(toUpdatePayouts);

@@ -46,7 +46,8 @@ namespace Mps.Application.Features.Payment
                         .Select(group => new
                         {
                             ShopId = group.Key,
-                            TotalAmount = group.Sum(x => x.ExpectAmount)
+                            TotalAmount = group.Sum(x => x.ExpectAmount),
+                            Amount = group.Sum(x => x.Amount)
                         })
                         .ToList();
                     if (groupShopOrders.Count == 0)
@@ -103,7 +104,7 @@ namespace Mps.Application.Features.Payment
                     foreach (var payout in payouts)
                     {
                         payout.PayoutStatusId = result.StatusCode == System.Net.HttpStatusCode.Created ? (int)Domain.Enums.PayoutStatus.Success : (int)Domain.Enums.PayoutStatus.Failed;
-                        payout.Amount = groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.TotalAmount;
+                        payout.Amount = groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.TotalAmount + groupShopOrders.Find(x => x.ShopId == payout.ShopId)?.Amount;
                         payout.Currency = "VND";
                         payout.UpdatedDate = DateTime.UtcNow;
                         payout.BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId;

@@ -61,7 +61,8 @@ namespace Mps.Application.Features.Payment
                         .Select(p => new
                         {
                             p.ShopId,
-                            p.ExpectAmount
+                            p.ExpectAmount,
+                            p.Amount
                         }).ToList();
                     if (groupShopOrders.Count == 0)
                     {
@@ -104,7 +105,7 @@ namespace Mps.Application.Features.Payment
                             PayoutResult = request.ShopIds.Select(shopId => new PayoutResult
                             {
                                 ShopId = shopId,
-                                Amount = groupShopOrders.Find(x => x.ShopId == shopId)?.ExpectAmount ?? 0,
+                                Amount = (groupShopOrders.Find(x => x.ShopId == shopId)?.ExpectAmount ?? 0) + (groupShopOrders.Find(x => x.ShopId == shopId)?.Amount ?? 0),
                                 Currency = "VND",
                                 UpdatedDate = DateTime.UtcNow,
                                 BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId
