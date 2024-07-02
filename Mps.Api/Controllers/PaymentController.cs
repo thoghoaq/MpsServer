@@ -107,7 +107,7 @@ namespace Mps.Api.Controllers
             });
         }
 
-        //[Auth(Roles = ["Staff"])]
+        [Auth(Roles = ["Staff"])]
         [HttpPost]
         [Route("accept-payout")]
         public async Task<IActionResult> AcceptPayout([FromBody] AcceptPayout.Command command)

@@ -93,7 +93,6 @@ namespace Mps.Application.Features.Shop
                             ExpectPayout = s.s.Payouts.FirstOrDefault(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year)!.ExpectAmount,
                             TotalPayout = s.s.Payouts
                                 .Where(o => request.MonthToDate == null || (o.MonthToDate.Month == request.MonthToDate.Value.Month && o.MonthToDate.Year == request.MonthToDate.Value.Year))
-                                .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success)
                                 .Sum(p => p.Amount)
                         })
                         .OrderBy(s => s.ShopName)

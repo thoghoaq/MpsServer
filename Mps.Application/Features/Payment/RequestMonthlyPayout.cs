@@ -32,18 +32,13 @@ namespace Mps.Application.Features.Payment
 
                     var PERCENT = 0.9m;
 
-                    // Calculate the total amount threshold
-                    decimal thresholdAmount = PERCENT * dbContext.Orders
-                        .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
-                        .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                        .Sum(o => o.TotalAmount);
-
-                    // Query to update payouts
                     var toUpdatePayouts = dbContext.Payouts
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
-                        .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed ||
-                                    p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending ||
-                                    thresholdAmount > p.ExpectAmount)
+                        .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending || dbContext.Orders
+                                .Where(o => o.ShopId == p.ShopId)
+                                .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
+                                .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                                .Sum(o => o.TotalAmount) * PERCENT > p.ExpectAmount)
                         .Select(p => new Payout
                         {
                             Id = p.Id,
@@ -55,7 +50,11 @@ namespace Mps.Application.Features.Payment
                             Currency = p.Currency,
                             UpdatedDate = p.UpdatedDate,
                             BatchId = p.BatchId,
-                            ExpectAmount = thresholdAmount - p.Amount
+                            ExpectAmount = dbContext.Orders
+                                .Where(o => o.ShopId == p.ShopId)
+                                .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
+                                .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                                .Sum(o => o.TotalAmount) * PERCENT - p.Amount
                         })
                         .ToList();
                     await dbContext.BulkUpdateAsync(toUpdatePayouts);
