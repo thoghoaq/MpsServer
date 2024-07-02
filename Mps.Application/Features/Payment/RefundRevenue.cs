@@ -4,6 +4,7 @@ using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 using PayoutsSdk.Payouts;
+using System.Globalization;
 
 namespace Mps.Application.Features.Payment
 {
@@ -79,7 +80,7 @@ namespace Mps.Application.Features.Payment
                         {
                             var grossInVND = group.ExpectAmount ?? 0;
                             var grossInUSD = Math.Round(grossInVND * vndToUsd * PERCENT, 2);
-                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD.ToString("0.00")} USD");
+                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD.ToString("0.00", CultureInfo.GetCultureInfo("en-US"))} USD");
                             var bankAccount = shopBankAccounts.Find(s => s.Id == group.ShopId)?.PayPalAccount;
                             return new PayoutItem()
                             {
@@ -87,7 +88,8 @@ namespace Mps.Application.Features.Payment
                                 Amount = new Currency()
                                 {
                                     CurrencyCode = "USD",
-                                    Value = grossInUSD.ToString("0.00"),
+
+                                    Value = grossInUSD.ToString("0.00", CultureInfo.GetCultureInfo("en-US")),
                                 },
                                 Receiver = bankAccount
                             };

@@ -5,6 +5,7 @@ using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 using PayoutsSdk.Payouts;
+using System.Globalization;
 
 namespace Mps.Application.Features.Payment
 {
@@ -91,7 +92,7 @@ namespace Mps.Application.Features.Payment
                                 Amount = new Currency()
                                 {
                                     CurrencyCode = "USD",
-                                    Value = grossInUSD.ToString("0.00"),
+                                    Value = grossInUSD.ToString("0.00", CultureInfo.GetCultureInfo("en-US")),
                                 },
                                 Receiver = bankAccount
                             };
