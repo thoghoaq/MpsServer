@@ -41,10 +41,10 @@ namespace Mps.Application.Features.Ecommerce
                         .Include(p => p.Brand)
                         .Include(p => p.Shop)
                         .Where(p => p.IsActive)
+                        .AsEnumerable()
                         .Where(s => request.Filter == null
                             || s.Name.SearchIgnoreCase(request.Filter)
-                        )
-                        .AsQueryable();
+                        );
 
                     if (request.CategoriesId != null && request.CategoriesId.Any())
                     {
@@ -66,9 +66,9 @@ namespace Mps.Application.Features.Ecommerce
                     {
                         query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                     }
-                    var products = await query
+                    var products = query
                         .OrderByDescending(s => s.UpdatedAt)
-                        .ToListAsync(cancellationToken: cancellationToken);
+                        .ToList();
 
                     return CommandResult<Result>.Success(new Result { Products = products });
                 }
