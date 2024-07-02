@@ -39,19 +39,13 @@ namespace Mps.Application.Features.Payment
             {
                 try
                 {
-                    var listShopIds = payouts.Select(p => p.ShopId).ToList();
                     // calculate revenue
-                    var groupShopOrders = dbContext.Orders
-                        .Include(o => o.Shop)
-                        .Where(o => listShopIds.Contains(o.ShopId))
-                        .Where(o => o.Shop != null && o.Shop.IsActive && o.Shop.PayPalAccount != null)
-                        .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
-                        .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                        .GroupBy(o => o.ShopId)
-                        .Select(g => new
+                    var groupShopOrders = payouts
+                        .GroupBy(p => p.ShopId)
+                        .Select(group => new
                         {
-                            ShopId = g.Key,
-                            TotalAmount = g.Sum(o => o.TotalAmount)
+                            ShopId = group.Key,
+                            TotalAmount = group.Sum(x => x.ExpectAmount)
                         })
                         .ToList();
                     if (groupShopOrders.Count == 0)
@@ -88,7 +82,7 @@ namespace Mps.Application.Features.Payment
                         },
                         Items = groupShopOrders.Select(group =>
                         {
-                            var grossInVND = group.TotalAmount;
+                            var grossInVND = group.TotalAmount ?? 0;
                             var grossInUSD = Math.Round(grossInVND * vndToUsd * PERCENT, 2);
                             var bankAccount = shopBankAccounts.Find(s => s.Id == group.ShopId)?.PayPalAccount;
                             return new PayoutItem()

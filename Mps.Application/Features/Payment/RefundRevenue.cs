@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
@@ -56,26 +55,18 @@ namespace Mps.Application.Features.Payment
                         })
                         .ToList();
 
-                    // calculate revenue
-                    var groupShopOrders = dbContext.Orders
-                        .Include(o => o.Shop)
-                        .Where(s => request.ShopIds.Contains(s.Id))
-                        .Where(o => o.Shop != null && o.Shop.IsActive && o.Shop.PayPalAccount != null)
-                        .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
-                        .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                        .GroupBy(o => o.ShopId)
-                        .Select(g => new
+                    var groupShopOrders = dbContext.Payouts
+                        .Where(p => request.ShopIds.Contains(p.ShopId))
+                        .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
+                        .Select(p => new
                         {
-                            ShopId = g.Key,
-                            TotalAmount = g.Sum(o => o.TotalAmount)
-                        })
-                        .ToList();
+                            p.ShopId,
+                            p.ExpectAmount
+                        }).ToList();
                     if (groupShopOrders.Count == 0)
                     {
                         return CommandResult<Result>.Fail("No revenue to refund");
                     }
-
-                    logger.LogInformation($"Total revenue in month {request.MonthToDate.Month}/{request.MonthToDate.Year}: {groupShopOrders.Sum(x => x.TotalAmount)} VND");
 
                     // refund revenue
                     var payoutRequest = new CreatePayoutRequest()
@@ -87,7 +78,7 @@ namespace Mps.Application.Features.Payment
                         },
                         Items = groupShopOrders.Select(group =>
                         {
-                            var grossInVND = group.TotalAmount;
+                            var grossInVND = group.ExpectAmount ?? 0;
                             var grossInUSD = Math.Round(grossInVND * vndToUsd * PERCENT, 2);
                             logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD} USD");
                             var bankAccount = shopBankAccounts.Find(s => s.Id == group.ShopId)?.PayPalAccount;
@@ -112,7 +103,7 @@ namespace Mps.Application.Features.Payment
                             PayoutResult = request.ShopIds.Select(shopId => new PayoutResult
                             {
                                 ShopId = shopId,
-                                Amount = Math.Round((groupShopOrders.Find(x => x.ShopId == shopId)?.TotalAmount ?? 0) * PERCENT, 2),
+                                Amount = Math.Round((groupShopOrders.Find(x => x.ShopId == shopId)?.ExpectAmount ?? 0) * PERCENT, 2),
                                 Currency = "VND",
                                 UpdatedDate = DateTime.UtcNow,
                                 BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId
