@@ -79,7 +79,9 @@ namespace Mps.Application.Features.Payment
                         Items = groupShopOrders.Select(group =>
                         {
                             var grossInVND = group.ExpectAmount ?? 0;
+                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInVND} VND");
                             var grossInUSD = Math.Round(grossInVND * vndToUsd * PERCENT, 2);
+                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD} USD");
                             var bankAccount = shopBankAccounts.Find(s => s.Id == group.ShopId)?.PayPalAccount;
                             return new PayoutItem()
                             {
