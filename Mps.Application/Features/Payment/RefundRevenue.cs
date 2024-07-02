@@ -102,7 +102,7 @@ namespace Mps.Application.Features.Payment
                             PayoutResult = request.ShopIds.Select(shopId => new PayoutResult
                             {
                                 ShopId = shopId,
-                                Amount = Math.Round((groupShopOrders.Find(x => x.ShopId == shopId)?.ExpectAmount ?? 0) * PERCENT, 2),
+                                Amount = groupShopOrders.Find(x => x.ShopId == shopId)?.ExpectAmount ?? 0,
                                 Currency = "VND",
                                 UpdatedDate = DateTime.UtcNow,
                                 BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId
