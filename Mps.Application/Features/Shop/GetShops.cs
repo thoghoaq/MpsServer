@@ -91,7 +91,7 @@ namespace Mps.Application.Features.Shop
                             IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
                             Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).ToList(),
                             Revenue = s.r!.Revenue,
-                            ExpectPayout = Math.Round(s.r!.Revenue * PERCENT, 2),
+                            ExpectPayout = s.s.Payouts.FirstOrDefault(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year)!.ExpectAmount,
                             TotalPayout = s.s.Payouts
                                 .Where(o => request.MonthToDate == null || (o.MonthToDate.Month == request.MonthToDate.Value.Month && o.MonthToDate.Year == request.MonthToDate.Value.Year))
                                 .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success)
