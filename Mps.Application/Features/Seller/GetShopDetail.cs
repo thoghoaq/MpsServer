@@ -31,6 +31,7 @@ namespace Mps.Application.Features.Seller
             public bool IsActive { get; set; }
             public DateTime CreatedAt { get; set; }
             public DateTime? UpdatedAt { get; set; }
+            public string? PayPalAccount { get; set; }
         }
 
         public class Handler(MpsDbContext context, ILoggedUser loggedUser, IAppLocalizer localizer) : IRequestHandler<Query, CommandResult<Result>>
@@ -63,6 +64,7 @@ namespace Mps.Application.Features.Seller
                     IsActive = shop.IsActive,
                     CreatedAt = shop.CreatedAt,
                     UpdatedAt = shop.UpdatedAt,
+                    PayPalAccount = shop.PayPalAccount
                 });
             }
         }
