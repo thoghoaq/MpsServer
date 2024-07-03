@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
@@ -49,7 +50,9 @@ namespace Mps.Application.Features.Shop
                         return CommandResult<Result>.Fail(_localizer["Unauthorized"]);
                     }
 
-                    var product = await _context.Products.FindAsync(request.Id);
+                    var product = await _context.Products
+                        .Include(p => p.Images)
+                        .FirstOrDefaultAsync(e => e.Id == request.Id);
                     if (product == null)
                     {
                         return CommandResult<Result>.Fail(_localizer["Product not found"]);
