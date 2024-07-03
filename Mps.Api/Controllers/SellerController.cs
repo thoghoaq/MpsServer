@@ -25,7 +25,20 @@ namespace Mps.Api.Controllers
         public async Task<IActionResult> CreateShop([FromBody] CreateShop.Command command)
         {
             var result = await _mediator.Send(command);
-            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new {
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
+        [HttpPut]
+        [Route("shop/{Id}")]
+        public async Task<IActionResult> UpdateShop([FromRoute] int Id, [FromBody] UpdateShop.Command command)
+        {
+            command.Id = Id;
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
                 Reason = result.FailureReason
             });
         }
