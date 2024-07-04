@@ -18,6 +18,8 @@
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public int ViewCount { get; set; }
+        public int SoldCount { get; set; }
 
         public virtual ProductCategory? Category { get; set; }
         public virtual ProductBrand? Brand { get; set; }

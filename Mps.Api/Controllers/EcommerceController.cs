@@ -47,5 +47,16 @@ namespace Mps.Api.Controllers
             var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload?.Orders) : BadRequest(result.FailureReason);
         }
+
+        [HttpPost]
+        [Route("tracking-product")]
+        public async Task<IActionResult> TrackingProduct([FromBody] TrackingProduct.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }

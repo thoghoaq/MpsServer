@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
 using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Ecommerce
@@ -18,6 +19,7 @@ namespace Mps.Application.Features.Ecommerce
             public int? PageNumber { get; set; }
             public int? PageSize { get; set; }
             public string? Filter { get; set; }
+            public ProductFilter? FilterBy { get; set; }
         }
 
         public class Result
@@ -62,12 +64,33 @@ namespace Mps.Application.Features.Ecommerce
                         query = query.Where(p => request.ShopsId.Contains(p.ShopId));
                     }
 
+                    if (request.FilterBy.HasValue)
+                    {
+                        switch (request.FilterBy.Value)
+                        {
+                            case ProductFilter.Newest:
+                                query = query.OrderByDescending(s => s.CreatedAt);
+                                break;
+                            case ProductFilter.Popular:
+                                query = query.OrderByDescending(s => s.ViewCount);
+                                break;
+                            case ProductFilter.BestSeller:
+                                query = query.OrderByDescending(s => s.SoldCount);
+                                break;
+                            case ProductFilter.PriceLowToHigh:
+                                query = query.OrderBy(s => s.Price);
+                                break;
+                            case ProductFilter.PriceHighToLow:
+                                query = query.OrderByDescending(s => s.Price);
+                                break;
+                        }
+                    }
+
                     if (request.PageNumber.HasValue && request.PageSize.HasValue)
                     {
                         query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                     }
                     var products = query
-                        .OrderByDescending(s => s.UpdatedAt)
                         .ToList();
 
                     return CommandResult<Result>.Success(new Result { Products = products });

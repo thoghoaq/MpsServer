@@ -89,6 +89,7 @@ namespace Mps.Application.Features.Payment
                         foreach (var orderDetail in orderDetails)
                         {
                             orderDetail.Product!.Stock -= orderDetail.Quantity;
+                            orderDetail.Product.SoldCount += orderDetail.Quantity;
                         }
                     }
                     else
