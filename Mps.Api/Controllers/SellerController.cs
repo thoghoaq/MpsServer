@@ -53,5 +53,16 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [HttpGet]
+        [Route("shop-overview")]
+        public async Task<IActionResult> GetShopOverview([FromQuery] GetShopOverview.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }
