@@ -141,6 +141,7 @@ namespace Mps.Application.Features.Seller
                             CategoryName = c.Name,
                             Total = productsSoldInMonth.Count(p => c.Id == p.CategoryId || c.Children.Any(cc => cc.Id == p.CategoryId) || c.Children.Any(cc => cc.Children.Any(ccc => ccc.Id == p.CategoryId)))
                         })
+                        .Where(p => p.Total > 0)
                         .ToList();
 
                     result.TopProducts = shopOrdersInMonth
