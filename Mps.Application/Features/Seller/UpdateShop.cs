@@ -85,12 +85,12 @@ namespace Mps.Application.Features.Seller
 
                     if (request.Latitude != null)
                     {
-                        shop.Latitude = request.Latitude;
+                        shop.Latitude = (double)request.Latitude;
                     }
 
                     if (request.Longitude != null)
                     {
-                        shop.Longitude = request.Longitude;
+                        shop.Longitude = (double)request.Longitude;
                     }
 
                     if (request.Description != null)

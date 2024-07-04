@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
+using Mps.Application.Helpers;
 using Mps.Domain.Entities;
 using Mps.Domain.Enums;
 using Mps.Domain.Extensions;
@@ -20,6 +21,8 @@ namespace Mps.Application.Features.Ecommerce
             public int? PageSize { get; set; }
             public string? Filter { get; set; }
             public ProductFilter? FilterBy { get; set; }
+            public double? Latitude { get; set; }
+            public double? Longitude { get; set; }
         }
 
         public class Result
@@ -84,6 +87,11 @@ namespace Mps.Application.Features.Ecommerce
                                 query = query.OrderByDescending(s => s.Price);
                                 break;
                         }
+                    }
+
+                    if (request.Latitude != null && request.Longitude != null)
+                    {
+                        query = query.OrderBy(s => CalculateHelper.CalculateDistance(s.Shop!.Latitude, s.Shop.Longitude, (double)request.Latitude, (double)request.Longitude));
                     }
 
                     if (request.PageNumber.HasValue && request.PageSize.HasValue)
