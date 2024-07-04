@@ -34,6 +34,7 @@ namespace Mps.Application.Features.Ecommerce
         {
             public int ProductId { get; set; }
             public required string ProductName { get; set; }
+            public string? ProductImage { get; set; }
             public decimal Price { get; set; }
             public int Quantity { get; set; }
             public decimal? Discount { get; set; }
@@ -88,6 +89,7 @@ namespace Mps.Application.Features.Ecommerce
                             {
                                 ProductId = x.ProductId,
                                 ProductName = x.ProductName,
+                                ProductImage = x.ProductImage,
                                 Quantity = x.Quantity,
                                 Price = x.Price,
                                 Discount = x.Discount ?? 0,
