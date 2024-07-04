@@ -103,15 +103,15 @@ namespace Mps.Application.Features.Seller
                     result.Overview.TotalSales = shopOrdersInMonth.Sum(o => o.OrderDetails.Sum(od => od.Quantity));
                     var totalSalesLastMonth = shopOrdersLastMonth.Sum(o => o.OrderDetails.Sum(od => od.Quantity));
                     var totalSalesInMonth = shopOrdersInMonth.Sum(o => o.OrderDetails.Sum(od => od.Quantity));
-                    result.Overview.SalePercentageWithLastMonth = totalSalesLastMonth == 0 ? 0 : ((totalSalesInMonth - totalSalesLastMonth) / totalSalesLastMonth);
+                    result.Overview.SalePercentageWithLastMonth = totalSalesLastMonth == 0 ? 1 : ((totalSalesInMonth - totalSalesLastMonth) / totalSalesLastMonth);
                     result.Overview.TotalRevenue = shopOrdersInMonth.Sum(o => o.TotalAmount);
                     var totalRevenueLastMonth = shopOrdersLastMonth.Sum(o => o.TotalAmount);
                     var totalRevenueInMonth = shopOrdersInMonth.Sum(o => o.TotalAmount);
-                    result.Overview.RevenuePercentageWithLastMonth = totalRevenueLastMonth == 0 ? 0 : (double)((totalRevenueInMonth - totalRevenueLastMonth) / totalRevenueLastMonth);
+                    result.Overview.RevenuePercentageWithLastMonth = totalRevenueLastMonth == 0 ? 1 : (double)((totalRevenueInMonth - totalRevenueLastMonth) / totalRevenueLastMonth);
                     result.Overview.TotalCustomers = shopOrdersInMonth.Select(o => o.CustomerId).Distinct().Count();
                     var totalCustomersLastMonth = shopOrdersLastMonth.Select(o => o.CustomerId).Distinct().Count();
                     var totalCustomersInMonth = shopOrdersInMonth.Select(o => o.CustomerId).Distinct().Count();
-                    result.Overview.CustomerPercentageWithLastMonth = totalCustomersLastMonth == 0 ? 0 : ((totalCustomersInMonth - totalCustomersLastMonth) / totalCustomersLastMonth);
+                    result.Overview.CustomerPercentageWithLastMonth = totalCustomersLastMonth == 0 ? 1 : ((totalCustomersInMonth - totalCustomersLastMonth) / totalCustomersLastMonth);
 
                     result.DailyRevenues = Enumerable.Range(1, DateTime.DaysInMonth(request.MonthToDate.Year, request.MonthToDate.Month))
                         .Select(day => new DailyRevenue
@@ -156,6 +156,17 @@ namespace Mps.Application.Features.Seller
                         })
                         .OrderByDescending(tp => tp.Price)
                         .Take(6)
+                        .ToList();
+
+                    result.RecentOrders = shopOrdersInMonth
+                        .OrderByDescending(o => o.OrderDate)
+                        .Take(10)
+                        .Select(o => new RecentOrder
+                        {
+                            OrderId = o.Id,
+                            OrderDate = o.OrderDate,
+                            Total = o.TotalAmount
+                        })
                         .ToList();
 
                     return CommandResult<Result>.Success(result);
