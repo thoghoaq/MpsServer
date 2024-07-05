@@ -288,4 +288,19 @@
   <data name="An error occurred" xml:space="preserve">
     <value>Có lỗi xảy ra</value>
   </data>
+  <data name="Invalid order status" xml:space="preserve">
+    <value>Trạng thái không hợp lệ</value>
+  </data>
+  <data name="Error when change order status" xml:space="preserve">
+    <value>Có lỗi xảy ra khi đổi trạng thái</value>
+  </data>
+  <data name="Request monthly payout successfully" xml:space="preserve">
+    <value>Yêu cầu thanh toán thành công</value>
+  </data>
+  <data name="An error occurred while processing the request" xml:space="preserve">
+    <value>Có lỗi xảy ra khi thực hiện yêu cầu</value>
+  </data>
+  <data name="An error occurs when refund revenue" xml:space="preserve">
+    <value>Có lỗi xảy ra khi hoàn tiền</value>
+  </data>
 </root>

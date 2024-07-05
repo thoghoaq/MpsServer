@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
@@ -34,7 +35,7 @@ namespace Mps.Application.Features.Payment
             public required string BatchId { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, IPayPalService payPalService, ICurrencyConverter currencyConverter, ILogger<RefundRevenue> logger) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, IPayPalService payPalService, ICurrencyConverter currencyConverter, ILogger<RefundRevenue> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -113,12 +114,12 @@ namespace Mps.Application.Features.Payment
                                 BatchId = result.Result<CreatePayoutResponse>().BatchHeader.PayoutBatchId
                             }).ToList()
                         })
-                        : CommandResult<Result>.Fail("An error occurs when refund revenue");
+                        : CommandResult<Result>.Fail(localizer["An error occurs when refund revenue"]);
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, ex.Message);
-                    return CommandResult<Result>.Fail("An error occurred");
+                    return CommandResult<Result>.Fail(localizer["An error occurred"]);
                 }
             }
         }

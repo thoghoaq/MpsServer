@@ -35,14 +35,37 @@ namespace Mps.Application.Features.Shop
                     {
                         return CommandResult<Result>.Fail(localizer["Unauthorized"]);
                     }
+
+                    if (!IsValidStatus(request.Status, (Domain.Enums.OrderStatus)order.OrderStatusId))
+                    {
+                        return CommandResult<Result>.Fail(localizer["Invalid order status"]);
+                    }
+
                     order.OrderStatusId = (int)request.Status;
                     await context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = localizer["Order status changed"] });
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error when change order status");
+                    logger.LogError(ex, ex.Message);
                     return CommandResult<Result>.Fail(localizer["Error when change order status"]);
+                }
+            }
+
+            private bool IsValidStatus(Domain.Enums.OrderStatus requestStatus, Domain.Enums.OrderStatus orderStatus)
+            {
+                switch (orderStatus)
+                {
+                    case Domain.Enums.OrderStatus.Processing:
+                        return requestStatus == Domain.Enums.OrderStatus.Delivered || requestStatus == Domain.Enums.OrderStatus.Cancelled;
+                    case Domain.Enums.OrderStatus.Delivered:
+                        return requestStatus == Domain.Enums.OrderStatus.Completed || requestStatus == Domain.Enums.OrderStatus.Returned;
+                    case Domain.Enums.OrderStatus.Cancelled:
+                        return requestStatus == Domain.Enums.OrderStatus.Refunded;
+                    case Domain.Enums.OrderStatus.Returned:
+                        return requestStatus == Domain.Enums.OrderStatus.Refunded;
+                    default:
+                        return false;
                 }
             }
         }

@@ -288,4 +288,19 @@
   <data name="An error occurred" xml:space="preserve">
     <value>An error occurred</value>
   </data>
+  <data name="Invalid order status" xml:space="preserve">
+    <value>Invalid order status</value>
+  </data>
+  <data name="Error when change order status" xml:space="preserve">
+    <value>Error when change order status</value>
+  </data>
+  <data name="Request monthly payout successfully" xml:space="preserve">
+    <value>Request monthly payout successfully</value>
+  </data>
+  <data name="An error occurred while processing the request" xml:space="preserve">
+    <value>An error occurred while processing the request</value>
+  </data>
+  <data name="An error occurs when refund revenue" xml:space="preserve">
+    <value>An error occurs when refund revenue</value>
+  </data>
 </root>
