@@ -10,7 +10,9 @@ namespace Mps.Domain.Entities
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductBrand> ProductBrands { get; set; }
+        public DbSet<ProductModel> ProductModels { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<ProductFeedback> ProductFeedbacks { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<OrderStatus> OrderStatuses { get; set; }
@@ -55,8 +57,9 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<Product>().Property(s => s.Price).IsRequired();
             modelBuilder.Entity<Product>().Property(s => s.Stock).IsRequired();
             modelBuilder.Entity<Product>().HasOne(s => s.Category).WithMany().HasForeignKey(s => s.CategoryId);
-            modelBuilder.Entity<Product>().HasOne(s => s.Brand).WithMany().HasForeignKey(s => s.BrandId);
+            modelBuilder.Entity<Product>().HasOne(s => s.Model).WithMany().HasForeignKey(s => s.ModelId);
             modelBuilder.Entity<Product>().HasMany(s => s.Images).WithOne().HasForeignKey(s => s.ProductId);
+            modelBuilder.Entity<Product>().HasMany(s => s.Feedbacks).WithOne().HasForeignKey(s => s.ProductId);
 
             modelBuilder.Entity<ProductCategory>().HasKey(c => c.Id);
             modelBuilder.Entity<ProductCategory>().Property(c => c.Name).IsRequired();
@@ -65,8 +68,14 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<ProductBrand>().HasKey(b => b.Id);
             modelBuilder.Entity<ProductBrand>().Property(b => b.Name).IsRequired();
 
+            modelBuilder.Entity<ProductModel>().HasKey(m => m.Id);
+            modelBuilder.Entity<ProductModel>().Property(m => m.Name).IsRequired();
+            modelBuilder.Entity<ProductModel>().HasOne(m => m.Brand).WithMany().HasForeignKey(m => m.BrandId);
+
             modelBuilder.Entity<ProductImage>().HasKey(i => i.Id);
             modelBuilder.Entity<ProductImage>().Property(i => i.ImagePath).IsRequired();
+
+            modelBuilder.Entity<ProductFeedback>().HasKey(f => f.Id);
 
             modelBuilder.Entity<Order>().HasKey(o => o.Id);
             modelBuilder.Entity<Order>().HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId);

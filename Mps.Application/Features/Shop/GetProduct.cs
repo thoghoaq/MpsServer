@@ -69,7 +69,7 @@ namespace Mps.Application.Features.Shop
                         Description = product.Description,
                         Price = product.Price,
                         Stock = product.Stock,
-                        BrandId = product.BrandId,
+                        BrandId = product.ModelId,
                         CategoryId = product.CategoryId,
                         ShopId = product.ShopId,
                         IsActive = product.IsActive,

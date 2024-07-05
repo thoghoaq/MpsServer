@@ -43,7 +43,7 @@ namespace Mps.Application.Features.Ecommerce
                     var query = _context.Products
                         .Include(p => p.Images)
                         .Include(p => p.Category)
-                        .Include(p => p.Brand)
+                        .Include(p => p.Model)
                         .Include(p => p.Shop)
                         .Where(p => p.IsActive)
                         .AsEnumerable()
@@ -59,7 +59,7 @@ namespace Mps.Application.Features.Ecommerce
 
                     if (request.BrandsId != null && request.BrandsId.Any())
                     {
-                        query = query.Where(p => p.BrandId != null && request.BrandsId.Contains((int)p.BrandId));
+                        query = query.Where(p => p.ModelId != null && request.BrandsId.Contains((int)p.ModelId));
                     }
 
                     if (request.ShopsId != null && request.ShopsId.Any())

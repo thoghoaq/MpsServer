@@ -85,7 +85,7 @@ namespace Mps.Application.Features.Shop
 
                     if (request.BrandId != null)
                     {
-                        product.BrandId = request.BrandId.Value;
+                        product.ModelId = request.BrandId.Value;
                     }
 
                     if (request.Images != null)

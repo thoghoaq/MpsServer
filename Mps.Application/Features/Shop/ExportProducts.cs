@@ -63,7 +63,7 @@ namespace Mps.Application.Features.Shop
                         Stock = p.Stock,
                         Description = p.Description,
                         CategoryId = p.CategoryId,
-                        BrandId = p.BrandId
+                        BrandId = p.ModelId
                     }).ToList();
 
                     var fileStream = _excelService.ExportToExcel(exportedProducts ?? []);

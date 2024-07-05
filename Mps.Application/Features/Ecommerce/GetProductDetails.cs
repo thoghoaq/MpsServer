@@ -32,7 +32,7 @@ namespace Mps.Application.Features.Ecommerce
                     var query = await _context.Products
                         .Include(p => p.Images)
                         .Include(p => p.Category)
-                        .Include(p => p.Brand)
+                        .Include(p => p.Model)
                         .Include(p => p.Shop)
                         .Where(p => p.IsActive)
                         .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);

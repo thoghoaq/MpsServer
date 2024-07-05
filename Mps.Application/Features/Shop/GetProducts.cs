@@ -42,7 +42,7 @@ namespace Mps.Application.Features.Shop
                     var query = _context.Products
                         .Include(p => p.Images)
                         .Include(p => p.Category)
-                        .Include(p => p.Brand)
+                        .Include(p => p.Model)
                         .Where(p => p.ShopId == request.ShopId)
                         .Where(s => request.Filter == null
                             || s.Name.Contains(request.Filter)

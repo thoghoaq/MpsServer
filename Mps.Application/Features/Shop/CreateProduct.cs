@@ -53,7 +53,7 @@ namespace Mps.Application.Features.Shop
                         Description = request.Description,
                         Price = request.Price,
                         Stock = request.Stock,
-                        BrandId = request.BrandId,
+                        ModelId = request.BrandId,
                         CategoryId = request.CategoryId,
                         Images = request.Images?.Select(i => new ProductImage { ImagePath = i.ImagePath }).ToList() ?? new List<ProductImage>(),
                         IsActive = true,
