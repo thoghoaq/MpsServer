@@ -19,7 +19,7 @@ namespace Mps.Application.Features.Shop
             public int? Stock { get; set; }
             public string? Description { get; set; }
             public int? CategoryId { get; set; }
-            public int? BrandId { get; set; }
+            public int? ModelId { get; set; }
             public List<Image>? Images { get; set; }
         }
 
@@ -83,9 +83,9 @@ namespace Mps.Application.Features.Shop
                         product.CategoryId = request.CategoryId.Value;
                     }
 
-                    if (request.BrandId != null)
+                    if (request.ModelId != null)
                     {
-                        product.ModelId = request.BrandId.Value;
+                        product.ModelId = request.ModelId.Value;
                     }
 
                     if (request.Images != null)

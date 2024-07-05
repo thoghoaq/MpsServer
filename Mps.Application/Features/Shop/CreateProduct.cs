@@ -16,7 +16,7 @@ namespace Mps.Application.Features.Shop
             public required int Stock { get; set; }
             public string? Description { get; set; }
             public int CategoryId { get; set; }
-            public int? BrandId { get; set; }
+            public int? ModelId { get; set; }
             public List<Image>? Images { get; set; }
         }
 
@@ -53,7 +53,7 @@ namespace Mps.Application.Features.Shop
                         Description = request.Description,
                         Price = request.Price,
                         Stock = request.Stock,
-                        ModelId = request.BrandId,
+                        ModelId = request.ModelId,
                         CategoryId = request.CategoryId,
                         Images = request.Images?.Select(i => new ProductImage { ImagePath = i.ImagePath }).ToList() ?? new List<ProductImage>(),
                         IsActive = true,
