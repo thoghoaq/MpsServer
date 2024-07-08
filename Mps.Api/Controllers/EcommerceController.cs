@@ -76,7 +76,7 @@ namespace Mps.Api.Controllers
         public async Task<IActionResult> GetFeedbacks([FromQuery] GetFeedbacks.Query query)
         {
             var result = await _mediator.Send(query);
-            return result.IsSuccess ? Ok(result.Payload?.Feedbacks) : BadRequest(result.FailureReason);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(result.FailureReason);
         }
     }
 }

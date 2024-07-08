@@ -18,6 +18,13 @@ namespace Mps.Application.Features.Ecommerce
 
         public class Result
         {
+            public double AverageRating { get; set; }
+            public int Total { get; set; }
+            public int FiveStar { get; set; }
+            public int FourStar { get; set; }
+            public int ThreeStar { get; set; }
+            public int TwoStar { get; set; }
+            public int OneStar { get; set; }
             public required List<ProductFeedback> Feedbacks { get; set; }
         }
 
@@ -39,7 +46,19 @@ namespace Mps.Application.Features.Ecommerce
                         .OrderByDescending(f => f.CreatedAt)
                         .ToListAsync(cancellationToken: cancellationToken);
 
-                    return CommandResult<Result>.Success(new Result { Feedbacks = feedbacks });
+                    var result = new Result
+                    {
+                        AverageRating = feedbacks.Count > 0 ? feedbacks.Average(f => f.Rating) : 0,
+                        Total = feedbacks.Count,
+                        FiveStar = feedbacks.Count(f => f.Rating == 5),
+                        FourStar = feedbacks.Count(f => f.Rating == 4),
+                        ThreeStar = feedbacks.Count(f => f.Rating == 3),
+                        TwoStar = feedbacks.Count(f => f.Rating == 2),
+                        OneStar = feedbacks.Count(f => f.Rating == 1),
+                        Feedbacks = feedbacks
+                    };
+
+                    return CommandResult<Result>.Success(result);
                 }
                 catch (Exception ex)
                 {
