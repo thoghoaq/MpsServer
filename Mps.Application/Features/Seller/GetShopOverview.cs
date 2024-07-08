@@ -53,6 +53,7 @@ namespace Mps.Application.Features.Seller
             public int OrderId { get; set; }
             public DateTime OrderDate { get; set; }
             public decimal Total { get; set; }
+            public int OrderStatus { get; set; }
         }
 
         public class TopProduct
@@ -61,6 +62,7 @@ namespace Mps.Application.Features.Seller
             public required string ProductName { get; set; }
             public string? ProductImage { get; set; }
             public decimal Price { get; set; }
+            public int SoldCount { get; set; }
         }
 
         public class Handler(MpsDbContext dbContext, ILogger<GetShopOverview> logger, IAppLocalizer localizer, ILoggedUser loggedUser) : IRequestHandler<Query, CommandResult<Result>>
@@ -152,9 +154,10 @@ namespace Mps.Application.Features.Seller
                             ProductId = g.Key,
                             ProductName = g.First().Product!.Name,
                             ProductImage = g.First().Product!.Images.FirstOrDefault()?.ImagePath,
-                            Price = g.First().Product!.Price
+                            Price = g.First().Product!.Price,
+                            SoldCount = g.First().Product!.SoldCount
                         })
-                        .OrderByDescending(tp => tp.Price)
+                        .OrderByDescending(tp => tp.SoldCount)
                         .Take(6)
                         .ToList();
 
@@ -165,7 +168,8 @@ namespace Mps.Application.Features.Seller
                         {
                             OrderId = o.Id,
                             OrderDate = o.OrderDate,
-                            Total = o.TotalAmount
+                            Total = o.TotalAmount,
+                            OrderStatus = o.OrderStatusId,
                         })
                         .ToList();
 
