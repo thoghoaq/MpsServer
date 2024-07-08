@@ -39,6 +39,8 @@ namespace Mps.Application.Features.Account
             public string? Email { get; set; }
             public string? DisplayName { get; set; }
             public string? PhotoUrl { get; set; }
+            public string? PhoneNumber { get; set; }
+            public string? CustomerAddress { get; set; }
             public Settings? Settings { get; set; }
             public List<string>? Shortcuts { get; set; }
         }
@@ -85,9 +87,11 @@ namespace Mps.Application.Features.Account
                         IsShopOwner = user!.Role.Contains(Role.ShopOwner.GetDescription()),
                         Data = new Data
                         {
-                            Email = user?.Email,
-                            DisplayName = user?.FullName,
-                            PhotoUrl = user?.AvatarPath,
+                            Email = user.Email,
+                            DisplayName = user.FullName,
+                            PhotoUrl = user.AvatarPath,
+                            PhoneNumber = user.PhoneNumber,
+                            CustomerAddress = user.Customer?.Address,
                             Settings = new Settings
                             {
                                 Layout = new Layout(),
