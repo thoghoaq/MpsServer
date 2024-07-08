@@ -58,5 +58,25 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [Auth(Roles = ["Customer"])]
+        [HttpPost]
+        [Route("feedback")]
+        public async Task<IActionResult> Feedback([FromBody] Feedback.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
+        [HttpGet]
+        [Route("feedbacks")]
+        public async Task<IActionResult> GetFeedbacks([FromQuery] GetFeedbacks.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Feedbacks) : BadRequest(result.FailureReason);
+        }
     }
 }

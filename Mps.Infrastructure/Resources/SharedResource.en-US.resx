@@ -303,4 +303,19 @@
   <data name="An error occurs when refund revenue" xml:space="preserve">
     <value>An error occurs when refund revenue</value>
   </data>
+  <data name="Rating must be between 1 and 5" xml:space="preserve">
+    <value>Rating must be between 1 and 5</value>
+  </data>
+  <data name="Feedback has been sent" xml:space="preserve">
+    <value>Feedback has been sent</value>
+  </data>
+  <data name="Failed to send feedback" xml:space="preserve">
+    <value>Failed to send feedback</value>
+  </data>
+  <data name="Failed to get feedbacks" xml:space="preserve">
+    <value>Failed to get feedbacks</value>
+  </data>
+  <data name="You have already sent feedback" xml:space="preserve">
+    <value>You have already sent feedback</value>
+  </data>
 </root>

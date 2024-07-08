@@ -76,6 +76,7 @@ namespace Mps.Domain.Entities
             modelBuilder.Entity<ProductImage>().Property(i => i.ImagePath).IsRequired();
 
             modelBuilder.Entity<ProductFeedback>().HasKey(f => f.Id);
+            modelBuilder.Entity<ProductFeedback>().HasOne(f => f.Customer).WithMany().HasForeignKey(f => f.UserId);
 
             modelBuilder.Entity<Order>().HasKey(o => o.Id);
             modelBuilder.Entity<Order>().HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId);

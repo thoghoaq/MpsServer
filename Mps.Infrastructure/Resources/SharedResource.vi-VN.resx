@@ -303,4 +303,19 @@
   <data name="An error occurs when refund revenue" xml:space="preserve">
     <value>Có lỗi xảy ra khi hoàn tiền</value>
   </data>
+  <data name="Rating must be between 1 and 5" xml:space="preserve">
+    <value>Đánh giá phải từ 1 tới 5</value>
+  </data>
+  <data name="Feedback has been sent" xml:space="preserve">
+    <value>Đánh giá đã được gửi</value>
+  </data>
+  <data name="Failed to send feedback" xml:space="preserve">
+    <value>Gửi đánh giá thất bại</value>
+  </data>
+  <data name="Failed to get feedbacks" xml:space="preserve">
+    <value>Lấy danh sách đánh giá thất bại</value>
+  </data>
+  <data name="You have already sent feedback" xml:space="preserve">
+    <value>Bạn đã gửi đánh giá cho sản phẩm này</value>
+  </data>
 </root>
