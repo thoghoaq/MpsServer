@@ -49,8 +49,15 @@ namespace Mps.Application.Features.Ecommerce
                         Rating = request.Rating,
                         CreatedAt = DateTime.UtcNow
                     };
-
                     context.ProductFeedbacks.Add(feedback);
+
+                    var orderDetail = await context.OrderDetails.FirstOrDefaultAsync(d => d.ProductId == request.ProductId && d.OrderId == request.OrderId, cancellationToken);
+                    if (orderDetail == null)
+                    {
+                        return CommandResult<Result>.Fail(localizer["Order detail not found"]);
+                    }
+                    orderDetail.IsFeedbacked = true;
+
                     await context.SaveChangesAsync(cancellationToken);
 
                     return CommandResult<Result>.Success(new Result { Message = localizer["Feedback has been sent"] });
