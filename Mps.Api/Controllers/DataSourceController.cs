@@ -64,6 +64,7 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["Staff"])]
         [HttpGet]
         [Route("categories/export")]
         public async Task<IActionResult> ExportCategories([FromQuery] ExportCategories.Query query)
@@ -83,6 +84,7 @@ namespace Mps.Api.Controllers
             return File(content, contentType, fileName);
         }
 
+        [Auth(Roles = ["Staff"])]
         [HttpPost]
         [Route("categories/import")]
         public async Task<IActionResult> ImportCategories([FromForm] ImportCategories.Command command)
@@ -94,6 +96,7 @@ namespace Mps.Api.Controllers
             });
         }
 
+        [Auth(Roles = ["Staff"])]
         [HttpGet]
         [Route("brands/export")]
         public async Task<IActionResult> ExportBrands([FromQuery] ExportBrands.Query query)
@@ -113,6 +116,7 @@ namespace Mps.Api.Controllers
             return File(content, contentType, fileName);
         }
 
+        [Auth(Roles = ["Staff"])]
         [HttpPost]
         [Route("brands/import")]
         public async Task<IActionResult> ImportBrands([FromForm] ImportBrands.Command command)
@@ -130,6 +134,18 @@ namespace Mps.Api.Controllers
         {
             var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload?.Models) : BadRequest(result.FailureReason);
+        }
+
+        [Auth(Roles = ["Staff"])]
+        [HttpPost]
+        [Route("model")]
+        public async Task<IActionResult> SaveModel([FromBody] SaveModel.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
         }
     }
 }
