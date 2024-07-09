@@ -123,5 +123,13 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [HttpGet]
+        [Route("models")]
+        public async Task<IActionResult> GetModels([FromQuery] GetModels.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Models) : BadRequest(result.FailureReason);
+        }
     }
 }
