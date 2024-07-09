@@ -54,6 +54,7 @@ namespace Mps.Application.Features.Ecommerce
                         .AsQueryable();
 
                     var products = await query
+                        .Take(10)
                         .OrderByDescending(p => p.ViewCount)
                         .ToListAsync(cancellationToken: cancellationToken);
 
