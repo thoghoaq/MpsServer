@@ -78,5 +78,13 @@ namespace Mps.Api.Controllers
             var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload) : BadRequest(result.FailureReason);
         }
+
+        [HttpGet]
+        [Route("similar")]
+        public async Task<IActionResult> GetSimilarProducts([FromQuery] GetSimilarProducts.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Products) : BadRequest(result.FailureReason);
+        }
     }
 }
