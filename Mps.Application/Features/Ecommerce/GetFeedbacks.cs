@@ -28,6 +28,20 @@ namespace Mps.Application.Features.Ecommerce
             public required List<ProductFeedback> Feedbacks { get; set; }
         }
 
+        public class ProductFeedback
+        {
+            public int Id { get; set; }
+            public int ProductId { get; set; }
+            public int UserId { get; set; }
+            public int? OrderId { get; set; }
+            public string? Feedback { get; set; }
+            public int Rating { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime? UpdatedAt { get; set; }
+
+            public User? User { get; set; }
+        }
+
         public class Handler(MpsDbContext context, IAppLocalizer localizer, ILogger<GetFeedbacks> logger) : IRequestHandler<Query, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
@@ -35,6 +49,25 @@ namespace Mps.Application.Features.Ecommerce
                 try
                 {
                     var query = context.ProductFeedbacks
+                        .Join(context.Users, f => f.UserId, u => u.Id, (f, u) => new ProductFeedback
+                        {
+                            Id = f.Id,
+                            ProductId = f.ProductId,
+                            UserId = f.UserId,
+                            Rating = f.Rating,
+                            Feedback = f.Feedback,
+                            CreatedAt = f.CreatedAt,
+                            User = new User
+                            {
+                                Id = u.Id,
+                                FullName = u.FullName,
+                                AvatarPath = u.AvatarPath,
+                                Email = u.Email,
+                                IdentityId = u.IdentityId,
+                                IsActive = u.IsActive,
+                                Role = u.Role,
+                            }
+                        })
                         .Where(f => f.ProductId == request.ProductId)
                         .AsQueryable();
 
