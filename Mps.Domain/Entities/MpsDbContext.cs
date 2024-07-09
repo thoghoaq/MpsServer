@@ -24,6 +24,7 @@ namespace Mps.Domain.Entities
         public DbSet<PaymentRef> PaymentRef { get; set; }
         public DbSet<Payout> Payouts { get; set; }
         public DbSet<PayoutStatus> PayoutStatuses { get; set; }
+        public DbSet<Setting> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -133,6 +134,18 @@ namespace Mps.Domain.Entities
                 new PayoutStatus { Id = 2, Name = "Success" },
                 new PayoutStatus { Id = 3, Name = "Failed" }
             );
+
+            modelBuilder.Entity<Setting>().HasKey(s => s.Key);
+            modelBuilder.Entity<Setting>().HasData(
+                new Setting { Key = "DISCOUNT_0_10", Value = "0" },
+                new Setting { Key = "DISCOUNT_10_30", Value = "5" },
+                new Setting { Key = "DISCOUNT_30_50", Value = "10" },
+                new Setting { Key = "DISCOUNT_50_100", Value = "15" },
+                new Setting { Key = "DISCOUNT_100_MAX", Value = "20" }
+            );
+
+            modelBuilder.Entity<ShopSetting>().HasKey(s => s.Id);
+            modelBuilder.Entity<ShopSetting>().HasOne(s => s.Shop).WithMany().HasForeignKey(s => s.ShopId);
         }
     }
 }
