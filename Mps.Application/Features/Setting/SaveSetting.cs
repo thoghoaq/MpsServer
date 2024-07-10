@@ -11,6 +11,11 @@ namespace Mps.Application.Features.Setting
     {
         public class Command : IRequest<CommandResult<Result>>
         {
+            public List<Request> Settings { get; set; } = [];
+        }
+
+        public record Request
+        {
             public required string Key { get; set; }
             public required string Value { get; set; }
             public string? Description { get; set; }
@@ -31,15 +36,32 @@ namespace Mps.Application.Features.Setting
             {
                 try
                 {
-                    var setting = await _context.Settings.FirstOrDefaultAsync(e => e.Key == request.Key);
-                    if (setting == null)
+                    // check any change
+                    var settings = await _context.Settings.ToListAsync(cancellationToken);
+                    var changedSettings = request.Settings.Where(s => settings.Any(x => x.Key == s.Key && x.Value != s.Value)).ToList();
+                    if (changedSettings.Count == 0)
                     {
-                        setting = new Domain.Entities.Setting { Key = request.Key, Value = request.Value, Description = request.Description };
-                        await _context.Settings.AddAsync(setting, cancellationToken);
+                        return CommandResult<Result>.Success(new Result { Message = _localizer["No setting changed"] });
                     }
-
-                    setting.Value = request.Value;
-                    setting.Description = request.Description;
+                    // save new setting base on key
+                    foreach (var setting in changedSettings)
+                    {
+                        var existSetting = settings.Find(s => s.Key == setting.Key);
+                        if (existSetting != null)
+                        {
+                            existSetting.Value = setting.Value;
+                            existSetting.Description = setting.Description;
+                        }
+                        else
+                        {
+                            _context.Settings.Add(new Domain.Entities.Setting
+                            {
+                                Key = setting.Key,
+                                Value = setting.Value,
+                                Description = setting.Description
+                            });
+                        }
+                    }
                     await _context.SaveChangesAsync(cancellationToken);
 
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Setting saved"] });

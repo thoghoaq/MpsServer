@@ -318,4 +318,10 @@
   <data name="You have already sent feedback" xml:space="preserve">
     <value>Bạn đã gửi đánh giá cho sản phẩm này</value>
   </data>
+  <data name="No setting changed" xml:space="preserve">
+    <value>Không có thay đổi cấu hình nào</value>
+  </data>
+  <data name="Setting saved" xml:space="preserve">
+    <value>Cấu hình đã được cập nhật</value>
+  </data>
 </root>
