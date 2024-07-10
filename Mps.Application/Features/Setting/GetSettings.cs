@@ -24,7 +24,9 @@ namespace Mps.Application.Features.Setting
             {
                 try
                 {
-                    var settings = await _context.Settings.ToListAsync(cancellationToken);
+                    var settings = await _context.Settings
+                        .OrderBy(s => s.Key)
+                        .ToListAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Settings = settings });
                 }
                 catch (Exception ex)
