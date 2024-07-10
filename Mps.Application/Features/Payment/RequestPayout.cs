@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 
@@ -21,7 +22,7 @@ namespace Mps.Application.Features.Payment
             public string? Message { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, ILogger<RequestPayout> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, ILogger<RequestPayout> logger, IAppLocalizer localizer, ISettingService settingService) : IRequestHandler<Command, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -43,13 +44,12 @@ namespace Mps.Application.Features.Payment
                     }
 
                     //expect payout amount
-                    var PERCENT = 0.9m;
                     var revenue = await dbContext.Orders
                         .Where(o => o.ShopId == request.ShopId)
                         .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
                         .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
                         .SumAsync(o => o.TotalAmount, cancellationToken);
-                    var expectAmount = revenue * PERCENT;
+                    var expectAmount = settingService.GetNetAmount(revenue);
 
                     dbContext.Payouts.Add(new Payout
                     {

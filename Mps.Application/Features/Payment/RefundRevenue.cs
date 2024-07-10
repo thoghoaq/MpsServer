@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Payment;
+using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 using PayoutsSdk.Payouts;
@@ -11,8 +12,6 @@ namespace Mps.Application.Features.Payment
 {
     public class RefundRevenue
     {
-        private static readonly decimal PERCENT = 0.9m;
-
         public class Command : IRequest<CommandResult<Result>>
         {
             public required List<int> ShopIds { get; set; }
@@ -35,7 +34,7 @@ namespace Mps.Application.Features.Payment
             public required string BatchId { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, IPayPalService payPalService, ICurrencyConverter currencyConverter, ILogger<RefundRevenue> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, IPayPalService payPalService, ICurrencyConverter currencyConverter, ILogger<RefundRevenue> logger, IAppLocalizer localizer, ISettingService settingService) : IRequestHandler<Command, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -82,8 +81,9 @@ namespace Mps.Application.Features.Payment
                         Items = groupShopOrders.Select(group =>
                         {
                             var grossInVND = group.ExpectAmount ?? 0;
-                            var grossInUSD = Math.Round(grossInVND * vndToUsd * PERCENT, 2);
-                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {grossInUSD.ToString("0.00", CultureInfo.GetCultureInfo("en-US"))} USD");
+                            var net = settingService.GetNetAmount(grossInVND);
+                            var netInUSD = Math.Round(net * vndToUsd, 2);
+                            logger.LogInformation($"Refund revenue for shop {group.ShopId}: {netInUSD.ToString("0.00", CultureInfo.GetCultureInfo("en-US"))} USD");
                             var bankAccount = shopBankAccounts.Find(s => s.Id == group.ShopId)?.PayPalAccount;
                             return new PayoutItem()
                             {
@@ -92,7 +92,7 @@ namespace Mps.Application.Features.Payment
                                 {
                                     CurrencyCode = "USD",
 
-                                    Value = grossInUSD.ToString("0.00", CultureInfo.GetCultureInfo("en-US")),
+                                    Value = netInUSD.ToString("0.00", CultureInfo.GetCultureInfo("en-US")),
                                 },
                                 Receiver = bankAccount
                             };

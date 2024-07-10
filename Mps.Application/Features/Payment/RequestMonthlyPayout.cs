@@ -1,7 +1,9 @@
 ﻿using EFCore.BulkExtensions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 
@@ -19,7 +21,7 @@ namespace Mps.Application.Features.Payment
             public string? Message { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, ILogger<RequestMonthlyPayout> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILogger<RequestMonthlyPayout> logger, IAppLocalizer localizer, ISettingService settingService) : IRequestHandler<Command, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -30,15 +32,18 @@ namespace Mps.Application.Features.Payment
                         .Select(p => p.ShopId)
                         .ToList();
 
-                    var PERCENT = 0.9m;
+                    var settings = dbContext.Settings.ToList();
 
                     var toUpdatePayouts = dbContext.Payouts
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
-                        .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending || dbContext.Orders
+                        .ToList()
+                        .AsEnumerable()
+                        .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending ||
+                            settingService.GetNetBySetting(dbContext.Orders
                                 .Where(o => o.ShopId == p.ShopId)
                                 .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
                                 .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount) * PERCENT > p.Amount)
+                                .Sum(o => o.TotalAmount), settings) > p.Amount)
                         .Select(p => new Payout
                         {
                             Id = p.Id,
@@ -50,11 +55,11 @@ namespace Mps.Application.Features.Payment
                             Currency = p.Currency,
                             UpdatedDate = p.UpdatedDate,
                             BatchId = p.BatchId,
-                            ExpectAmount = dbContext.Orders
+                            ExpectAmount = settingService.GetNetBySetting(dbContext.Orders
                                 .Where(o => o.ShopId == p.ShopId)
                                 .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
                                 .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount) * PERCENT - p.Amount
+                                .Sum(o => o.TotalAmount), settings) - p.Amount
                         })
                         .ToList();
                     await dbContext.BulkUpdateAsync(toUpdatePayouts);
@@ -62,6 +67,8 @@ namespace Mps.Application.Features.Payment
                     var newPayouts = dbContext.Shops
                         .Where(s => s.IsActive && s.PayPalAccount != null)
                         .Where(s => !existShop.Contains(s.Id))
+                        .ToList()
+                        .AsEnumerable()
                         .Select(s => new Payout
                         {
                             ShopId = s.Id,
@@ -69,11 +76,11 @@ namespace Mps.Application.Features.Payment
                             PayoutStatusId = (int)Domain.Enums.PayoutStatus.Pending,
                             CreatedDate = DateTime.UtcNow,
                             Amount = 0,
-                            ExpectAmount = dbContext.Orders
+                            ExpectAmount = settingService.GetNetBySetting(dbContext.Orders
                                 .Where(o => o.ShopId == s.Id)
                                 .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
                                 .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount) * PERCENT
+                                .Sum(o => o.TotalAmount), settings)
                         })
                         .ToList();
                     await dbContext.BulkInsertAsync(newPayouts);

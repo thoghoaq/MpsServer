@@ -25,6 +25,7 @@ namespace Mps.Domain.Entities
         public DbSet<Payout> Payouts { get; set; }
         public DbSet<PayoutStatus> PayoutStatuses { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<ShopSetting> ShopSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
