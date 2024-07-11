@@ -46,6 +46,7 @@ namespace Mps.Application.Features.Ecommerce
                         .Include(p => p.Model)
                         .Include(p => p.Shop)
                         .Where(p => p.IsActive)
+                        .OrderByDescending(x => x.CreatedAt)
                         .AsEnumerable()
                         .Where(s => request.Filter == null
                             || s.Name.SearchIgnoreCase(request.Filter)
