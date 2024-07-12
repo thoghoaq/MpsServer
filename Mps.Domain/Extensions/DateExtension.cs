@@ -16,7 +16,7 @@ namespace Mps.Domain.Extensions
 
         public static bool CompareWeek(this DateTime date, DateTime compareDate)
         {
-            var cultureInfo = CultureInfo.CurrentCulture;
+            var cultureInfo = CultureInfo.InvariantCulture;
             var calendar = cultureInfo.Calendar;
 
             int week1 = calendar.GetWeekOfYear(date, CalendarWeekRule.FirstDay, DayOfWeek.Monday);
