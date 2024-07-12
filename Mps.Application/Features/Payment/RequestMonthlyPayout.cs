@@ -6,6 +6,7 @@ using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Payment
 {
@@ -33,17 +34,18 @@ namespace Mps.Application.Features.Payment
                         .ToList();
 
                     var settings = dbContext.Settings.ToList();
+                    var allOrders = dbContext.Orders.ToList();
 
                     var toUpdatePayouts = dbContext.Payouts
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
                         .ToList()
                         .AsEnumerable()
                         .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending ||
-                            settingService.GetNetBySetting(dbContext.Orders
-                                .Where(o => o.ShopId == p.ShopId)
-                                .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
-                                .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount), settings) > p.Amount)
+                            allOrders
+                            .Where(o => o.ShopId == p.ShopId)
+                            .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                            .Where(o => o.OrderDate.CompareWeek(request.MonthToDate))
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings)) > p.Amount)
                         .Select(p => new Payout
                         {
                             Id = p.Id,
@@ -55,11 +57,11 @@ namespace Mps.Application.Features.Payment
                             Currency = p.Currency,
                             UpdatedDate = p.UpdatedDate,
                             BatchId = p.BatchId,
-                            ExpectAmount = settingService.GetNetBySetting(dbContext.Orders
-                                .Where(o => o.ShopId == p.ShopId)
-                                .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
-                                .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount), settings) - p.Amount
+                            ExpectAmount = allOrders
+                            .Where(o => o.ShopId == p.ShopId)
+                            .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                            .Where(o => o.OrderDate.CompareWeek(request.MonthToDate))
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings)) - p.Amount
                         })
                         .ToList();
                     await dbContext.BulkUpdateAsync(toUpdatePayouts);
@@ -76,11 +78,11 @@ namespace Mps.Application.Features.Payment
                             PayoutStatusId = (int)Domain.Enums.PayoutStatus.Pending,
                             CreatedDate = DateTime.UtcNow,
                             Amount = 0,
-                            ExpectAmount = settingService.GetNetBySetting(dbContext.Orders
-                                .Where(o => o.ShopId == s.Id)
-                                .Where(o => o.OrderDate.Month == request.MonthToDate.Month && o.OrderDate.Year == request.MonthToDate.Year)
-                                .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                                .Sum(o => o.TotalAmount), settings)
+                            ExpectAmount = allOrders
+                            .Where(o => o.ShopId == s.Id)
+                            .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                            .Where(o => o.OrderDate.CompareWeek(request.MonthToDate))
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings))
                         })
                         .ToList();
                     await dbContext.BulkInsertAsync(newPayouts);
