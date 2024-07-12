@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
-using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 
@@ -43,13 +42,12 @@ namespace Mps.Application.Features.Shop
 
             public bool IsCurrentMonthPaid { get; set; }
             public decimal? Revenue { get; set; }
-            public decimal? Discount { get; set; }
             public decimal? ExpectPayout { get; set; }
             public decimal? TotalPayout { get; set; }
             public List<Payout> Payouts { get; set; } = [];
         }
 
-        public class Handler(MpsDbContext context, IAppLocalizer localizer, ILogger<GetShops> logger, ISettingService settingService) : IRequestHandler<Query, CommandResult<Result>>
+        public class Handler(MpsDbContext context, IAppLocalizer localizer, ILogger<GetShops> logger) : IRequestHandler<Query, CommandResult<Result>>
         {
 
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
@@ -100,13 +98,6 @@ namespace Mps.Application.Features.Shop
                         })
                         .OrderBy(s => s.ShopName)
                         .ToListAsync(cancellationToken);
-
-                    var settings = context.Settings.ToList();
-                    foreach (var shop in shops)
-                    {
-                        var discount = settingService.GetRateBySetting(shop.Revenue ?? 0, settings);
-                        shop.Discount = discount;
-                    }
 
                     return CommandResult<Result>.Success(new Result { Shops = shops });
                 }
