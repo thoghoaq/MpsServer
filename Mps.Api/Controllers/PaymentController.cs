@@ -139,7 +139,7 @@ namespace Mps.Api.Controllers
             });
         }
 
-        [Auth(Roles = ["ShopOwner", "Staff"])]
+        [Auth(Roles = ["Staff"])]
         [HttpPost]
         [Route("request-monthly-payout")]
         public async Task<IActionResult> RequestMonthlyPayout([FromBody] RequestMonthlyPayout.Command command)
@@ -149,6 +149,34 @@ namespace Mps.Api.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["Staff"])]
+        [HttpPost]
+        [Route("request-weekly-payout")]
+        public async Task<IActionResult> RequestWeeklyPayout([FromBody] RequestWeeklyPayout.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["Staff"])]
+        [HttpGet]
+        [Route("weekly-payouts")]
+        public async Task<IActionResult> GetWeeklyPayouts([FromQuery] GetWeeklyPayouts.Query query)
+        {
+            var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
             {
                 reason = result.FailureReason
