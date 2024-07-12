@@ -7,8 +7,8 @@ namespace Mps.Api
     {
         public static void Start()
         {
-            RecurringJob.AddOrUpdate<MonthlyRequestPayout>("MonthlyRequestPayout", x => x.Process(), Cron.Monthly(1));
-            RecurringJob.AddOrUpdate<MonthlyPayout>("MonthlyPayout", x => x.Process(), Cron.Monthly(5));
+            RecurringJob.AddOrUpdate<MonthlyRequestPayout>("WeeklyRequestPayout", x => x.Process(), Cron.Weekly(DayOfWeek.Monday));
+            RecurringJob.AddOrUpdate<MonthlyPayout>("WeeklyPayout", x => x.Process(), Cron.Weekly(DayOfWeek.Tuesday));
         }
     }
 }
