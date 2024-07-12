@@ -6,7 +6,6 @@ using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
-using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Payment
 {
@@ -34,7 +33,10 @@ namespace Mps.Application.Features.Payment
                         .ToList();
 
                     var settings = dbContext.Settings.ToList();
-                    var allOrders = dbContext.Orders.ToList();
+                    var allOrders = dbContext.Orders
+                        .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                        .Where(p => p.OrderDate.Month == request.MonthToDate.Month && p.OrderDate.Year == request.MonthToDate.Year)
+                        .ToList();
 
                     var toUpdatePayouts = dbContext.Payouts
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
@@ -43,8 +45,6 @@ namespace Mps.Application.Features.Payment
                         .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending ||
                             allOrders
                             .Where(o => o.ShopId == p.ShopId)
-                            .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                            .Where(o => o.OrderDate.CompareWeek(request.MonthToDate))
                             .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings)) > p.Amount)
                         .Select(p => new Payout
                         {
@@ -59,8 +59,6 @@ namespace Mps.Application.Features.Payment
                             BatchId = p.BatchId,
                             ExpectAmount = allOrders
                             .Where(o => o.ShopId == p.ShopId)
-                            .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                            .Where(o => o.OrderDate.CompareWeek(request.MonthToDate))
                             .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings)) - p.Amount
                         })
                         .ToList();
@@ -80,8 +78,6 @@ namespace Mps.Application.Features.Payment
                             Amount = 0,
                             ExpectAmount = allOrders
                             .Where(o => o.ShopId == s.Id)
-                            .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
-                            .Where(o => o.OrderDate.CompareWeek(request.MonthToDate))
                             .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings))
                         })
                         .ToList();
