@@ -150,5 +150,17 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [Auth(Roles = ["ShopOwner", "Staff"])]
+        [HttpGet]
+        [Route("orders-in-payout-date")]
+        public async Task<IActionResult> GetOrdersInPayoutDate([FromQuery] GetOrdersInPayoutDate.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload?.Orders) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }
