@@ -98,8 +98,8 @@ namespace Mps.Application.Features.Shop
                             UpdatedAt = s.s.UpdatedAt,
                             IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
                             Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).OrderBy(n => Array.IndexOf(payoutDateOrder, n.PayoutDate)).ToList(),
-                            Revenue = s.r!.Revenue,
-                            ExpectPayout = s.s.Payouts.FirstOrDefault(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate)!.ExpectAmount,
+                            Revenue = s.r?.Revenue,
+                            ExpectPayout = s.s.Payouts.FirstOrDefault(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate)?.ExpectAmount,
                             TotalPayout = s.s.Payouts
                                 .Where(p => request.MonthToDate == null || (p.MonthToDate.Month == request.MonthToDate.Value.Month && p.MonthToDate.Year == request.MonthToDate.Value.Year && p.PayoutDate == (int)payoutDate))
                                 .Sum(p => p.Amount)
