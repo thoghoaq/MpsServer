@@ -41,7 +41,7 @@ namespace Mps.Application.Features.Shop
                     .Include(o => o.Shop)
                     .Include(o => o.PaymentMethod)
                     .Include(o => o.PaymentStatus)
-                    .Where(o => o.ShopId == request.ShopId && o.OrderStatusId != (int)Domain.Enums.OrderStatus.Completed)
+                    .Where(o => o.ShopId == request.ShopId && o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
                     .AsEnumerable()
                     .Where(o => o.OrderDate.InPayoutDate(request.MonthToDate, request.PayoutDate));
 
