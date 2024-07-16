@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 using Mps.Domain.Extensions;
@@ -32,6 +33,8 @@ namespace Mps.Application.Features.Seller
             public double SalePercentageWithLastMonth { get; set; }
             public decimal TotalRevenue { get; set; }
             public double RevenuePercentageWithLastMonth { get; set; }
+            public decimal TotalNet { get; set; }
+            public double NetPercentageWithLastMonth { get; set; }
             public int TotalCustomers { get; set; }
             public double CustomerPercentageWithLastMonth { get; set; }
         }
@@ -40,6 +43,7 @@ namespace Mps.Application.Features.Seller
         {
             public int Date { get; set; }
             public decimal Total { get; set; }
+            public decimal Net { get; set; }
         }
 
         public class ProductSoldByCategory
@@ -65,7 +69,7 @@ namespace Mps.Application.Features.Seller
             public int SoldCount { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, ILogger<GetShopOverview> logger, IAppLocalizer localizer, ILoggedUser loggedUser) : IRequestHandler<Query, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILogger<GetShopOverview> logger, IAppLocalizer localizer, ILoggedUser loggedUser, ISettingService settingService) : IRequestHandler<Query, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
@@ -110,6 +114,11 @@ namespace Mps.Application.Features.Seller
                     var totalRevenueLastMonth = shopOrdersLastMonth.Sum(o => o.TotalAmount);
                     var totalRevenueInMonth = shopOrdersInMonth.Sum(o => o.TotalAmount);
                     result.Overview.RevenuePercentageWithLastMonth = totalRevenueLastMonth == 0 ? 1 : (double)((totalRevenueInMonth - totalRevenueLastMonth) / totalRevenueLastMonth);
+                    var settings = dbContext.Settings.ToList();
+                    var totalNetLastMonth = shopOrdersLastMonth.Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings));
+                    var totalNetInMonth = shopOrdersInMonth.Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings));
+                    result.Overview.TotalNet = totalNetInMonth;
+                    result.Overview.NetPercentageWithLastMonth = totalNetLastMonth == 0 ? 1 : (double)((totalNetInMonth - totalNetLastMonth) / totalNetLastMonth);
                     result.Overview.TotalCustomers = shopOrdersInMonth.Select(o => o.CustomerId).Distinct().Count();
                     var totalCustomersLastMonth = shopOrdersLastMonth.Select(o => o.CustomerId).Distinct().Count();
                     var totalCustomersInMonth = shopOrdersInMonth.Select(o => o.CustomerId).Distinct().Count();
@@ -121,7 +130,8 @@ namespace Mps.Application.Features.Seller
                             Date = day,
                             Total = shopOrdersInMonth
                                 .Where(o => o.OrderDate.Day == day)
-                                .Sum(o => o.TotalAmount)
+                                .Sum(o => o.TotalAmount),
+                            Net = shopOrdersInMonth.Where(o => o.OrderDate.Day == day).Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings))
                         })
                         .ToList();
 
