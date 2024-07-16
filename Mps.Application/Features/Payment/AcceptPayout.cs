@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Payment
 {
@@ -41,7 +42,8 @@ namespace Mps.Application.Features.Payment
                     var refundRevenueCommand = new RefundRevenue.Command
                     {
                         ShopIds = new List<int> { payout.ShopId },
-                        MonthToDate = payout.MonthToDate
+                        MonthToDate = payout.MonthToDate,
+                        PayoutDate = payout.PayoutDate.GetEnum<Domain.Enums.PayoutDate>(),
                     };
                     var refundRevenueResult = await mediator.Send(refundRevenueCommand, cancellationToken);
                     payout.PayoutStatusId = refundRevenueResult.IsSuccess ? (int)Domain.Enums.PayoutStatus.Success : (int)Domain.Enums.PayoutStatus.Failed;

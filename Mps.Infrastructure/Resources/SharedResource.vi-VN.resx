@@ -324,4 +324,7 @@
   <data name="Setting saved" xml:space="preserve">
     <value>Cấu hình đã được cập nhật</value>
   </data>
+  <data name="Request custom payout successfully" xml:space="preserve">
+    <value>Tạo yêu cầu thành công</value>
+  </data>
 </root>

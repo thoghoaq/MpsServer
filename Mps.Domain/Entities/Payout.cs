@@ -8,6 +8,8 @@
         public decimal? Amount { get; set; }
         public string? Currency { get; set; }
         public DateTime MonthToDate { get; set; }
+        public int PayoutDate { get; set; }
+        public bool IsConfirmed { get; set; }
         public string? BatchId { get; set; }
         public int PayoutStatusId { get; set; }
         public DateTime CreatedDate { get; set; }

@@ -324,4 +324,7 @@
   <data name="Setting saved" xml:space="preserve">
     <value>Setting saved</value>
   </data>
+  <data name="Request custom payout successfully" xml:space="preserve">
+    <value>Request custom payout successfully</value>
+  </data>
 </root>

@@ -182,5 +182,21 @@ namespace Mps.Api.Controllers
                 reason = result.FailureReason
             });
         }
+
+        [Auth(Roles = ["Staff"])]
+        [HttpPost]
+        [Route("custom-request-payout")]
+        public async Task<IActionResult> CustomRequestPayout([FromBody] RequestCustomPayout.Command command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
     }
 }

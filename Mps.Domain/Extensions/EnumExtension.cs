@@ -11,5 +11,10 @@ namespace Mps.Domain.Extensions
             var attribute = (DescriptionAttribute?)field?.GetCustomAttribute(typeof(DescriptionAttribute));
             return attribute == null ? value.ToString() : attribute.Description;
         }
+
+        public static T GetEnum<T>(this int value)
+        {
+            return (T)Enum.ToObject(typeof(T), value);
+        }
     }
 }

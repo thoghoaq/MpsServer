@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Shop
 {
@@ -12,6 +14,7 @@ namespace Mps.Application.Features.Shop
         public class Query : IRequest<CommandResult<Result>>
         {
             public DateTime? MonthToDate { get; set; }
+            public PayoutDate? PayoutDate { get; set; }
         }
 
         public class Result
@@ -55,19 +58,24 @@ namespace Mps.Application.Features.Shop
                 try
                 {
                     var currentMonth = request.MonthToDate ?? DateTime.UtcNow;
+                    var payoutDate = request.PayoutDate ?? PayoutDate.Day8;
                     var revenueQuery = context.Orders
-                        .Where(o => request.MonthToDate == null || (o.OrderDate.Month == request.MonthToDate.Value.Month && o.OrderDate.Year == request.MonthToDate.Value.Year))
                         .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
+                        .AsEnumerable()
+                        .Where(o => request.MonthToDate == null || o.OrderDate.InPayoutDate(currentMonth, payoutDate))
                         .GroupBy(o => o.ShopId)
                         .Select(g => new
                         {
                             ShopId = g.Key,
                             Revenue = g.Sum(o => o.TotalAmount)
-                        });
+                        }).ToList();
 
-                    var shops = await context.Shops
+                    int[] payoutDateOrder = [8, 15, 22, 1];
+
+                    var shops = context.Shops
                         .Where(s => s.IsActive)
                         .Include(s => s.Payouts)
+                        .AsEnumerable()
                         .GroupJoin(revenueQuery, s => s.Id, r => r.ShopId, (s, r) => new { s, r })
                         .SelectMany(s => s.r.DefaultIfEmpty(), (s, r) => new { s.s, r })
                         .Select(s => new Shop
@@ -88,16 +96,16 @@ namespace Mps.Application.Features.Shop
                             PayPalAccount = s.s.PayPalAccount,
                             CreatedAt = s.s.CreatedAt,
                             UpdatedAt = s.s.UpdatedAt,
-                            IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
-                            Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).ToList(),
+                            IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
+                            Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).OrderBy(n => Array.IndexOf(payoutDateOrder, n.PayoutDate)).ToList(),
                             Revenue = s.r!.Revenue,
-                            ExpectPayout = s.s.Payouts.FirstOrDefault(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year)!.ExpectAmount,
+                            ExpectPayout = s.s.Payouts.FirstOrDefault(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate)!.ExpectAmount,
                             TotalPayout = s.s.Payouts
-                                .Where(o => request.MonthToDate == null || (o.MonthToDate.Month == request.MonthToDate.Value.Month && o.MonthToDate.Year == request.MonthToDate.Value.Year))
+                                .Where(p => request.MonthToDate == null || (p.MonthToDate.Month == request.MonthToDate.Value.Month && p.MonthToDate.Year == request.MonthToDate.Value.Year && p.PayoutDate == (int)payoutDate))
                                 .Sum(p => p.Amount)
                         })
                         .OrderBy(s => s.ShopName)
-                        .ToListAsync(cancellationToken);
+                        .ToList();
 
                     return CommandResult<Result>.Success(new Result { Shops = shops });
                 }

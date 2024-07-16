@@ -5,6 +5,7 @@ using Mps.Application.Abstractions.Payment;
 using Mps.Application.Abstractions.Setting;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
 using PayoutsSdk.Payouts;
 using System.Globalization;
 
@@ -16,6 +17,7 @@ namespace Mps.Application.Features.Payment
         {
             public required List<int> ShopIds { get; set; }
             public required DateTime MonthToDate { get; set; }
+            public required PayoutDate PayoutDate { get; set; }
         }
 
         public class Result
@@ -59,6 +61,8 @@ namespace Mps.Application.Features.Payment
                     var groupShopOrders = dbContext.Payouts
                         .Where(p => request.ShopIds.Contains(p.ShopId))
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
+                        .Where(p => p.PayoutDate == (int)request.PayoutDate)
+                        .Where(p => p.ExpectAmount > 0)
                         .Select(p => new
                         {
                             p.ShopId,
@@ -75,8 +79,8 @@ namespace Mps.Application.Features.Payment
                     {
                         SenderBatchHeader = new SenderBatchHeader()
                         {
-                            EmailMessage = $"SMPS refund your revenue in month {request.MonthToDate.Month}/{request.MonthToDate.Year}",
-                            EmailSubject = $"SMPS refund your revenue in month {request.MonthToDate.Month}/{request.MonthToDate.Year}"
+                            EmailMessage = $"SMPS refund your revenue in month {request.MonthToDate.Month}/{request.MonthToDate.Year}. Final settlement date: {request.PayoutDate}",
+                            EmailSubject = $"SMPS refund your revenue in month {request.MonthToDate.Month}/{request.MonthToDate.Year}. Final settlement date: {request.PayoutDate}"
                         },
                         Items = groupShopOrders.Select(group =>
                         {
