@@ -327,4 +327,7 @@
   <data name="Request custom payout successfully" xml:space="preserve">
     <value>Tạo yêu cầu thành công</value>
   </data>
+  <data name="Payout amount is invalid" xml:space="preserve">
+    <value>Giá trị thanh toán không hợp lệ</value>
+  </data>
 </root>

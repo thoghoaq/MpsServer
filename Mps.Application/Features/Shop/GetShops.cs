@@ -58,6 +58,10 @@ namespace Mps.Application.Features.Shop
                 try
                 {
                     var currentMonth = request.MonthToDate ?? DateTime.UtcNow;
+                    if (request.PayoutDate == PayoutDate.Day1)
+                    {
+                        currentMonth = currentMonth.AddMonths(1);
+                    }
                     var payoutDate = request.PayoutDate ?? PayoutDate.Day8;
                     var revenueQuery = context.Orders
                         .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
@@ -69,8 +73,6 @@ namespace Mps.Application.Features.Shop
                             ShopId = g.Key,
                             Revenue = g.Sum(o => o.TotalAmount)
                         }).ToList();
-
-                    int[] payoutDateOrder = [8, 15, 22, 1];
 
                     var shops = context.Shops
                         .Where(s => s.IsActive)
@@ -97,7 +99,7 @@ namespace Mps.Application.Features.Shop
                             CreatedAt = s.s.CreatedAt,
                             UpdatedAt = s.s.UpdatedAt,
                             IsCurrentMonthPaid = s.s.Payouts.Any(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate && p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Success),
-                            Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).ThenByDescending(n => Array.IndexOf(payoutDateOrder, n.PayoutDate)).ToList(),
+                            Payouts = s.s.Payouts.OrderByDescending(p => p.MonthToDate).ThenByDescending(n => n.PayoutDate).ToList(),
                             Revenue = s.r?.Revenue,
                             ExpectPayout = s.s.Payouts.FirstOrDefault(p => p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate)?.ExpectAmount,
                             TotalPayout = s.s.Payouts

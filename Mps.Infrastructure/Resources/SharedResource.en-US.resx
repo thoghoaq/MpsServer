@@ -327,4 +327,7 @@
   <data name="Request custom payout successfully" xml:space="preserve">
     <value>Request custom payout successfully</value>
   </data>
+  <data name="Payout amount is invalid" xml:space="preserve">
+    <value>Payout amount is invalid</value>
+  </data>
 </root>
