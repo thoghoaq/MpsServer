@@ -17,6 +17,7 @@ namespace Mps.Application.Features.Account
             public string? PhoneNumber { get; set; }
             public string? AvatarPath { get; set; }
             public StaffData? StaffData { get; set; }
+            public CustomerData? CustomerData { get; set; }
         }
 
         public class Result
@@ -31,6 +32,11 @@ namespace Mps.Application.Features.Account
             public string? IdentityCardBackPath { get; set; }
             public string? Address { get; set; }
             public string? CertificatePath { get; set; }
+        }
+
+        public record CustomerData
+        {
+            public string? Address { get; set; }
         }
 
         public class Handler(ILoggedUser loggedUser, ILogger<UpdateUser> logger, IAppLocalizer localizer, MpsDbContext dbContext) : IRequestHandler<Command, CommandResult<Result>>
@@ -51,6 +57,7 @@ namespace Mps.Application.Features.Account
                 {
                     var user = await _dbContext.Users
                         .Include(x => x.Staff)
+                        .Include(x => x.Customer)
                         .Where(x => x.Id == request.UserId)
                         .FirstOrDefaultAsync(cancellationToken);
                     if (user == null)
@@ -69,6 +76,11 @@ namespace Mps.Application.Features.Account
                         user.Staff.Address = request.StaffData?.Address ?? user.Staff.Address;
                         user.Staff.CertificatePath = request.StaffData?.CertificatePath ?? user.Staff.CertificatePath;
                         user.Staff.UpdatedAt = DateTime.UtcNow;
+                    }
+                    if (user.Customer != null)
+                    {
+                        user.Customer.Address = request.CustomerData?.Address ?? user.Customer.Address;
+                        user.Customer.UpdatedAt = DateTime.UtcNow;
                     }
                     await _dbContext.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = _localizer["User updated successfully"] });
