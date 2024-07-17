@@ -34,6 +34,11 @@ namespace Mps.Application.Features.Shop
 
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
+                var currentMonth = request.MonthToDate;
+                if (request.PayoutDate == PayoutDate.Day1)
+                {
+                    currentMonth = request.MonthToDate.AddMonths(1);
+                }
                 var query = _context.Orders
                     .Include(o => o.OrderDetails)
                     .Include(o => o.OrderStatus)
@@ -43,7 +48,7 @@ namespace Mps.Application.Features.Shop
                     .Include(o => o.PaymentStatus)
                     .Where(o => o.ShopId == request.ShopId && o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
                     .AsEnumerable()
-                    .Where(o => o.OrderDate.InPayoutDate(request.MonthToDate, request.PayoutDate));
+                    .Where(o => o.OrderDate.InPayoutDate(currentMonth, request.PayoutDate));
 
                 if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
