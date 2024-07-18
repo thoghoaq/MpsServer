@@ -22,5 +22,16 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [HttpPut]
+        [Route("shop/accept")]
+        public async Task<IActionResult> AcceptShop([FromBody] AcceptShop.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }

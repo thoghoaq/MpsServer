@@ -330,4 +330,7 @@
   <data name="Payout amount is invalid" xml:space="preserve">
     <value>Payout amount is invalid</value>
   </data>
+  <data name="Shop accepted/rejected successfully" xml:space="preserve">
+    <value>Shop accepted/rejected successfully</value>
+  </data>
 </root>

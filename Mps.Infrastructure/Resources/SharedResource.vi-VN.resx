@@ -330,4 +330,7 @@
   <data name="Payout amount is invalid" xml:space="preserve">
     <value>Giá trị thanh toán không hợp lệ</value>
   </data>
+  <data name="Shop accepted/rejected successfully" xml:space="preserve">
+    <value>Cửa hàng đã được chấp nhận/từ chối</value>
+  </data>
 </root>
