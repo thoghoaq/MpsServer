@@ -38,7 +38,7 @@ namespace Mps.Application.Features.Setting
                 {
                     // check any change
                     var settings = await _context.Settings.ToListAsync(cancellationToken);
-                    var changedSettings = request.Settings.Where(s => settings.Any(x => x.Key == s.Key && x.Value != s.Value)).ToList();
+                    var changedSettings = request.Settings.Where(s => settings.Any(x => x.Key == s.Key && x.Value != s.Value && x.Description != s.Description)).ToList();
                     if (changedSettings.Count == 0)
                     {
                         return CommandResult<Result>.Success(new Result { Message = _localizer["No setting changed"] });
