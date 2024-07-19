@@ -48,16 +48,15 @@ namespace Mps.Application.Features.Shop
                         .AsEnumerable()
                         .Where(s => request.Filter == null
                             || s.Name.SearchIgnoreCase(request.Filter)
-                        )
-                        .AsQueryable();
+                        );
 
                     if (request.PageNumber.HasValue && request.PageSize.HasValue)
                     {
                         query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                     }
-                    var products = await query
+                    var products = query
                         .OrderBy(s => s.Name)
-                        .ToListAsync(cancellationToken: cancellationToken);
+                        .ToList();
 
                     return CommandResult<Result>.Success(new Result { Products = products });
                 }
