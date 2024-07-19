@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Staff
 {
@@ -27,15 +27,16 @@ namespace Mps.Application.Features.Staff
             {
                 try
                 {
-                    var shops = await _context.Shops
+                    var shops = _context.Shops
                         .Where(s => s.IsActive)
+                        .AsEnumerable()
                         .Where(s => request.Filter == null
-                            || s.ShopName.Contains(request.Filter)
-                            || s.PhoneNumber.Contains(request.Filter)
-                            || s.Address.Contains(request.Filter)
+                            || s.ShopName.SearchIgnoreCase(request.Filter)
+                            || s.PhoneNumber.SearchIgnoreCase(request.Filter)
+                            || s.Address.SearchIgnoreCase(request.Filter)
                         )
                         .OrderByDescending(s => s.CreatedAt)
-                        .ToListAsync(cancellationToken);
+                        .ToList();
 
                     if (request.PageNumber.HasValue && request.PageSize.HasValue)
                     {
