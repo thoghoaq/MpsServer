@@ -53,6 +53,7 @@ namespace Mps.Application.Features.Seller
                         Avatar = request.Avatar,
                         Cover = request.Cover,
                         IsActive = false,
+                        IsAccepted = true,
                         PayPalAccount = request.PayPalAccount,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
