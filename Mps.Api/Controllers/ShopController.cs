@@ -96,6 +96,18 @@ namespace Mps.Api.Controllers
         }
 
         [Auth(Roles = ["ShopOwner"])]
+        [HttpPut]
+        [Route("product/status")]
+        public async Task<IActionResult> DeactiveProduct([FromBody] DeactiveProduct.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
+        [Auth(Roles = ["ShopOwner"])]
         [HttpGet]
         [Route("products/export")]
         public async Task<IActionResult> ExportProducts([FromQuery] ExportProducts.Query query)

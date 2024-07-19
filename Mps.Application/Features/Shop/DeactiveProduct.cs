@@ -12,6 +12,7 @@ namespace Mps.Application.Features.Shop
         public class Command : IRequest<CommandResult<Result>>
         {
             public required int Id { get; set; }
+            public required bool IsActive { get; set; } = false;
         }
 
         public class Result
@@ -40,10 +41,10 @@ namespace Mps.Application.Features.Shop
                         return CommandResult<Result>.Fail(_localizer["Unauthorized"]);
                     }
 
-                    product.IsActive = false;
+                    product.IsActive = request.IsActive;
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    return CommandResult<Result>.Success(new Result { Message = _localizer["Product deactivated"] });
+                    return CommandResult<Result>.Success(new Result { Message = _localizer[$"Product {(!request.IsActive ? "deactivated" : "activated")}"] });
                 }
                 catch (Exception ex)
                 {
