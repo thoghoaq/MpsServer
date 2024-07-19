@@ -5,6 +5,7 @@ using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Shop
 {
@@ -44,8 +45,9 @@ namespace Mps.Application.Features.Shop
                         .Include(p => p.Category)
                         .Include(p => p.Model)
                         .Where(p => p.ShopId == request.ShopId)
+                        .AsEnumerable()
                         .Where(s => request.Filter == null
-                            || s.Name.Contains(request.Filter)
+                            || s.Name.SearchIgnoreCase(request.Filter)
                         )
                         .AsQueryable();
 
