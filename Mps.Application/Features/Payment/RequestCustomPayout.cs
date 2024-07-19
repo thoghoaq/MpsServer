@@ -34,7 +34,6 @@ namespace Mps.Application.Features.Payment
                         .Select(p => p.ShopId)
                         .ToList();
 
-                    var settings = dbContext.Settings.ToList();
                     var allOrders = dbContext.Orders
                         .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Completed)
                         .AsEnumerable()
@@ -48,7 +47,16 @@ namespace Mps.Application.Features.Payment
                         .Where(p => p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Failed || p.PayoutStatusId == (int)Domain.Enums.PayoutStatus.Pending ||
                             allOrders
                             .Where(o => o.ShopId == p.ShopId)
-                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings)) > p.Amount)
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount,
+                                dbContext.ShopSettings
+                                .Where(s => s.ShopId == o.ShopId)
+                                .Select(x => new Domain.Entities.Setting
+                                {
+                                    Key = x.Key,
+                                    Value = x.Value
+                                }).ToList())
+                            ) > p.Amount
+                        )
                         .Select(p => new Payout
                         {
                             Id = p.Id,
@@ -63,7 +71,13 @@ namespace Mps.Application.Features.Payment
                             BatchId = p.BatchId,
                             ExpectAmount = allOrders
                             .Where(o => o.ShopId == p.ShopId)
-                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings)) - p.Amount
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, dbContext.ShopSettings
+                                .Where(s => s.ShopId == o.ShopId)
+                                .Select(x => new Domain.Entities.Setting
+                                {
+                                    Key = x.Key,
+                                    Value = x.Value
+                                }).ToList())) - p.Amount
                         })
                         .ToList();
                     await dbContext.BulkUpdateAsync(toUpdatePayouts);
@@ -82,7 +96,13 @@ namespace Mps.Application.Features.Payment
                             Amount = 0,
                             ExpectAmount = allOrders
                             .Where(o => o.ShopId == s.Id)
-                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings))
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, dbContext.ShopSettings
+                                .Where(s => s.ShopId == o.ShopId)
+                                .Select(x => new Domain.Entities.Setting
+                                {
+                                    Key = x.Key,
+                                    Value = x.Value
+                                }).ToList()))
                         })
                         .ToList();
                     await dbContext.BulkInsertAsync(newPayouts);
