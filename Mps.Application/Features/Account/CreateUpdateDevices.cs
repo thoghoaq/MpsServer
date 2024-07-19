@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
-using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 
@@ -22,14 +21,13 @@ namespace Mps.Application.Features.Account
 
         public class Result
         {
-            public string? Message { get; set; }
+            public UserDevice? Device { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, IAppLocalizer localizer, ILogger<CreateUpdateDevices> logger) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILoggedUser loggedUser, ILogger<CreateUpdateDevices> logger) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly MpsDbContext _dbContext = dbContext;
             private readonly ILoggedUser _loggedUser = loggedUser;
-            private readonly IAppLocalizer _localizer = localizer;
             private readonly ILogger<CreateUpdateDevices> _logger = logger;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
@@ -63,8 +61,9 @@ namespace Mps.Application.Features.Account
                         device.UpdatedAt = DateTime.UtcNow;
                     }
                     await _dbContext.SaveChangesAsync(cancellationToken);
-                    return CommandResult<Result>.Success(new Result { Message = _localizer["Update device successfully"] });
-                } catch (Exception ex)
+                    return CommandResult<Result>.Success(new Result { Device = device });
+                }
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "CreateUpdateDevicesFailure");
                     return CommandResult<Result>.Fail(ex.Message);
