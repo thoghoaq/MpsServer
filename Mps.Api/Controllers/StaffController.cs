@@ -36,9 +36,9 @@ namespace Mps.Api.Controllers
 
         [HttpGet]
         [Route("shops")]
-        public async Task<IActionResult> GetShops()
+        public async Task<IActionResult> GetShops([FromQuery] GetShops.Query query)
         {
-            var result = await _mediator.Send(new GetShops.Query());
+            var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload?.Shops) : BadRequest(new
             {
                 Reason = result.FailureReason
