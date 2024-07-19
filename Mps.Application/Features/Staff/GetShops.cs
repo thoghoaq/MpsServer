@@ -9,6 +9,9 @@ namespace Mps.Application.Features.Staff
     {
         public class Query : IRequest<CommandResult<Result>>
         {
+            public string? Filter { get; set; }
+            public int? PageNumber { get; set; }
+            public int? PageSize { get; set; }
         }
 
         public class Result
@@ -26,8 +29,19 @@ namespace Mps.Application.Features.Staff
                 {
                     var shops = await _context.Shops
                         .Where(s => s.IsActive)
+                        .Where(s => request.Filter == null
+                            || s.ShopName.Contains(request.Filter)
+                            || s.PhoneNumber.Contains(request.Filter)
+                            || s.Address.Contains(request.Filter)
+                        )
                         .OrderByDescending(s => s.CreatedAt)
                         .ToListAsync(cancellationToken);
+
+                    if (request.PageNumber.HasValue && request.PageSize.HasValue)
+                    {
+                        shops = shops.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value).ToList();
+                    }
+
                     return CommandResult<Result>.Success(new Result { Shops = shops });
                 }
                 catch (Exception ex)
