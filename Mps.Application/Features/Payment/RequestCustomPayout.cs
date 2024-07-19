@@ -40,6 +40,8 @@ namespace Mps.Application.Features.Payment
                         .Where(p => p.OrderDate.InPayoutDate(request.MonthToDate, request.PayoutDate))
                         .ToList();
 
+                    var settings = dbContext.ShopSettings.ToList();
+
                     var toUpdatePayouts = dbContext.Payouts
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year)
                         .Where(p => p.PayoutDate == (int)request.PayoutDate)
@@ -48,7 +50,7 @@ namespace Mps.Application.Features.Payment
                             allOrders
                             .Where(o => o.ShopId == p.ShopId)
                             .Sum(o => settingService.GetNetBySetting(o.TotalAmount,
-                                dbContext.ShopSettings
+                                settings
                                 .Where(s => s.ShopId == o.ShopId)
                                 .Select(x => new Domain.Entities.Setting
                                 {
@@ -71,7 +73,7 @@ namespace Mps.Application.Features.Payment
                             BatchId = p.BatchId,
                             ExpectAmount = allOrders
                             .Where(o => o.ShopId == p.ShopId)
-                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, dbContext.ShopSettings
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings
                                 .Where(s => s.ShopId == o.ShopId)
                                 .Select(x => new Domain.Entities.Setting
                                 {
@@ -96,7 +98,7 @@ namespace Mps.Application.Features.Payment
                             Amount = 0,
                             ExpectAmount = allOrders
                             .Where(o => o.ShopId == s.Id)
-                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, dbContext.ShopSettings
+                            .Sum(o => settingService.GetNetBySetting(o.TotalAmount, settings
                                 .Where(s => s.ShopId == o.ShopId)
                                 .Select(x => new Domain.Entities.Setting
                                 {
