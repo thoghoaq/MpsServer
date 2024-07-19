@@ -333,4 +333,7 @@
   <data name="Shop accepted/rejected successfully" xml:space="preserve">
     <value>Shop accepted/rejected successfully</value>
   </data>
+  <data name="Shop settings refreshed successfully" xml:space="preserve">
+    <value>Shop settings refreshed successfully</value>
+  </data>
 </root>

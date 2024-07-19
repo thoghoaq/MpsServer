@@ -43,7 +43,14 @@ namespace Mps.Application.Features.Staff
                     else
                     {
                         shop.IsActive = true;
+                        // Apply default shop settings
+                        if (!_context.ShopSettings.Any(s => s.ShopId == shop.Id))
+                        {
+                            var settings = _context.Settings.ToList();
+                            _context.ShopSettings.AddRange(settings.Select(s => new ShopSetting { ShopId = shop.Id, Key = s.Key, Value = s.Value, Description = s.Description }));
+                        }
                     }
+
                     await _context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Shop accepted/rejected successfully"] });
                 }
