@@ -42,7 +42,7 @@ namespace Mps.Application.Features.Setting
                     var settings = await _context.ShopSettings
                         .Where(e => e.ShopId == request.ShopId)
                         .ToListAsync(cancellationToken);
-                    var changedSettings = request.Settings.Where(s => settings.Any(x => x.Key == s.Key && x.Value != s.Value && x.Description != s.Description)).ToList();
+                    var changedSettings = request.Settings.Where(s => settings.Any(x => x.Key == s.Key && (x.Value != s.Value || x.Description != s.Description))).ToList();
                     if (changedSettings.Count == 0)
                     {
                         return CommandResult<Result>.Success(new Result { Message = _localizer["No setting changed"] });
