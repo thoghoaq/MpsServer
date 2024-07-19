@@ -25,7 +25,8 @@ namespace Mps.Application.Features.Staff
                 try
                 {
                     var shops = await _context.Shops
-                        .OrderBy(s => s.IsActive)
+                        .Where(s => s.IsActive)
+                        .OrderByDescending(s => s.CreatedAt)
                         .ToListAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Shops = shops });
                 }
