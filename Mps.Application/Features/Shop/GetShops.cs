@@ -106,7 +106,7 @@ namespace Mps.Application.Features.Shop
                                 .Where(p => request.MonthToDate == null || (p.MonthToDate.Month == currentMonth.Month && p.MonthToDate.Year == currentMonth.Year && p.PayoutDate == (int)payoutDate))
                                 .Sum(p => p.Amount)
                         })
-                        .OrderBy(s => s.ShopName)
+                        .OrderByDescending(s => s.Revenue)
                         .ToList();
 
                     return CommandResult<Result>.Success(new Result { Shops = shops });
