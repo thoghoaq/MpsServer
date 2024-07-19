@@ -33,5 +33,16 @@ namespace Mps.Api.Controllers
                 Reason = result.FailureReason
             });
         }
+
+        [HttpGet]
+        [Route("shops")]
+        public async Task<IActionResult> GetShops()
+        {
+            var result = await _mediator.Send(new GetShops.Query());
+            return result.IsSuccess ? Ok(result.Payload?.Shops) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }
