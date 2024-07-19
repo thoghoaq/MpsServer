@@ -2,8 +2,11 @@
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Messaging;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
+using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Seller
 {
@@ -29,11 +32,13 @@ namespace Mps.Application.Features.Seller
             public string? Message { get; set; }
         }
 
-        public class CommandHandler(MpsDbContext context, ILoggedUser loggedUser, IAppLocalizer localizer, ILogger<CreateShop> logger) : IRequestHandler<Command, CommandResult<Result>>
+        public class CommandHandler(MpsDbContext context, ILoggedUser loggedUser, IAppLocalizer localizer, ILogger<CreateShop> logger, INotificationService notificationService) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly MpsDbContext _context = context;
             private readonly ILoggedUser _loggedUser = loggedUser;
             private readonly IAppLocalizer _localizer = localizer;
+            private readonly ILogger<CreateShop> _logger = logger;
+            private readonly INotificationService _notificationService = notificationService;
 
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -60,6 +65,19 @@ namespace Mps.Application.Features.Seller
                     };
                     _context.Shops.Add(shop);
                     await _context.SaveChangesAsync(cancellationToken);
+
+                    var staffIds = _context.Users.Where(u => u.Role.Contains(Role.Staff.GetDescription()) || u.Role.Contains(Role.Admin.GetDescription()) || u.Role.Contains(Role.SuperAdmin.GetDescription())).Select(u => u.Id).ToList();
+                    await _notificationService.SendMessageAllDevicesAsync(staffIds, new MessageRequest
+                    {
+                        Title = _localizer["New shop request"],
+                        Body = _localizer["New shop request from "] + _loggedUser.FullName,
+                        ImageUrl = shop.Avatar,
+                        Data = new Dictionary<string, string>
+                        {
+                            { "type", NotificationType.NewShopRequest.ToString() },
+                            { "shopId", shop.Id.ToString() }
+                        },
+                    });
                     return CommandResult<Result>.Success(new Result
                     {
                         Message = _localizer["Shop created successfully"]

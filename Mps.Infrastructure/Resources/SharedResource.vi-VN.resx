@@ -336,4 +336,10 @@
   <data name="Shop settings refreshed successfully" xml:space="preserve">
     <value>Cấu hình cửa hàng được đặt về mặc định</value>
   </data>
+  <data name="New shop request" xml:space="preserve">
+    <value>Yêu cầu tạo cửa hàng</value>
+  </data>
+  <data name="New shop request from" xml:space="preserve">
+    <value>Yêu cầu tạo cửa hàng từ </value>
+  </data>
 </root>

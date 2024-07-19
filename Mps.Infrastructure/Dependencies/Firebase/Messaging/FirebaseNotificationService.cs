@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Messaging;
 using Mps.Domain.Entities;
+using Newtonsoft.Json;
 
 namespace Mps.Infrastructure.Dependencies.Firebase.Messaging
 {
@@ -17,7 +18,7 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Messaging
                 var messaging = FirebaseMessaging.DefaultInstance;
                 var result = await messaging.SendAsync(new Message
                 {
-                    Notification = new Notification
+                    Notification = new FirebaseAdmin.Messaging.Notification
                     {
                         Title = request.Title,
                         Body = request.Body,
@@ -26,12 +27,28 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Messaging
                     Token = request.DeviceToken,
                     Data = request.Data,
                 });
+
+                var userId = _dbContext.UserDevices.FirstOrDefault(d => d.DeviceToken == request.DeviceToken)?.UserId;
+                if (userId != null)
+                {
+                    _dbContext.Notifications.Add(new Domain.Entities.UserNotification
+                    {
+                        Title = request.Title,
+                        Body = request.Body,
+                        ImageUrl = request.ImageUrl,
+                        UserId = (int)userId,
+                        Data = JsonConvert.SerializeObject(request.Data),
+                        CreatedAt = DateTime.UtcNow,
+                    });
+                    await _dbContext.SaveChangesAsync();
+                }
                 return new MessageResponse
                 {
                     Success = true,
                     Message = result,
                 };
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "SendMessageFailure");
                 return new MessageResponse
@@ -46,8 +63,8 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Messaging
         {
             try
             {
-                var devices = _dbContext.UserDevices.Where(d => d.UserId == userId && d.IsLogged == true).ToList();
-                if (devices == null || devices.Count == 0)
+                var devices = _dbContext.UserDevices.Where(d => d.UserId == userId && d.IsLogged).ToList();
+                if (devices.Count == 0)
                 {
                     return [
                         new MessageResponse
@@ -60,7 +77,7 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Messaging
                 var messaging = FirebaseMessaging.DefaultInstance;
                 var result = await messaging.SendEachForMulticastAsync(new MulticastMessage
                 {
-                    Notification = new Notification
+                    Notification = new FirebaseAdmin.Messaging.Notification
                     {
                         Title = request.Title,
                         Body = request.Body,
@@ -69,12 +86,83 @@ namespace Mps.Infrastructure.Dependencies.Firebase.Messaging
                     Tokens = devices.Select(d => d.DeviceToken).ToList(),
                     Data = request.Data,
                 });
+
+                _dbContext.Notifications.Add(new Domain.Entities.UserNotification
+                {
+                    Title = request.Title,
+                    Body = request.Body,
+                    ImageUrl = request.ImageUrl,
+                    UserId = userId,
+                    Data = JsonConvert.SerializeObject(request.Data),
+                    CreatedAt = DateTime.UtcNow,
+                });
+                await _dbContext.SaveChangesAsync();
+
                 return result.Responses.Select(r => new MessageResponse
                 {
                     Success = r.IsSuccess,
                     Message = r.Exception?.Message,
                 }).ToList();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SendMessageAllDevicesFailure");
+                return [
+                    new MessageResponse
+                    {
+                        Success = false,
+                        Message = ex.Message,
+                    }
+                ];
+            }
+        }
+
+        public async Task<List<MessageResponse>> SendMessageAllDevicesAsync(List<int> userIds, MessageRequest request)
+        {
+            try
+            {
+                var devices = _dbContext.UserDevices.Where(d => userIds.Contains(d.UserId) && d.IsLogged).ToList();
+                if (devices.Count == 0)
+                {
+                    return [
+                        new MessageResponse
+                        {
+                            Success = false,
+                            Message = "No device found",
+                        }
+                    ];
+                }
+                var messaging = FirebaseMessaging.DefaultInstance;
+                var result = await messaging.SendEachForMulticastAsync(new MulticastMessage
+                {
+                    Notification = new FirebaseAdmin.Messaging.Notification
+                    {
+                        Title = request.Title,
+                        Body = request.Body,
+                        ImageUrl = request.ImageUrl,
+                    },
+                    Tokens = devices.Select(d => d.DeviceToken).ToList(),
+                    Data = request.Data,
+                });
+
+                _dbContext.Notifications.AddRange(userIds.Select(u => new Domain.Entities.UserNotification
+                {
+                    Title = request.Title,
+                    Body = request.Body,
+                    ImageUrl = request.ImageUrl,
+                    UserId = u,
+                    Data = JsonConvert.SerializeObject(request.Data),
+                    CreatedAt = DateTime.UtcNow,
+                }).ToList());
+                await _dbContext.SaveChangesAsync();
+
+                return result.Responses.Select(r => new MessageResponse
+                {
+                    Success = r.IsSuccess,
+                    Message = r.Exception?.Message,
+                }).ToList();
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "SendMessageAllDevicesFailure");
                 return [

@@ -26,6 +26,7 @@ namespace Mps.Domain.Entities
         public DbSet<PayoutStatus> PayoutStatuses { get; set; }
         public DbSet<Setting> Settings { get; set; }
         public DbSet<ShopSetting> ShopSettings { get; set; }
+        public DbSet<UserNotification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -148,6 +149,12 @@ namespace Mps.Domain.Entities
 
             modelBuilder.Entity<ShopSetting>().HasKey(s => s.Id);
             modelBuilder.Entity<ShopSetting>().HasOne(s => s.Shop).WithMany().HasForeignKey(s => s.ShopId);
+
+            modelBuilder.Entity<UserNotification>().HasKey(n => n.Id);
+            modelBuilder.Entity<UserNotification>().Property(n => n.Title).IsRequired();
+            modelBuilder.Entity<UserNotification>().Property(n => n.Body).IsRequired();
+            modelBuilder.Entity<UserNotification>().Property(n => n.CreatedAt).IsRequired();
+            modelBuilder.Entity<UserNotification>().HasOne(n => n.User).WithMany().HasForeignKey(n => n.UserId);
         }
     }
 }
