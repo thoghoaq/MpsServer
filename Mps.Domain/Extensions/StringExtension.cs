@@ -21,9 +21,17 @@ namespace Mps.Domain.Extensions
             foreach (var c in normalizedString)
             {
                 var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+
                 if (unicodeCategory != UnicodeCategory.NonSpacingMark)
                 {
-                    stringBuilder.Append(c);
+                    if (c == 'đ' || c == 'Đ')
+                    {
+                        stringBuilder.Append('d');
+                    }
+                    else
+                    {
+                        stringBuilder.Append(c);
+                    }
                 }
             }
 
