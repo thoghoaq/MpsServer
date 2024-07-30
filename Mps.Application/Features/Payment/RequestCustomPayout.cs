@@ -29,6 +29,10 @@ namespace Mps.Application.Features.Payment
             {
                 try
                 {
+                    if (request.PayoutDate == PayoutDate.Day1)
+                    {
+                        request.MonthToDate = request.MonthToDate.AddMonths(1);
+                    }
                     var existShop = dbContext.Payouts
                         .Where(p => p.MonthToDate.Month == request.MonthToDate.Month && p.MonthToDate.Year == request.MonthToDate.Year && p.PayoutDate == (int)request.PayoutDate)
                         .Select(p => p.ShopId)
