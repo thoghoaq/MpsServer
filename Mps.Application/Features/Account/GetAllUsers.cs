@@ -38,7 +38,7 @@ namespace Mps.Application.Features.Account
                 }
                 if (request.Role == Role.ShopOwner.GetDescription())
                 {
-                    query = query.Include(u => u.ShopOwner);
+                    query = query.Include(u => u.ShopOwner).ThenInclude(s => s!.Shops);
                 }
                 if (request.Role == Role.Customer.GetDescription())
                 {
