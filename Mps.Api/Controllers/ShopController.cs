@@ -5,7 +5,6 @@ using Mps.Infrastructure.Middleware;
 
 namespace Mps.Api.Controllers
 {
-    [Auth(Roles = ["ShopOwner"])]
     [Route("api/[controller]")]
     [ApiController]
     public class ShopController(IMediator mediator) : ControllerBase
