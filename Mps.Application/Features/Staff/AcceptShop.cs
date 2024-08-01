@@ -12,6 +12,7 @@ namespace Mps.Application.Features.Staff
         {
             public int Id { get; set; }
             public bool IsAccepted { get; set; }
+            public string? Comment { get; set; }
         }
 
         public class Result
@@ -39,6 +40,7 @@ namespace Mps.Application.Features.Staff
                     if (!request.IsAccepted)
                     {
                         shop.IsActive = false;
+                        shop.Comment = request.Comment;
                     }
                     else
                     {

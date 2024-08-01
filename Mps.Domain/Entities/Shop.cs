@@ -27,6 +27,8 @@
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
+        public string? Comment { get; set; }
+
         public ICollection<Payout> Payouts { get; set; }
     }
 }
