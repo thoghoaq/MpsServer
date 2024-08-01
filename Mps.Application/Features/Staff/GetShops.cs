@@ -67,6 +67,7 @@ namespace Mps.Application.Features.Staff
                             Latitude = s.s.Latitude,
                             Longitude = s.s.Longitude,
                             PayPalAccount = s.s.PayPalAccount,
+                            Comment = s.s.Comment,
                         })
                         .Where(s => s.IsActive)
                         .AsEnumerable()

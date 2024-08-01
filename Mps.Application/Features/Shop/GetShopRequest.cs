@@ -67,6 +67,7 @@ namespace Mps.Application.Features.Shop
                             Latitude = s.s.Latitude,
                             Longitude = s.s.Longitude,
                             PayPalAccount = s.s.PayPalAccount,
+                            Comment = s.s.Comment,
                         })
                         .Where(s => !s.IsActive)
                         .Where(s => request.Filter == null || s.ShopName.Contains(request.Filter));
