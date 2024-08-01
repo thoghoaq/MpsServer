@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Messaging;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
+using Mps.Domain.Enums;
 
 namespace Mps.Application.Features.Payment
 {
@@ -38,7 +40,7 @@ namespace Mps.Application.Features.Payment
             public string? Signature { get; set; }
         }
 
-        public class Handler(MpsDbContext dbContext, ILogger<GetPayment> logger, IConfiguration configuration, IVnPayService vnPayService, IAppLocalizer localizer) : IRequestHandler<Query, CommandResult<Result>>
+        public class Handler(MpsDbContext dbContext, ILogger<GetPayment> logger, IConfiguration configuration, IVnPayService vnPayService, IAppLocalizer localizer, INotificationService notificationService) : IRequestHandler<Query, CommandResult<Result>>
         {
             private readonly MpsDbContext _dbContext = dbContext;
             private readonly ILogger<GetPayment> _logger = logger;
@@ -97,9 +99,25 @@ namespace Mps.Application.Features.Payment
                         payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Failed;
                     }
 
-                    await ChangeOrderStatus(orderIds, isSuccess ? (int)Domain.Enums.OrderStatus.Processing : (int)Domain.Enums.OrderStatus.Cancelled, cancellationToken);
+                    var orders = await ChangeOrderStatus(orderIds, isSuccess ? (int)Domain.Enums.OrderStatus.Processing : (int)Domain.Enums.OrderStatus.Cancelled, cancellationToken);
                     if (isSuccess)
                     {
+                        foreach (var item in orders)
+                        {
+                            if (item.Shop?.ShopOwnerId != null)
+                            {
+                                await notificationService.SendMessageAllDevicesAsync(item.Shop.ShopOwnerId, new MessageRequest
+                                {
+                                    Title = _localizer["You has new order"],
+                                    Body = _localizer["Order date"] + ":" + item.OrderDate.ToString() + "UTC",
+                                    Data = new Dictionary<string, string>
+                                    {
+                                        { "type", NotificationType.NewOrder.ToString() },
+                                        { "orderId", item.Id.ToString() }
+                                    }
+                                });
+                            }
+                        }
                         return CommandResult<Result>.Success(paymentResult);
                     }
                     return CommandResult<Result>.Fail(_localizer[paymentMessage]);
@@ -111,9 +129,11 @@ namespace Mps.Application.Features.Payment
                 }
             }
 
-            private async Task ChangeOrderStatus(List<int?> orderId, int status, CancellationToken cancellationToken)
+            private async Task<List<Order>> ChangeOrderStatus(List<int?> orderId, int status, CancellationToken cancellationToken)
             {
-                var orders = _dbContext.Orders.Where(x => orderId.Contains(x.Id));
+                var orders = _dbContext.Orders
+                    .Include(x => x.Shop)
+                    .Where(x => orderId.Contains(x.Id));
                 if (orders.Any())
                 {
                     foreach (var item in orders)
@@ -122,6 +142,7 @@ namespace Mps.Application.Features.Payment
                     }
                     await _dbContext.SaveChangesAsync(cancellationToken);
                 }
+                return orders.ToList();
             }
         }
     }
