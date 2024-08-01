@@ -342,4 +342,10 @@
   <data name="New shop request from" xml:space="preserve">
     <value>Yêu cầu tạo cửa hàng từ </value>
   </data>
+  <data name="Shop Accepted" xml:space="preserve">
+    <value>Cửa hàng được chấp nhận</value>
+  </data>
+  <data name="Shop Rejected" xml:space="preserve">
+    <value>Cửa hàng bị từ chối</value>
+  </data>
 </root>

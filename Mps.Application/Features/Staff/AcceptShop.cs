@@ -56,16 +56,14 @@ namespace Mps.Application.Features.Staff
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    if (!request.IsAccepted)
+                    // Send notification to shop owner
+                    await notificationService.SendMessageAllDevicesAsync(shop.ShopOwnerId, new MessageRequest
                     {
-                        // Send notification to shop owner
-                        await notificationService.SendMessageAllDevicesAsync(shop.ShopOwnerId, new MessageRequest
-                        {
-                            Title = _localizer["Shop Rejected"],
-                            Body = request.Comment ?? shop.ShopName,
-                            ImageUrl = shop.Avatar
-                        });
-                    }
+                        Title = request.IsAccepted ? _localizer["Shop Accepted"] : _localizer["Shop Rejected"],
+                        Body = request.Comment ?? shop.ShopName,
+                        ImageUrl = shop.Avatar
+                    });
+
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Shop accepted/rejected successfully"] });
                 }
                 catch (Exception ex)
