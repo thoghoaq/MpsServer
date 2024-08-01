@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using Mps.Application.Abstractions.Localization;
+using Mps.Application.Abstractions.Messaging;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 
@@ -20,7 +21,7 @@ namespace Mps.Application.Features.Staff
             public string? Message { get; set; }
         }
 
-        public class Handler(MpsDbContext context, IAppLocalizer localizer, ILogger<AcceptShop> logger) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext context, IAppLocalizer localizer, ILogger<AcceptShop> logger, INotificationService notificationService) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly MpsDbContext _context = context;
             private readonly IAppLocalizer _localizer = localizer;
@@ -54,6 +55,17 @@ namespace Mps.Application.Features.Staff
                     }
 
                     await _context.SaveChangesAsync(cancellationToken);
+
+                    if (!request.IsAccepted)
+                    {
+                        // Send notification to shop owner
+                        await notificationService.SendMessageAllDevicesAsync(shop.ShopOwnerId, new MessageRequest
+                        {
+                            Title = _localizer["Shop Rejected"],
+                            Body = request.Comment ?? shop.ShopName,
+                            ImageUrl = shop.Avatar
+                        });
+                    }
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Shop accepted/rejected successfully"] });
                 }
                 catch (Exception ex)
