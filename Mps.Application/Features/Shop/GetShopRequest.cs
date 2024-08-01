@@ -23,7 +23,7 @@ namespace Mps.Application.Features.Shop
 
         public class ShopResult : Domain.Entities.Shop
         {
-            public ShopOwner? ShopOwner { get; set; }
+            public ShopOwnerResult? ShopOwner { get; set; }
         }
 
         public class ShopOwnerResult : ShopOwner
