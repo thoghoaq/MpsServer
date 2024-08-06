@@ -27,7 +27,7 @@ namespace Mps.Application.Features.Ecommerce
                     var rating = await context.Products
                         .Include(p => p.Feedbacks)
                         .Where(p => p.ShopId == request.ShopId)
-                        .SumAsync(p => p.Feedbacks.Average(f => f.Rating), cancellationToken);
+                        .AverageAsync(p => p.Feedbacks.Average(f => f.Rating), cancellationToken);
 
                     return CommandResult<Result>.Success(new Result { Rating = rating });
                 }
