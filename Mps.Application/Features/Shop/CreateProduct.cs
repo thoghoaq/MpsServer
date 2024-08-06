@@ -56,7 +56,7 @@ namespace Mps.Application.Features.Shop
                         ModelId = request.ModelId,
                         CategoryId = request.CategoryId,
                         Images = request.Images?.Select(i => new ProductImage { ImagePath = i.ImagePath }).ToList() ?? new List<ProductImage>(),
-                        IsActive = true,
+                        IsActive = false,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
