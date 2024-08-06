@@ -29,7 +29,7 @@ namespace Mps.Application.Features.Ecommerce
                         .Where(p => p.ShopId == request.ShopId)
                         .AverageAsync(p => p.Feedbacks.Average(f => f.Rating), cancellationToken);
 
-                    return CommandResult<Result>.Success(new Result { Rating = Math.Round(rating, 2) });
+                    return CommandResult<Result>.Success(new Result { Rating = Math.Round(rating, 1) });
                 }
                 catch (Exception ex)
                 {
