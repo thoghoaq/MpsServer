@@ -25,11 +25,16 @@ namespace Mps.Application.Features.Ecommerce
             {
                 try
                 {
-                    var rating = await context.Products
+                    var products = context.Products
                         .Include(p => p.Feedbacks)
-                        .Where(p => p.ShopId == request.ShopId)
-                        .AverageAsync(p => p.Feedbacks.Average(f => f.Rating), cancellationToken);
+                        .Where(p => p.ShopId == request.ShopId);
 
+                    var feedbacks = products.SelectMany(p => p.Feedbacks);
+                    if (!feedbacks.Any())
+                    {
+                        return CommandResult<Result>.Success(new Result { Rating = 0 });
+                    }
+                    var rating = feedbacks.Average(f => f.Rating);
                     return CommandResult<Result>.Success(new Result { Rating = Math.Round(rating, 1) });
                 }
                 catch (Exception ex)
