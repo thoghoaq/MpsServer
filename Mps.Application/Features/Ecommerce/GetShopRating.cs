@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
 using Mps.Domain.Entities;
 
@@ -18,7 +19,7 @@ namespace Mps.Application.Features.Ecommerce
             public required double Rating { get; set; }
         }
 
-        public class Handler(MpsDbContext context, ILogger<GetShopRating> logger) : IRequestHandler<Query, CommandResult<Result>>
+        public class Handler(MpsDbContext context, ILogger<GetShopRating> logger, IAppLocalizer localizer) : IRequestHandler<Query, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
@@ -34,7 +35,7 @@ namespace Mps.Application.Features.Ecommerce
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "GetShopRatingFailure");
-                    return CommandResult<Result>.Fail("Error getting shop rating");
+                    return CommandResult<Result>.Fail(localizer["Error getting shop rating"]);
                 }
             }
         }

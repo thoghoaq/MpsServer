@@ -348,4 +348,7 @@
   <data name="Shop Rejected" xml:space="preserve">
     <value>Cửa hàng bị từ chối</value>
   </data>
+  <data name="Error getting shop rating" xml:space="preserve">
+    <value>Có lỗi khi lấy đánh giá cửa hàng</value>
+  </data>
 </root>
