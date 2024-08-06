@@ -86,5 +86,13 @@ namespace Mps.Api.Controllers
             var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload?.Products) : BadRequest(result.FailureReason);
         }
+
+        [HttpGet]
+        [Route("shop-rating")]
+        public async Task<IActionResult> GetShopRating([FromQuery] GetShopRating.Query query)
+        {
+            var result = await _mediator.Send(query);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(result.FailureReason);
+        }
     }
 }
