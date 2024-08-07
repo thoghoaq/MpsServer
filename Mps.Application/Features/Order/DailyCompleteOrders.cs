@@ -35,7 +35,14 @@ namespace Mps.Application.Features.Order
                         .ToListAsync(cancellationToken);
                     orders.ForEach(o =>
                     {
-                        o.OrderStatusId = (int)Domain.Enums.OrderStatus.Completed;
+                        if (o.OrderStatusId == (int)Domain.Enums.OrderStatus.Received)
+                        {
+                            o.OrderStatusId = (int)Domain.Enums.OrderStatus.Completed;
+                        }
+                        else if (o.OrderStatusId == (int)Domain.Enums.OrderStatus.Delivered)
+                        {
+                            o.OrderStatusId = (int)Domain.Enums.OrderStatus.Received;
+                        }
                     });
                     await dbContext.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Success = true });
