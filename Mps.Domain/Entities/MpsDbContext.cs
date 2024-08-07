@@ -104,7 +104,8 @@ namespace Mps.Domain.Entities
                 new OrderStatus { Id = 4, Name = "Cancelled" },
                 new OrderStatus { Id = 5, Name = "Returned" },
                 new OrderStatus { Id = 6, Name = "Refunded" },
-                new OrderStatus { Id = 7, Name = "Completed" }
+                new OrderStatus { Id = 7, Name = "Completed" },
+                new OrderStatus { Id = 8, Name = "Received" }
                 );
 
             modelBuilder.Entity<PaymentStatus>().HasKey(s => s.Id);

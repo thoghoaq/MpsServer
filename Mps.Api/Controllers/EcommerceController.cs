@@ -94,5 +94,17 @@ namespace Mps.Api.Controllers
             var result = await _mediator.Send(query);
             return result.IsSuccess ? Ok(result.Payload) : BadRequest(result.FailureReason);
         }
+
+        [Auth(Roles = ["Customer"])]
+        [HttpPut]
+        [Route("receive-order")]
+        public async Task<IActionResult> ReceiveOrder([FromBody] UpdateOrderStatusReceived.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
     }
 }

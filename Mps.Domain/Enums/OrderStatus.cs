@@ -8,6 +8,7 @@
         Cancelled = 4,
         Returned = 5,
         Refunded = 6,
-        Completed = 7
+        Completed = 7,
+        Received = 8
     }
 }
