@@ -42,6 +42,10 @@ namespace Mps.Application.Features.Shop
                     }
 
                     order.OrderStatusId = (int)request.Status;
+                    if (request.Status == Domain.Enums.OrderStatus.Delivered)
+                    {
+                        order.DeliveryAt = DateTime.UtcNow;
+                    }
                     await context.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = localizer["Order status changed"] });
                 }

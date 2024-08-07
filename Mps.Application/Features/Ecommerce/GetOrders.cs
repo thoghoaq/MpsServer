@@ -19,7 +19,7 @@ namespace Mps.Application.Features.Ecommerce
 
         public class Result
         {
-            public required List<Order> Orders { get; set; }
+            public required List<Domain.Entities.Order> Orders { get; set; }
         }
 
         public class Handler(MpsDbContext context, IAppLocalizer localizer, ILogger<GetOrders> logger, ILoggedUser loggedUser) : IRequestHandler<Query, CommandResult<Result>>

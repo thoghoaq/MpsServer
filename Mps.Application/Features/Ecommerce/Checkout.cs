@@ -69,11 +69,11 @@ namespace Mps.Application.Features.Ecommerce
                         }
                     }
 
-                    var listOrders = new List<Order>();
+                    var listOrders = new List<Domain.Entities.Order>();
                     var groupOrders = request.Items.GroupBy(x => x.ShopId).ToList();
                     foreach (var group in groupOrders)
                     {
-                        var order = new Order
+                        var order = new Domain.Entities.Order
                         {
                             CustomerId = _loggedUser.UserId,
                             ShopId = group.Key,

@@ -39,6 +39,7 @@ namespace Mps.Application.Features.Ecommerce
                     }
 
                     order.OrderStatusId = (int)Domain.Enums.OrderStatus.Received;
+                    order.ReceivedAt = DateTime.UtcNow;
                     await dbContext.SaveChangesAsync(cancellationToken);
 
                     return CommandResult<Result>.Success(new Result { Success = true });

@@ -19,6 +19,8 @@ namespace Mps.Api
 
             RecurringJob.AddOrUpdate<CustomRequestPayout>("Day22RequestPayout", x => x.Process(PayoutDate.Day22), Cron.Monthly(22));
             RecurringJob.AddOrUpdate<CustomPayout>("Day23Payout", x => x.Process(PayoutDate.Day22), Cron.Monthly(23));
+
+            RecurringJob.AddOrUpdate<DailyCompleteOrders>("DailyCompleteOrders", x => x.Process(), Cron.Daily());
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Mps.Application.Features.Shop
 
         public class Result
         {
-            public List<Order> Orders { get; set; } = [];
+            public List<Domain.Entities.Order> Orders { get; set; } = [];
         }
 
         public class Handler(MpsDbContext context, IAppLocalizer localizer, ILogger<GetOrders> logger, ILoggedUser loggedUser) : IRequestHandler<Query, CommandResult<Result>>

@@ -129,7 +129,7 @@ namespace Mps.Application.Features.Payment
                 }
             }
 
-            private async Task<List<Order>> ChangeOrderStatus(List<int?> orderId, int status, CancellationToken cancellationToken)
+            private async Task<List<Domain.Entities.Order>> ChangeOrderStatus(List<int?> orderId, int status, CancellationToken cancellationToken)
             {
                 var orders = _dbContext.Orders
                     .Include(x => x.Shop)

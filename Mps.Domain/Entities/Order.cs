@@ -23,6 +23,8 @@
         public decimal TotalAmount { get; set; }
         public decimal? Discount { get; set; }
         public string? Note { get; set; }
+        public DateTime? DeliveryAt { get; set; }
+        public DateTime? ReceivedAt { get; set; }
 
         public virtual Customer? Customer { get; set; }
         public virtual Shop? Shop { get; set; }

@@ -14,7 +14,7 @@ namespace Mps.Application.Features.Payment
 
         public class Result
         {
-            public List<Order> Orders { get; set; } = [];
+            public List<Domain.Entities.Order> Orders { get; set; } = [];
         }
 
         public class Handler(MpsDbContext dbContext) : IRequestHandler<Query, CommandResult<Result>>
