@@ -29,7 +29,7 @@ namespace Mps.Application.Features.Shop
             public required int Stock { get; set; }
             public string? Description { get; set; }
             public int CategoryId { get; set; }
-            public int? ModelId { get; set; }
+            public string? CategoryName { get; set; }
         }
 
         public class Handler(IExcelService excelService, IMediator mediator, IAppLocalizer localizer, ILogger<ExportProducts> logger) : IRequestHandler<Query, CommandResult<Result>>
@@ -63,7 +63,7 @@ namespace Mps.Application.Features.Shop
                         Stock = p.Stock,
                         Description = p.Description,
                         CategoryId = p.CategoryId,
-                        ModelId = p.ModelId
+                        CategoryName = p.Category?.Name,
                     }).ToList();
 
                     var fileStream = _excelService.ExportToExcel(exportedProducts ?? []);

@@ -28,13 +28,11 @@ namespace Mps.Application.Features.Shop
             public int Row { get; set; }
             public int? Id { get; set; }
             public string? Name { get; set; }
-            public decimal Price { get; set; }
-            public int Stock { get; set; }
+            public string? Price { get; set; }
+            public string? Stock { get; set; }
             public string? Description { get; set; }
-            public int CategoryId { get; set; }
+            public string? CategoryId { get; set; }
             public string? CategoryName { get; set; }
-            public int? ModelId { get; set; }
-            public string? ModelName { get; set; }
             public bool IsSuccess => string.IsNullOrEmpty(Message);
             public string? Message { get; set; }
         }
@@ -43,13 +41,11 @@ namespace Mps.Application.Features.Shop
         {
             public string? Id { get; set; }
             public string? Name { get; set; }
-            public decimal Price { get; set; }
-            public int Stock { get; set; }
+            public string? Price { get; set; }
+            public string? Stock { get; set; }
             public string? Description { get; set; }
-            public int CategoryId { get; set; }
+            public string? CategoryId { get; set; }
             public string? CategoryName { get; set; }
-            public int? ModelId { get; set; }
-            public string? ModelName { get; set; }
         }
 
         public class Handler(IExcelService excelService, MpsDbContext context, ILogger<ImportProducts> logger, IAppLocalizer localizer) : IRequestHandler<Command, CommandResult<Result>>
@@ -76,20 +72,20 @@ namespace Mps.Application.Features.Shop
                     {
                         return CommandResult<Result>.Fail(_localizer["No data found"]);
                     }
+                    var categories = _context.ProductCategories.ToList();
 
                     var results = new List<ExecuteResult>();
                     foreach (var product in importedProducts)
                     {
                         var result = new ExecuteResult
                         {
+                            Id = !string.IsNullOrEmpty(product.Id) ? int.Parse(product.Id) : null,
                             Name = product.Name,
                             Price = product.Price,
                             Stock = product.Stock,
                             Description = product.Description,
                             CategoryId = product.CategoryId,
-                            ModelId = product.ModelId,
                             CategoryName = product.CategoryName,
-                            ModelName = product.ModelName,
                             Row = importedProducts.IndexOf(product) + 1
                         };
 
@@ -100,43 +96,50 @@ namespace Mps.Application.Features.Shop
                             continue;
                         }
 
-                        if (product.Price <= 0)
+                        decimal.TryParse(product.Price, out var price);
+                        if (price <= 0)
                         {
                             result.Message = _localizer["Price must be greater than 0"];
                             results.Add(result);
                             continue;
                         }
 
-                        if (product.Stock < 0)
+                        int.TryParse(product.Stock, out var stock);
+                        if (stock < 0)
                         {
                             result.Message = _localizer["Stock must be greater than or equal to 0"];
                             results.Add(result);
                             continue;
                         }
 
-                        if (product.CategoryId <= 0)
+                        if (string.IsNullOrEmpty(product.CategoryId))
                         {
                             result.Message = _localizer["Category is required"];
                             results.Add(result);
                             continue;
                         }
 
-                        if (product.ModelId.HasValue && product.ModelId <= 0)
+                        int.TryParse(product.CategoryId, out var categoryId);
+                        if (categoryId <= 0)
                         {
-                            result.Message = _localizer["Model is invalid"];
+                            result.Message = _localizer["Category is invalid"];
                             results.Add(result);
                             continue;
                         }
 
-                        var category = await _context.ProductCategories.FirstOrDefaultAsync(x => x.Id == product.CategoryId, cancellationToken);
+                        var category = categories.Find(x => x.Id == categoryId);
                         if (category == null)
                         {
                             result.Message = _localizer["Category is invalid"];
+                            results.Add(result);
+                            continue;
                         }
+
+                        results.Add(result);
                     }
 
-                    var databaseProducts = await _context.Products.ToListAsync(cancellationToken);
-                    var existingProducts = results.Where(c => c.Id != null && c.IsSuccess);
+                    var databaseProducts = await _context.Products.Where(x => x.ShopId == request.ShopId).ToListAsync(cancellationToken);
+                    var existingProducts = results.Where(c => c.Id != null && c.IsSuccess).ToList();
                     foreach (var product in existingProducts)
                     {
                         var existingProduct = databaseProducts.Find(x => x.Id == product.Id);
@@ -147,15 +150,15 @@ namespace Mps.Application.Features.Shop
                         }
 
                         existingProduct.Name = product.Name!;
-                        existingProduct.Price = product.Price;
-                        existingProduct.Stock = product.Stock;
+                        existingProduct.Price = decimal.Parse(product.Price!);
+                        existingProduct.Stock = int.Parse(product.Stock!);
                         existingProduct.Description = product.Description;
-                        existingProduct.CategoryId = product.CategoryId;
-                        existingProduct.ModelId = product.ModelId;
+                        existingProduct.CategoryId = int.Parse(product.CategoryId!);
                         _context.Products.Update(existingProduct);
+                        await _context.SaveChangesAsync(cancellationToken);
                     }
 
-                    var newProducts = results.Where(c => c.Id == null && c.IsSuccess);
+                    var newProducts = results.Where(c => c.Id == null && c.IsSuccess).ToList();
                     foreach (var product in newProducts)
                     {
                         var newProduct = new Product
@@ -165,23 +168,21 @@ namespace Mps.Application.Features.Shop
                             Stock = product.Stock,
                             Description = product.Description,
                             CategoryId = product.CategoryId,
-                            ModelId = product.ModelId
                         };
                         _context.Products.Add(new Domain.Entities.Product
                         {
                             Name = newProduct.Name,
-                            Price = newProduct.Price,
-                            Stock = newProduct.Stock,
+                            Price = decimal.Parse(newProduct.Price!),
+                            Stock = int.Parse(newProduct.Stock!),
                             Description = newProduct.Description,
-                            CategoryId = newProduct.CategoryId,
-                            ModelId = newProduct.ModelId,
+                            CategoryId = int.Parse(newProduct.CategoryId!),
                             ShopId = request.ShopId,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow,
                             IsActive = false,
                         });
+                        await _context.SaveChangesAsync(cancellationToken);
                     }
-                    await _context.SaveChangesAsync(cancellationToken);
 
                     return CommandResult<Result>.Success(new Result
                     {
