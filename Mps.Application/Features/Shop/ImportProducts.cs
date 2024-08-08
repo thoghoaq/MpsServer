@@ -13,6 +13,7 @@ namespace Mps.Application.Features.Shop
     {
         public class Command : IRequest<CommandResult<Result>>
         {
+            public required int ShopId { get; set; }
             public required IFormFile File { get; set; }
         }
 
@@ -136,13 +137,57 @@ namespace Mps.Application.Features.Shop
 
                     var databaseProducts = await _context.Products.ToListAsync(cancellationToken);
                     var existingProducts = results.Where(c => c.Id != null && c.IsSuccess);
+                    foreach (var product in existingProducts)
+                    {
+                        var existingProduct = databaseProducts.Find(x => x.Id == product.Id);
+                        if (existingProduct == null)
+                        {
+                            product.Message = _localizer["Product not found"];
+                            continue;
+                        }
+
+                        existingProduct.Name = product.Name!;
+                        existingProduct.Price = product.Price;
+                        existingProduct.Stock = product.Stock;
+                        existingProduct.Description = product.Description;
+                        existingProduct.CategoryId = product.CategoryId;
+                        existingProduct.ModelId = product.ModelId;
+                        _context.Products.Update(existingProduct);
+                    }
+
+                    var newProducts = results.Where(c => c.Id == null && c.IsSuccess);
+                    foreach (var product in newProducts)
+                    {
+                        var newProduct = new Product
+                        {
+                            Name = product.Name!,
+                            Price = product.Price,
+                            Stock = product.Stock,
+                            Description = product.Description,
+                            CategoryId = product.CategoryId,
+                            ModelId = product.ModelId
+                        };
+                        _context.Products.Add(new Domain.Entities.Product
+                        {
+                            Name = newProduct.Name,
+                            Price = newProduct.Price,
+                            Stock = newProduct.Stock,
+                            Description = newProduct.Description,
+                            CategoryId = newProduct.CategoryId,
+                            ModelId = newProduct.ModelId,
+                            ShopId = request.ShopId,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            IsActive = false,
+                        });
+                    }
+                    await _context.SaveChangesAsync(cancellationToken);
 
                     return CommandResult<Result>.Success(new Result
                     {
                         Message = _localizer["Import success"],
                         Results = results
                     });
-
                 }
                 catch (Exception ex)
                 {

@@ -126,6 +126,18 @@ namespace Mps.Api.Controllers
             return File(content, contentType, fileName);
         }
 
+        [Auth(Roles = ["ShopOwner"])]
+        [HttpPost]
+        [Route("products/import")]
+        public async Task<IActionResult> ImportProducts([FromForm] ImportProducts.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                Reason = result.FailureReason
+            });
+        }
+
         [Auth(Roles = ["ShopOwner", "Staff"])]
         [HttpGet]
         [Route("orders")]
