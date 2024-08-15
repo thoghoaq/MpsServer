@@ -2,6 +2,7 @@
 using Mps.Infrastructure.Dependencies.VnPay.Helpers;
 using Mps.Infrastructure.Dependencies.VnPay.Models;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Mps.Infrastructure.Dependencies.VnPay
@@ -122,6 +123,51 @@ namespace Mps.Infrastructure.Dependencies.VnPay
         public bool IsSuccessResponse(string responseCode)
         {
             return responseCode.Equals("00", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public async Task<string> RefundPaymentAsync(string secretKey, string tmnCode, string vnpUrl, string txnRef, long amount, string transactionNo, string orderInfo)
+        {
+            var parameters = new SortedDictionary<string, string>
+            {
+                { "vnp_Version", "2.1.0" },
+                { "vnp_Command", "refund" },
+                { "vnp_TmnCode", tmnCode },
+                { "vnp_TxnRef", txnRef },
+                { "vnp_Amount", (amount * 100).ToString() }, // Amount in VND * 100
+                { "vnp_TransactionNo", transactionNo },
+                { "vnp_OrderInfo", orderInfo },
+                { "vnp_CreateDate", DateTime.UtcNow.ToString("yyyyMMddHHmmss") }
+            };
+            string queryString = GenerateQueryString(parameters);
+            string secureHash = GenerateSignature(queryString, secretKey);
+            parameters.Add("vnp_SecureHash", secureHash);
+
+            using var httpClient = new HttpClient();
+            var content = new FormUrlEncodedContent(parameters);
+            HttpResponseMessage response = await httpClient.PostAsync(vnpUrl, content);
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            return responseContent;
+        }
+
+        private static string GenerateQueryString(SortedDictionary<string, string> parameters)
+        {
+            StringBuilder data = new();
+            foreach (var item in parameters)
+            {
+                if (!string.IsNullOrEmpty(item.Value))
+                {
+                    data.Append(WebUtility.UrlEncode(item.Key) + "=" + WebUtility.UrlEncode(item.Value) + "&");
+                }
+            }
+            return data.ToString();
+        }
+
+        private static string GenerateSignature(string rawData, string secretKey)
+        {
+            using var hmacsha512 = new HMACSHA512(Encoding.UTF8.GetBytes(secretKey));
+            byte[] hash = hmacsha512.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+            return BitConverter.ToString(hash).Replace("-", "").ToLower();
         }
     }
 }

@@ -198,5 +198,17 @@ namespace Mps.Api.Controllers
                 reason = result.FailureReason
             });
         }
+
+        [Auth(Roles = ["Admin"])]
+        [HttpPost]
+        [Route("refund-order")]
+        public async Task<IActionResult> RefundOrder([FromBody] RefundOrder.Command command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result.Payload) : BadRequest(new
+            {
+                reason = result.FailureReason
+            });
+        }
     }
 }

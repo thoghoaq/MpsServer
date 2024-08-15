@@ -19,6 +19,8 @@
         public int? PaymentSignatureId { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public string? TransactionNo { get; set; }
+        public string? OrderInfo { get; set; }
 
         public virtual ICollection<PaymentRef> PaymentRefs { get; set; }
         public PaymentStatus? PaymentStatus { get; set; }

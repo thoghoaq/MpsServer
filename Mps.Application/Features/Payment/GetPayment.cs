@@ -82,6 +82,8 @@ namespace Mps.Application.Features.Payment
                         paymentResult.Signature = payment.PaymentSignature?.SignValue;
 
                         payment.PaymentStatusId = (int)Domain.Enums.PaymentStatus.Success;
+                        payment.TransactionNo = request.Vnp_TransactionNo;
+                        payment.OrderInfo = request.Vnp_OrderInfo;
 
                         var orderDetails = _dbContext.OrderDetails
                             .Include(x => x.Product)
