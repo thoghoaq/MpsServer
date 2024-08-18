@@ -125,18 +125,24 @@ namespace Mps.Infrastructure.Dependencies.VnPay
             return responseCode.Equals("00", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public async Task<string> RefundPaymentAsync(string secretKey, string tmnCode, string vnpUrl, string txnRef, long amount, string transactionNo, string orderInfo)
+        public async Task<string> RefundPaymentAsync(string secretKey, string tmnCode, string vnpUrl, string txnRef, long amount, string orderInfo, string transactionNo, string transactionDate, string createBy, string ipAddress)
         {
-            var parameters = new SortedDictionary<string, string>
+            var requestId = Guid.NewGuid().ToString();
+            var parameters = new Dictionary<string, string>
             {
+                { "vnp_RequestId", requestId },
                 { "vnp_Version", "2.1.0" },
                 { "vnp_Command", "refund" },
                 { "vnp_TmnCode", tmnCode },
+                { "vnp_TransactionType", "03" },
                 { "vnp_TxnRef", txnRef },
                 { "vnp_Amount", (amount * 100).ToString() }, // Amount in VND * 100
-                { "vnp_TransactionNo", transactionNo },
                 { "vnp_OrderInfo", orderInfo },
-                { "vnp_CreateDate", DateTime.UtcNow.ToString("yyyyMMddHHmmss") }
+                { "vnp_TransactionNo", transactionNo },
+                { "vnp_TransactionDate", transactionDate },
+                { "vnp_CreateBy", createBy },
+                { "vnp_CreateDate", DateTime.UtcNow.ToString("yyyyMMddHHmmss") },
+                { "vnp_IpAddr", ipAddress }
             };
             string queryString = GenerateQueryString(parameters);
             string secureHash = GenerateSignature(queryString, secretKey);
@@ -150,17 +156,17 @@ namespace Mps.Infrastructure.Dependencies.VnPay
             return responseContent;
         }
 
-        private static string GenerateQueryString(SortedDictionary<string, string> parameters)
+        private static string GenerateQueryString(Dictionary<string, string> parameters)
         {
             StringBuilder data = new();
             foreach (var item in parameters)
             {
                 if (!string.IsNullOrEmpty(item.Value))
                 {
-                    data.Append(WebUtility.UrlEncode(item.Key) + "=" + WebUtility.UrlEncode(item.Value) + "&");
+                    data.Append(item.Value + "|");
                 }
             }
-            return data.ToString();
+            return data.ToString().Remove(data.Length - 1, 1);
         }
 
         private static string GenerateSignature(string rawData, string secretKey)

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Abstractions.Payment;
 using Mps.Application.Commons;
@@ -22,7 +23,7 @@ namespace Mps.Application.Features.Payment
             public string? Message { get; set; }
         }
 
-        public class Handler(MpsDbContext context, ILogger<RefundOrder> logger, IAppLocalizer localizer, IVnPayService vnPayService, IConfiguration configuration) : IRequestHandler<Command, CommandResult<Result>>
+        public class Handler(MpsDbContext context, ILogger<RefundOrder> logger, IAppLocalizer localizer, IVnPayService vnPayService, IConfiguration configuration, ILoggedUser loggedUser) : IRequestHandler<Command, CommandResult<Result>>
         {
             public async Task<CommandResult<Result>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -58,13 +59,24 @@ namespace Mps.Application.Features.Payment
                     var vnpSecretKey = configuration["VnPay:HashSecret"]!;
                     var vnpTmnCode = configuration["VnPay:TmnCode"]!;
                     var vnpUrl = configuration["VnPay:RefundApi"]!;
-                    var refundResult = await vnPayService.RefundPaymentAsync(vnpSecretKey, vnpTmnCode, vnpUrl, payment.Id.ToString(), (int)order.TotalAmount, payment.TransactionNo, payment.OrderInfo);
-                    if (refundResult == null)
+                    var refundResult = await vnPayService.RefundPaymentAsync(
+                        vnpSecretKey,
+                        vnpTmnCode,
+                        vnpUrl,
+                        payment.Id.ToString(),
+                        (long)order.TotalAmount,
+                        localizer[$"Refund for order "] + order.Id,
+                        payment.TransactionNo,
+                        payment.PaymentDate!.Value.ToString("yyyyMMddHHmmss"),
+                        loggedUser.FullName,
+                        loggedUser.IpAddress
+                        );
+                    if (!refundResult.Contains("vnp_ResponseCode"))
                     {
-                        return CommandResult<Result>.Fail(localizer["Refund failed"]);
+                        return CommandResult<Result>.Fail(localizer["Error has occur"]);
                     }
                     var refundJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(refundResult)!;
-                    if (refundJson["RspCode"] != "00")
+                    if (refundJson["vnp_ResponseCode"] != "00")
                     {
                         return CommandResult<Result>.Fail(localizer["Refund failed"]);
                     }

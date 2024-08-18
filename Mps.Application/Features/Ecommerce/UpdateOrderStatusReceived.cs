@@ -38,7 +38,7 @@ namespace Mps.Application.Features.Ecommerce
                         return CommandResult<Result>.Fail(localizer["Order status is not Delivered"]);
                     }
 
-                    order.OrderStatusId = (int)Domain.Enums.OrderStatus.Received;
+                    order.OrderStatusId = (int)Domain.Enums.OrderStatus.Completed;
                     order.ReceivedAt = DateTime.UtcNow;
                     await dbContext.SaveChangesAsync(cancellationToken);
 
