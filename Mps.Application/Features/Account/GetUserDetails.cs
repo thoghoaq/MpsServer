@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Mps.Application.Abstractions.Authentication;
 using Mps.Application.Abstractions.Localization;
 using Mps.Application.Commons;
-using Mps.Domain.Enums;
 using Mps.Domain.Entities;
-using Mps.Domain.Extensions;
 
 namespace Mps.Application.Features.Account
 {
@@ -30,12 +28,17 @@ namespace Mps.Application.Features.Account
 
         public class CustomerData
         {
-            
+
         }
 
         public class ShopOwnerData
         {
-
+            public int UserId { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime? UpdatedAt { get; set; }
+            public string? IdentityFrontImage { get; set; }
+            public string? IdentityBackImage { get; set; }
+            public string? TaxNumber { get; set; }
         }
 
         public class StaffData
@@ -79,11 +82,16 @@ namespace Mps.Application.Features.Account
                     Role = user.Role,
                     CustomerData = user.Customer != null ? new CustomerData
                     {
-                        
+
                     } : null,
                     ShopOwnerData = user.ShopOwner != null ? new ShopOwnerData
                     {
-                        
+                        UserId = user.ShopOwner.UserId,
+                        CreatedAt = user.ShopOwner.CreatedAt,
+                        UpdatedAt = user.ShopOwner.UpdatedAt,
+                        IdentityFrontImage = user.ShopOwner.IdentityFrontImage,
+                        IdentityBackImage = user.ShopOwner.IdentityBackImage,
+                        TaxNumber = user.ShopOwner.TaxNumber
                     } : null,
                     StaffData = user.Staff != null ? new StaffData
                     {
