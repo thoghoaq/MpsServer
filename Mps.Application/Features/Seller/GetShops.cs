@@ -50,62 +50,63 @@ namespace Mps.Application.Features.Seller
         {
             public int ShopId { get; set; }
             public int ProcessingOrderCount { get; set; }
+        }
 
-            public class QueryHandler(MpsDbContext context, ILoggedUser loggedUser) : IRequestHandler<Query, CommandResult<Result>>
+        public class QueryHandler(MpsDbContext context, ILoggedUser loggedUser) : IRequestHandler<Query, CommandResult<Result>>
+        {
+            private readonly MpsDbContext _context = context;
+
+            public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
             {
-                private readonly MpsDbContext _context = context;
-
-                public async Task<CommandResult<Result>> Handle(Query request, CancellationToken cancellationToken)
+                var query = _context.Shops
+                    .Where(s => s.ShopOwnerId == loggedUser.UserId)
+                    .Where(s => request.Filter == null
+                        || s.ShopName.Contains(request.Filter)
+                     )
+                    .AsQueryable();
+                if (request.PageNumber.HasValue && request.PageSize.HasValue)
                 {
-                    var query = _context.Shops
-                        .Where(s => s.ShopOwnerId == loggedUser.UserId)
-                        .Where(s => request.Filter == null
-                            || s.ShopName.Contains(request.Filter)
-                         )
-                        .AsQueryable();
-                    if (request.PageNumber.HasValue && request.PageSize.HasValue)
-                    {
-                        query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
-                    }
-                    var shops = await query
-                        .OrderByDescending(s => s.UpdatedAt)
-                        .ToListAsync(cancellationToken: cancellationToken);
-
-                    var shopOrdersProcessingCount = _context.Orders
-                        .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Processing)
-                        .GroupBy(o => o.ShopId)
-                        .Select(g => new ShopOrderCount
-                        {
-                            ShopId = g.Key,
-                            ProcessingOrderCount = g.Count()
-                        }).ToList();
-
-                    return CommandResult<Result>.Success(new Result
-                    {
-                        Shops = shops.Select(s => new ShopResult
-                        {
-                            Address = s.Address,
-                            Avatar = s.Avatar,
-                            City = s.City,
-                            Comment = s.Comment,
-                            Cover = s.Cover,
-                            CreatedAt = s.CreatedAt,
-                            District = s.District,
-                            Description = s.Description,
-                            Id = s.Id,
-                            IsActive = s.IsActive,
-                            IsAccepted = s.IsAccepted,
-                            Latitude = s.Latitude,
-                            Longitude = s.Longitude,
-                            PayPalAccount = s.PayPalAccount,
-                            PhoneNumber = s.PhoneNumber,
-                            ShopName = s.ShopName,
-                            ShopOwnerId = s.ShopOwnerId,
-                            UpdatedAt = s.UpdatedAt,
-                            ProcessingOrderCount = shopOrdersProcessingCount.Find(x => x.ShopId == s.Id)?.ProcessingOrderCount ?? 0
-                        }).ToList()
-                    });
+                    query = query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value);
                 }
+                var shops = await query
+                    .OrderByDescending(s => s.UpdatedAt)
+                    .ToListAsync(cancellationToken: cancellationToken);
+
+                var shopOrdersProcessingCount = _context.Orders
+                    .Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Processing)
+                    .GroupBy(o => o.ShopId)
+                    .Select(g => new ShopOrderCount
+                    {
+                        ShopId = g.Key,
+                        ProcessingOrderCount = g.Count()
+                    }).ToList();
+
+                return CommandResult<Result>.Success(new Result
+                {
+                    Shops = shops.Select(s => new ShopResult
+                    {
+                        Address = s.Address,
+                        Avatar = s.Avatar,
+                        City = s.City,
+                        Comment = s.Comment,
+                        Cover = s.Cover,
+                        CreatedAt = s.CreatedAt,
+                        District = s.District,
+                        Description = s.Description,
+                        Id = s.Id,
+                        IsActive = s.IsActive,
+                        IsAccepted = s.IsAccepted,
+                        Latitude = s.Latitude,
+                        Longitude = s.Longitude,
+                        PayPalAccount = s.PayPalAccount,
+                        PhoneNumber = s.PhoneNumber,
+                        ShopName = s.ShopName,
+                        ShopOwnerId = s.ShopOwnerId,
+                        UpdatedAt = s.UpdatedAt,
+                        ProcessingOrderCount = shopOrdersProcessingCount.Find(x => x.ShopId == s.Id)?.ProcessingOrderCount ?? 0
+                    }).ToList()
+                });
             }
         }
     }
+}
