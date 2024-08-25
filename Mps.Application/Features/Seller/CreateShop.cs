@@ -25,6 +25,7 @@ namespace Mps.Application.Features.Seller
             public string? Description { get; set; }
             public string? Avatar { get; set; }
             public string? Cover { get; set; }
+            public string? BusinessLicenseImage { get; set; }
         }
 
         public class Result
@@ -60,6 +61,7 @@ namespace Mps.Application.Features.Seller
                         IsActive = false,
                         IsAccepted = true,
                         PayPalAccount = request.PayPalAccount,
+                        BusinessLicenseImage = request.BusinessLicenseImage,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
                     };

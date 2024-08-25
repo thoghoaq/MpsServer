@@ -24,6 +24,7 @@ namespace Mps.Application.Features.Seller
             public string? Description { get; set; }
             public string? Avatar { get; set; }
             public string? Cover { get; set; }
+            public string? BusinessLicenseImage { get; set; }
         }
 
         public class Result
@@ -106,6 +107,11 @@ namespace Mps.Application.Features.Seller
                     if (request.Cover != null)
                     {
                         shop.Cover = request.Cover;
+                    }
+
+                    if (request.BusinessLicenseImage != null)
+                    {
+                        shop.BusinessLicenseImage = request.BusinessLicenseImage;
                     }
 
                     shop.UpdatedAt = DateTime.UtcNow;
