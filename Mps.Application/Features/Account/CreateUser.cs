@@ -135,10 +135,13 @@ namespace Mps.Application.Features.Account
                     _context.Add(user);
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    await _mediator.Send(new SendPasswordResetEmail.Command
+                    if (request.Role == Role.Staff.GetDescription())
                     {
-                        Email = request.Email
-                    });
+                        await _mediator.Send(new SendPasswordResetEmail.Command
+                        {
+                            Email = request.Email
+                        });
+                    }
 
                     return CommandResult<Result>.Success(new Result { Message = _localizer["Successfully created new user"] });
                 }
