@@ -18,6 +18,7 @@ namespace Mps.Application.Features.Account
             public string? AvatarPath { get; set; }
             public StaffData? StaffData { get; set; }
             public CustomerData? CustomerData { get; set; }
+            public ShopOwnerData? ShopOwnerData { get; set; }
         }
 
         public class Result
@@ -39,6 +40,13 @@ namespace Mps.Application.Features.Account
             public string? Address { get; set; }
         }
 
+        public record ShopOwnerData
+        {
+            public string? IdentityFrontImage { get; set; }
+            public string? IdentityBackImage { get; set; }
+            public string? TaxNumber { get; set; }
+        }
+
         public class Handler(ILoggedUser loggedUser, ILogger<UpdateUser> logger, IAppLocalizer localizer, MpsDbContext dbContext) : IRequestHandler<Command, CommandResult<Result>>
         {
             private readonly ILogger<UpdateUser> _logger = logger;
@@ -58,6 +66,7 @@ namespace Mps.Application.Features.Account
                     var user = await _dbContext.Users
                         .Include(x => x.Staff)
                         .Include(x => x.Customer)
+                        .Include(x => x.ShopOwner)
                         .Where(x => x.Id == request.UserId)
                         .FirstOrDefaultAsync(cancellationToken);
                     if (user == null)
@@ -81,6 +90,14 @@ namespace Mps.Application.Features.Account
                     {
                         user.Customer.Address = request.CustomerData?.Address ?? user.Customer.Address;
                         user.Customer.UpdatedAt = DateTime.UtcNow;
+                    }
+
+                    if (user.ShopOwner != null)
+                    {
+                        user.ShopOwner.IdentityFrontImage = request.ShopOwnerData?.IdentityFrontImage ?? user.ShopOwner.IdentityFrontImage;
+                        user.ShopOwner.IdentityBackImage = request.ShopOwnerData?.IdentityBackImage ?? user.ShopOwner.IdentityBackImage;
+                        user.ShopOwner.TaxNumber = request.ShopOwnerData?.TaxNumber ?? user.ShopOwner.TaxNumber;
+                        user.ShopOwner.UpdatedAt = DateTime.UtcNow;
                     }
                     await _dbContext.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = _localizer["User updated successfully"] });

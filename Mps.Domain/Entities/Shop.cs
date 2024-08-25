@@ -21,6 +21,7 @@
         public string? Cover { get; set; }
         public bool IsActive { get; set; }
         public bool IsAccepted { get; set; }
+        public string? BusinessLicenseImage { get; set; }
 
         public string? PayPalAccount { get; set; }
 
