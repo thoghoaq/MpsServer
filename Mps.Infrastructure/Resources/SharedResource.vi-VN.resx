@@ -360,4 +360,7 @@
   <data name="Error updating order status" xml:space="preserve">
     <value>Có lỗi xảy ra khi đổi trạng thái đơn hàng</value>
   </data>
+  <data name="Category had products" xml:space="preserve">
+    <value>Danh mục đã có sản phẩm</value>
+  </data>
 </root>

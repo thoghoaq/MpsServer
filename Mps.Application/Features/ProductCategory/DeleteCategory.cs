@@ -29,6 +29,10 @@ namespace Mps.Application.Features.ProductCategory
                     {
                         return CommandResult<Result>.Fail(localizer["Category not found"]);
                     }
+                    if (dbContext.Products.Any(p => p.CategoryId == category.Id))
+                    {
+                        return CommandResult<Result>.Fail(localizer["Category had products"]);
+                    }
                     category.IsDeleted = true;
                     await dbContext.SaveChangesAsync(cancellationToken);
                     return CommandResult<Result>.Success(new Result { Message = localizer["Category deleted successfully"] });
