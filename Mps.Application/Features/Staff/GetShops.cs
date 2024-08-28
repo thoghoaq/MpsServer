@@ -43,6 +43,9 @@ namespace Mps.Application.Features.Staff
                                 {
                                     UserId = y.u.UserId,
                                     User = y.x,
+                                    IdentityBackImage = y.u.IdentityBackImage,
+                                    IdentityFrontImage = y.u.IdentityFrontImage,
+                                    TaxNumber = y.u.TaxNumber,
                                     CreatedAt = y.u.CreatedAt,
                                     UpdatedAt = y.u.UpdatedAt,
                                 }
@@ -68,6 +71,7 @@ namespace Mps.Application.Features.Staff
                             Longitude = s.s.Longitude,
                             PayPalAccount = s.s.PayPalAccount,
                             Comment = s.s.Comment,
+                            BusinessLicenseImage = s.s.BusinessLicenseImage,
                         })
                         .Where(s => s.IsActive)
                         .AsEnumerable()

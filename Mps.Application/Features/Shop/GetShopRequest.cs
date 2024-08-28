@@ -45,6 +45,9 @@ namespace Mps.Application.Features.Shop
                                     User = y.x,
                                     CreatedAt = y.u.CreatedAt,
                                     UpdatedAt = y.u.UpdatedAt,
+                                    IdentityBackImage = y.u.IdentityBackImage,
+                                    IdentityFrontImage = y.u.IdentityFrontImage,
+                                    TaxNumber = y.u.TaxNumber,
                                 }
                             ), s => s.ShopOwnerId, so => so.UserId, (s, so) => new { s, so })
                         .Select(s => new ShopResult
@@ -68,6 +71,7 @@ namespace Mps.Application.Features.Shop
                             Longitude = s.s.Longitude,
                             PayPalAccount = s.s.PayPalAccount,
                             Comment = s.s.Comment,
+                            BusinessLicenseImage = s.s.BusinessLicenseImage,
                         })
                         .Where(s => !s.IsActive)
                         .Where(s => request.Filter == null || s.ShopName.Contains(request.Filter));
