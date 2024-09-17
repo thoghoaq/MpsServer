@@ -74,7 +74,8 @@ namespace Mps.Application.Features.Account
                     var existUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
                     if (existUser != null)
                     {
-                        return await AppendNewRole(existUser, request, cancellationToken);
+                        return CommandResult<Result>.Fail(_localizer["Email is existed"]);
+                        //return await AppendNewRole(existUser, request, cancellationToken);
                     }
                     return await CreateNewUser(request, cancellationToken);
                 }
