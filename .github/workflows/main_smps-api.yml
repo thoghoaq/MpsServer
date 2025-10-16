@@ -12,46 +12,25 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-          include-prerelease: true
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: App Settings Variable Substitution
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: '${{env.DOTNET_ROOT}}\myapp\appsettings.json'
-        env:
-          ConnectionStrings.DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
-          FirebaseAdminSdk: ${{ secrets.FIREBASE_ADMIN_SDK }}
-          Authentication.TokenUri: ${{ secrets.AUTHENTICATION_TOKEN_URI }}
-          Authentication.RefreshUri: ${{ secrets.AUTHENTICATION_REFRESH_URI }}
-          Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
-          Authentication.ValidIssuer: ${{ secrets.AUTHENTICATION_VALID_ISSUER }}
-          HangfireKey: ${{ secrets.HANGFIRE_KEY }}
-          VnPay.HashSecret: ${{ secrets.VNPAY_SECRET_KEY }}
-          VnPay.TmnCode: ${{ secrets.VNPAY_TMN_CODE }}
-          FirebaseStorage.Bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
-          FirebaseStorage.ApiKey: ${{ secrets.FIREBASE_STORAGE_API_KEY }}
-          Email.Smtp.FromEmail: ${{ secrets.EMAIL_SMTP_FROM_EMAIL }}
-          Email.Smtp.Password: ${{ secrets.EMAIL_SMTP_PASSWORD }}
-          PayPal.ClientId: ${{ secrets.PAYPAL_CLIENT_ID }}
-          PayPal.Secret: ${{ secrets.PAYPAL_SECRET }}
-          CurrencyConverter.BaseUrl: ${{ secrets.CURRENCY_CONVERTER_BASE_URL }}
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
@@ -59,28 +38,26 @@ jobs:
   deploy:
     runs-on: windows-latest
     needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: .net-app
       
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_CE2A20073B0645FC9E8460B6745F6349 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B0D134FB9D564DAB99D85679DCC62B62 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_52F1373FB2504ED3A0FA50C4974D7E25 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_44F871376B1540E0AD82E4F68F666CDA }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2BF68E6A21F241CE830FDA9E7620475A }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B7B0CD2B693A40269821DE7B2E64F731 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'smps-api'
           slot-name: 'Production'
