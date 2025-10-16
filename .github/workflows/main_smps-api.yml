@@ -28,6 +28,28 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{env.DOTNET_ROOT}}\myapp\appsettings.json'
+        env:
+          ConnectionStrings.DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
+          FirebaseAdminSdk: ${{ secrets.FIREBASE_ADMIN_SDK }}
+          Authentication.TokenUri: ${{ secrets.AUTHENTICATION_TOKEN_URI }}
+          Authentication.RefreshUri: ${{ secrets.AUTHENTICATION_REFRESH_URI }}
+          Authentication.Audience: ${{ secrets.AUTHENTICATION_AUDIENCE }}
+          Authentication.ValidIssuer: ${{ secrets.AUTHENTICATION_VALID_ISSUER }}
+          HangfireKey: ${{ secrets.HANGFIRE_KEY }}
+          VnPay.HashSecret: ${{ secrets.VNPAY_SECRET_KEY }}
+          VnPay.TmnCode: ${{ secrets.VNPAY_TMN_CODE }}
+          FirebaseStorage.Bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FirebaseStorage.ApiKey: ${{ secrets.FIREBASE_STORAGE_API_KEY }}
+          Email.Smtp.FromEmail: ${{ secrets.EMAIL_SMTP_FROM_EMAIL }}
+          Email.Smtp.Password: ${{ secrets.EMAIL_SMTP_PASSWORD }}
+          PayPal.ClientId: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PayPal.Secret: ${{ secrets.PAYPAL_SECRET }}
+          CurrencyConverter.BaseUrl: ${{ secrets.CURRENCY_CONVERTER_BASE_URL }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -62,4 +84,5 @@ jobs:
           app-name: 'smps-api'
           slot-name: 'Production'
           package: .
+
           
